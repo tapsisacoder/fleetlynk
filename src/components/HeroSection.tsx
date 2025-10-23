@@ -1,5 +1,7 @@
+import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import { ArrowRight, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
+import heroTruck from "@/assets/hero-truck.jpg";
 
 export const HeroSection = () => {
   const scrollToForm = () => {
@@ -8,57 +10,98 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-[600px] md:min-h-[700px] bg-gradient-to-br from-primary via-primary to-[hsl(221,47%,12%)] text-white overflow-hidden">
-      {/* Floating shapes */}
-      <div className="absolute inset-0 overflow-hidden opacity-10">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-accent rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent rounded-full blur-3xl animate-float delay-500"></div>
-        <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-white rounded-full blur-3xl animate-float delay-300"></div>
+    <section className="relative min-h-[90vh] overflow-hidden">
+      {/* Hero truck image background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${heroTruck})` }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/60" />
       </div>
 
-      <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
+      <div className="container relative z-10 mx-auto px-4 py-24 md:py-32">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent rounded-full mb-8 animate-fade-in-up animate-pulse-subtle">
-            <span className="text-sm font-bold">⚡ Founding Fleet: Limited Spots</span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in-up delay-100">
-            No Hardware. No Hassle.
+          {/* Hero headline with spring animation */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 100, damping: 15, mass: 0.8 }}
+            className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+          >
+            No Hardware.
+            <br />
+            No Hassle.
             <br />
             <span className="text-accent">Just Control.</span>
-          </h1>
+          </motion.h1>
 
           {/* Subheadline */}
-          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto animate-fade-in-up delay-200">
-            Track your fleet using drivers' phones. Free pilot. Launching January 2026.
-          </p>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 100, 
+              damping: 15, 
+              mass: 0.8,
+              delay: 0.2 
+            }}
+            className="text-xl md:text-2xl text-white/90 mb-6 max-w-2xl mx-auto"
+          >
+            Track your fleet using drivers' phones. Free pilot starting next year.
+          </motion.p>
+
+          {/* Urgency badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 200, 
+              damping: 15, 
+              bounce: 0.4,
+              delay: 0.3 
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent rounded-full mb-8"
+          >
+            <span className="text-sm font-bold text-white">🔥 Applications close end of year</span>
+          </motion.div>
 
           {/* CTA Button */}
-          <Button 
-            variant="hero" 
-            size="xl"
-            onClick={scrollToForm}
-            className="mb-6 animate-fade-in-up delay-300"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 100, 
+              damping: 15,
+              delay: 0.4 
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mb-6"
           >
-            Join the Founding Fleet
-            <ArrowRight className="ml-2" />
-          </Button>
+            <Button 
+              variant="hero" 
+              size="xl"
+              onClick={scrollToForm}
+              className="shadow-2xl"
+            >
+              Join the Founding Fleet
+            </Button>
+          </motion.div>
 
           {/* Trust line */}
-          <div className="flex items-center justify-center gap-2 text-sm text-white/70 animate-fade-in-up delay-400">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex items-center justify-center gap-2 text-sm text-white/70"
+          >
             <Shield className="w-4 h-4" />
-            <span>Your data is encrypted and never shared</span>
-          </div>
+            <span>Data encrypted • Never shared</span>
+          </motion.div>
         </div>
-      </div>
-
-      {/* Bottom wave decoration */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-          <path d="M0 0L60 10C120 20 240 40 360 46.7C480 53 600 47 720 43.3C840 40 960 40 1080 46.7C1200 53 1320 67 1380 73.3L1440 80V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V0Z" fill="white"/>
-        </svg>
       </div>
     </section>
   );

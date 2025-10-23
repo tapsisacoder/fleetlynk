@@ -1,0 +1,450 @@
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Check, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+import { storage } from "@/lib/storage";
+
+interface FormData {
+  region: string;
+  trucks: string;
+  biggestPain: string;
+  priorityFactor: string;
+  mustHaveFeature: string;
+  company: string;
+  email: string;
+  whatsapp: string;
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
+
+export const ApplicationFormNew = () => {
+  const [formData, setFormData] = useState<FormData>({
+    region: "",
+    trucks: "",
+    biggestPain: "",
+    priorityFactor: "",
+    mustHaveFeature: "",
+    company: "",
+    email: "",
+    whatsapp: ""
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.region) newErrors.region = "Please select your region";
+    if (!formData.trucks) newErrors.trucks = "Please select fleet size";
+    if (formData.biggestPain.length < 20) newErrors.biggestPain = "Please write at least 20 characters";
+    if (!formData.priorityFactor) newErrors.priorityFactor = "Please select your priority";
+    if (formData.mustHaveFeature.length < 15) newErrors.mustHaveFeature = "Please write at least 15 characters";
+    if (!formData.company) newErrors.company = "Company name is required";
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+    }
+    if (!formData.whatsapp || formData.whatsapp.length < 10) {
+      newErrors.whatsapp = "Please enter a valid WhatsApp number";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields correctly");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const applicationData = {
+        id: `founding_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        ...formData
+      };
+
+      await storage.set(`founding:${Date.now()}`, JSON.stringify(applicationData));
+      
+      setIsSuccess(true);
+      toast.success("Application submitted successfully!");
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Something went wrong. Please WhatsApp us directly.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleReset = () => {
+    setIsSuccess(false);
+    setFormData({
+      region: "",
+      trucks: "",
+      biggestPain: "",
+      priorityFactor: "",
+      mustHaveFeature: "",
+      company: "",
+      email: "",
+      whatsapp: ""
+    });
+    setErrors({});
+  };
+
+  return (
+    <section id="application-form" className="py-20 bg-white">
+      <div className="container mx-auto px-4">
+        <AnimatePresence mode="wait">
+          {!isSuccess ? (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ type: "spring", stiffness: 80, damping: 20 }}
+              className="max-w-2xl mx-auto border border-gray-200 rounded-xl shadow-lg p-8"
+            >
+              <div className="text-center mb-8">
+                <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                  Apply in 2 Minutes
+                </h2>
+                <p className="text-gray-600">
+                  5 questions. We'll contact you within 5 business days.
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Question 1: Region */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <Label className="text-primary font-semibold">Where do you operate?</Label>
+                  <RadioGroup
+                    value={formData.region}
+                    onValueChange={(value) => setFormData({ ...formData, region: value })}
+                    className="mt-2 space-y-2"
+                  >
+                    {["🇿🇦 South Africa", "🇿🇼 Zimbabwe", "🌍 Both SA & Zimbabwe", "🌍 Other Southern Africa"].map((option) => (
+                      <div key={option} className="flex items-center space-x-2">
+                        <RadioGroupItem value={option} id={option} />
+                        <Label htmlFor={option} className="cursor-pointer">{option}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                  {errors.region && (
+                    <motion.p
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-red-500 text-sm mt-1 flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.region}
+                    </motion.p>
+                  )}
+                </motion.div>
+
+                {/* Question 2: Fleet Size */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Label className="text-primary font-semibold">How many trucks?</Label>
+                  <RadioGroup
+                    value={formData.trucks}
+                    onValueChange={(value) => setFormData({ ...formData, trucks: value })}
+                    className="mt-2 space-y-2"
+                  >
+                    {["1-5 trucks", "6-15 trucks", "16-50 trucks", "50+ trucks"].map((option) => (
+                      <div key={option} className="flex items-center space-x-2">
+                        <RadioGroupItem value={option} id={option} />
+                        <Label htmlFor={option} className="cursor-pointer">{option}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                  {errors.trucks && (
+                    <motion.p
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-red-500 text-sm mt-1 flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.trucks}
+                    </motion.p>
+                  )}
+                </motion.div>
+
+                {/* Question 3: Biggest Pain */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Label htmlFor="biggestPain" className="text-primary font-semibold">
+                    What's your biggest daily headache?
+                  </Label>
+                  <Textarea
+                    id="biggestPain"
+                    placeholder="e.g., Fuel vanishes, drivers don't answer, maintenance chaos"
+                    rows={3}
+                    value={formData.biggestPain}
+                    onChange={(e) => setFormData({ ...formData, biggestPain: e.target.value })}
+                    className="mt-2"
+                  />
+                  <p className="text-gray-500 text-sm mt-1">
+                    {formData.biggestPain.length}/20 minimum
+                  </p>
+                  {errors.biggestPain && (
+                    <motion.p
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-red-500 text-sm mt-1 flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.biggestPain}
+                    </motion.p>
+                  )}
+                </motion.div>
+
+                {/* Question 4: Priority */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <Label className="text-primary font-semibold">
+                    What matters most in fleet software?
+                  </Label>
+                  <p className="text-gray-500 text-sm italic mt-1">This helps us understand your priorities</p>
+                  <RadioGroup
+                    value={formData.priorityFactor}
+                    onValueChange={(value) => setFormData({ ...formData, priorityFactor: value })}
+                    className="mt-2 space-y-2"
+                  >
+                    {[
+                      "Affordable with flexible payment",
+                      "Reliable with no downtime",
+                      "Simple and easy to use",
+                      "Great support when I need help",
+                      "Integrates with my existing systems"
+                    ].map((option) => (
+                      <div key={option} className="flex items-center space-x-2">
+                        <RadioGroupItem value={option} id={option} />
+                        <Label htmlFor={option} className="cursor-pointer">{option}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                  {errors.priorityFactor && (
+                    <motion.p
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-red-500 text-sm mt-1 flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.priorityFactor}
+                    </motion.p>
+                  )}
+                </motion.div>
+
+                {/* Question 5: Must-Have Feature */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Label htmlFor="mustHaveFeature" className="text-primary font-semibold">
+                    One feature that would make this essential?
+                  </Label>
+                  <Textarea
+                    id="mustHaveFeature"
+                    placeholder="e.g., Real-time fuel alerts, driver scoring, maintenance reminders"
+                    rows={3}
+                    value={formData.mustHaveFeature}
+                    onChange={(e) => setFormData({ ...formData, mustHaveFeature: e.target.value })}
+                    className="mt-2"
+                  />
+                  <p className="text-gray-500 text-sm mt-1">
+                    {formData.mustHaveFeature.length}/15 minimum
+                  </p>
+                  {errors.mustHaveFeature && (
+                    <motion.p
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-red-500 text-sm mt-1 flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.mustHaveFeature}
+                    </motion.p>
+                  )}
+                </motion.div>
+
+                {/* Contact Details */}
+                <div className="border-t pt-6 mt-6">
+                  <h3 className="text-primary font-semibold mb-4">Contact Details</h3>
+                  
+                  <div className="space-y-4">
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <Label htmlFor="company">Company/Fleet Name</Label>
+                      <Input
+                        id="company"
+                        placeholder="Your company name"
+                        value={formData.company}
+                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                        className="mt-1"
+                      />
+                      {errors.company && (
+                        <motion.p
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="text-red-500 text-sm mt-1 flex items-center gap-1"
+                        >
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.company}
+                        </motion.p>
+                      )}
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.7 }}
+                    >
+                      <Label htmlFor="email">Email Address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="your@company.co.za"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="mt-1"
+                      />
+                      {errors.email && (
+                        <motion.p
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="text-red-500 text-sm mt-1 flex items-center gap-1"
+                        >
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.email}
+                        </motion.p>
+                      )}
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.8 }}
+                    >
+                      <Label htmlFor="whatsapp">WhatsApp Number</Label>
+                      <Input
+                        id="whatsapp"
+                        type="tel"
+                        placeholder="082 123 4567"
+                        value={formData.whatsapp}
+                        onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                        className="mt-1"
+                      />
+                      <p className="text-gray-500 text-sm mt-1">We'll reach you here first</p>
+                      {errors.whatsapp && (
+                        <motion.p
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="text-red-500 text-sm mt-1 flex items-center gap-1"
+                        >
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.whatsapp}
+                        </motion.p>
+                      )}
+                    </motion.div>
+                  </div>
+                </div>
+
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.9 }}
+                  className="text-center text-gray-600 text-sm"
+                >
+                  🔒 Your data is encrypted and never shared
+                </motion.p>
+
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <Button
+                    type="submit"
+                    variant="cta"
+                    size="lg"
+                    disabled={isSubmitting}
+                    className="w-full text-lg py-6"
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Application"}
+                  </Button>
+                </motion.div>
+              </form>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15, bounce: 0.4 }}
+              className="max-w-2xl mx-auto text-center p-12 bg-white rounded-xl shadow-lg"
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 15 }}
+                className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6"
+              >
+                <Check className="w-10 h-10 text-green-600" />
+              </motion.div>
+
+              <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
+                You're In. We'll Contact You Soon.
+              </h2>
+
+              <div className="text-gray-700 space-y-3 max-w-lg mx-auto mb-8">
+                <p>Applications reviewed weekly.</p>
+                <p>Selected members contacted via WhatsApp within 5 business days.</p>
+                <p className="font-semibold text-primary">
+                  You just helped shape the future of African logistics.
+                </p>
+              </div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button onClick={handleReset} variant="cta" size="lg">
+                  Refer Another Fleet
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </section>
+  );
+};

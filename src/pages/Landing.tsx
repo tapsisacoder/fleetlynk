@@ -1,12 +1,11 @@
 import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
-import { FoundingValueSection } from "@/components/FoundingValueSection";
-import { ProblemSolutionSection } from "@/components/ProblemSolutionSection";
-import { ThreeToolsSection } from "@/components/ThreeToolsSection";
-import { EconomicsSection } from "@/components/EconomicsSection";
-import { FoundingProgramSection } from "@/components/FoundingProgramSection";
-import { ApplicationForm } from "@/components/ApplicationForm";
+import { WhyWeExistSection } from "@/components/WhyWeExistSection";
+import { ValuePropsSection } from "@/components/ValuePropsSection";
+import { ComparisonSection } from "@/components/ComparisonSection";
+import { FoundingProgramSectionNew } from "@/components/FoundingProgramSectionNew";
+import { ApplicationFormNew } from "@/components/ApplicationFormNew";
 import { Footer } from "@/components/Footer";
 
 const Landing = () => {
@@ -23,12 +22,11 @@ const Landing = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       <HeroSection />
-      <FoundingValueSection />
-      <ProblemSolutionSection />
-      <ThreeToolsSection />
-      <EconomicsSection />
-      <FoundingProgramSection />
-      <ApplicationForm />
+      <WhyWeExistSection />
+      <ValuePropsSection />
+      <ComparisonSection />
+      <FoundingProgramSectionNew />
+      <ApplicationFormNew />
       <Footer />
     </div>
   );
