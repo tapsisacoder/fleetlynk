@@ -11,9 +11,9 @@ import { storage } from "@/lib/storage";
 
 interface FormData {
   region: string;
-  trucks: string;
-  biggestPain: string;
-  priorityFactor: string;
+  vehicles: string;
+  biggestChallenge: string;
+  essentialFactor: string;
   mustHaveFeature: string;
   company: string;
   email: string;
@@ -27,9 +27,9 @@ interface FormErrors {
 export const ApplicationFormNew = () => {
   const [formData, setFormData] = useState<FormData>({
     region: "",
-    trucks: "",
-    biggestPain: "",
-    priorityFactor: "",
+    vehicles: "",
+    biggestChallenge: "",
+    essentialFactor: "",
     mustHaveFeature: "",
     company: "",
     email: "",
@@ -44,9 +44,9 @@ export const ApplicationFormNew = () => {
     const newErrors: FormErrors = {};
 
     if (!formData.region) newErrors.region = "Please select your region";
-    if (!formData.trucks) newErrors.trucks = "Please select fleet size";
-    if (formData.biggestPain.length < 20) newErrors.biggestPain = "Please write at least 20 characters";
-    if (!formData.priorityFactor) newErrors.priorityFactor = "Please select your priority";
+    if (!formData.vehicles) newErrors.vehicles = "Please select fleet size";
+    if (formData.biggestChallenge.length < 20) newErrors.biggestChallenge = "Please write at least 20 characters";
+    if (!formData.essentialFactor) newErrors.essentialFactor = "Please select what's essential";
     if (formData.mustHaveFeature.length < 15) newErrors.mustHaveFeature = "Please write at least 15 characters";
     if (!formData.company) newErrors.company = "Company name is required";
     if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
@@ -93,9 +93,9 @@ export const ApplicationFormNew = () => {
     setIsSuccess(false);
     setFormData({
       region: "",
-      trucks: "",
-      biggestPain: "",
-      priorityFactor: "",
+      vehicles: "",
+      biggestChallenge: "",
+      essentialFactor: "",
       mustHaveFeature: "",
       company: "",
       email: "",
@@ -118,11 +118,11 @@ export const ApplicationFormNew = () => {
               className="max-w-2xl mx-auto border border-gray-200 rounded-xl shadow-lg p-8"
             >
               <div className="text-center mb-8">
-                <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                  Apply in 2 Minutes
+                <h2 className="text-3xl font-bold text-primary mb-2">
+                  Secure Your Spot in 2 Minutes
                 </h2>
                 <p className="text-gray-600">
-                  5 questions. We'll contact you within 5 business days.
+                  5 precise questions. We'll contact you within 5 business days.
                 </p>
               </div>
 
@@ -164,84 +164,84 @@ export const ApplicationFormNew = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <Label className="text-primary font-semibold">How many trucks?</Label>
+                  <Label className="text-primary font-semibold">How many vehicles in your fleet?</Label>
                   <RadioGroup
-                    value={formData.trucks}
-                    onValueChange={(value) => setFormData({ ...formData, trucks: value })}
+                    value={formData.vehicles}
+                    onValueChange={(value) => setFormData({ ...formData, vehicles: value })}
                     className="mt-2 space-y-2"
                   >
-                    {["1-5 trucks", "6-15 trucks", "16-50 trucks", "50+ trucks"].map((option) => (
+                    {["1-5 vehicles", "6-15 vehicles", "16-50 vehicles", "50+ vehicles"].map((option) => (
                       <div key={option} className="flex items-center space-x-2">
                         <RadioGroupItem value={option} id={option} />
                         <Label htmlFor={option} className="cursor-pointer">{option}</Label>
                       </div>
                     ))}
                   </RadioGroup>
-                  {errors.trucks && (
+                  {errors.vehicles && (
                     <motion.p
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="text-red-500 text-sm mt-1 flex items-center gap-1"
                     >
                       <AlertCircle className="w-4 h-4" />
-                      {errors.trucks}
+                      {errors.vehicles}
                     </motion.p>
                   )}
                 </motion.div>
 
-                {/* Question 3: Biggest Pain */}
+                {/* Question 3: Biggest Challenge */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <Label htmlFor="biggestPain" className="text-primary font-semibold">
-                    What's your biggest daily headache?
+                  <Label htmlFor="biggestChallenge" className="text-primary font-semibold">
+                    What's the biggest operational challenge you face daily?
                   </Label>
                   <Textarea
-                    id="biggestPain"
-                    placeholder="e.g., Fuel vanishes, drivers don't answer, maintenance chaos"
+                    id="biggestChallenge"
+                    placeholder="e.g., Tracking fuel usage, managing compliance deadlines, driver communication, invoice chaos"
                     rows={3}
-                    value={formData.biggestPain}
-                    onChange={(e) => setFormData({ ...formData, biggestPain: e.target.value })}
+                    value={formData.biggestChallenge}
+                    onChange={(e) => setFormData({ ...formData, biggestChallenge: e.target.value })}
                     className="mt-2"
                   />
                   <p className="text-gray-500 text-sm mt-1">
-                    {formData.biggestPain.length}/20 minimum
+                    Minimum 20 characters ({formData.biggestChallenge.length}/20)
                   </p>
-                  {errors.biggestPain && (
+                  {errors.biggestChallenge && (
                     <motion.p
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="text-red-500 text-sm mt-1 flex items-center gap-1"
                     >
                       <AlertCircle className="w-4 h-4" />
-                      {errors.biggestPain}
+                      {errors.biggestChallenge}
                     </motion.p>
                   )}
                 </motion.div>
 
-                {/* Question 4: Priority */}
+                {/* Question 4: Essential Factor */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 }}
                 >
                   <Label className="text-primary font-semibold">
-                    What matters most in fleet software?
+                    What would make fleet management software essential for you?
                   </Label>
-                  <p className="text-gray-500 text-sm italic mt-1">This helps us understand your priorities</p>
+                  <p className="text-gray-500 text-sm italic mt-1">This helps us prioritize what we build first</p>
                   <RadioGroup
-                    value={formData.priorityFactor}
-                    onValueChange={(value) => setFormData({ ...formData, priorityFactor: value })}
+                    value={formData.essentialFactor}
+                    onValueChange={(value) => setFormData({ ...formData, essentialFactor: value })}
                     className="mt-2 space-y-2"
                   >
                     {[
-                      "Affordable with flexible payment",
-                      "Reliable with no downtime",
-                      "Simple and easy to use",
-                      "Great support when I need help",
-                      "Integrates with my existing systems"
+                      "Affordable pricing with flexible payment options",
+                      "Rock-solid reliability (no downtime, always accessible)",
+                      "Dead simple to use (my team isn't tech-savvy)",
+                      "Great support when I need help fast",
+                      "Integrates with my fuel cards or accounting software"
                     ].map((option) => (
                       <div key={option} className="flex items-center space-x-2">
                         <RadioGroupItem value={option} id={option} />
@@ -249,14 +249,14 @@ export const ApplicationFormNew = () => {
                       </div>
                     ))}
                   </RadioGroup>
-                  {errors.priorityFactor && (
+                  {errors.essentialFactor && (
                     <motion.p
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="text-red-500 text-sm mt-1 flex items-center gap-1"
                     >
                       <AlertCircle className="w-4 h-4" />
-                      {errors.priorityFactor}
+                      {errors.essentialFactor}
                     </motion.p>
                   )}
                 </motion.div>
@@ -268,18 +268,18 @@ export const ApplicationFormNew = () => {
                   transition={{ delay: 0.5 }}
                 >
                   <Label htmlFor="mustHaveFeature" className="text-primary font-semibold">
-                    One feature that would make this essential?
+                    One feature that would make you sign up immediately?
                   </Label>
                   <Textarea
                     id="mustHaveFeature"
-                    placeholder="e.g., Real-time fuel alerts, driver scoring, maintenance reminders"
+                    placeholder="e.g., Automated compliance alerts, real-time fuel tracking, simple invoicing, WhatsApp notifications"
                     rows={3}
                     value={formData.mustHaveFeature}
                     onChange={(e) => setFormData({ ...formData, mustHaveFeature: e.target.value })}
                     className="mt-2"
                   />
                   <p className="text-gray-500 text-sm mt-1">
-                    {formData.mustHaveFeature.length}/15 minimum
+                    Minimum 15 characters ({formData.mustHaveFeature.length}/15)
                   </p>
                   {errors.mustHaveFeature && (
                     <motion.p
@@ -295,7 +295,7 @@ export const ApplicationFormNew = () => {
 
                 {/* Contact Details */}
                 <div className="border-t pt-6 mt-6">
-                  <h3 className="text-primary font-semibold mb-4">Contact Details</h3>
+                  <h3 className="text-primary font-semibold mb-4">Your Contact Details</h3>
                   
                   <div className="space-y-4">
                     <motion.div
@@ -303,7 +303,7 @@ export const ApplicationFormNew = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.6 }}
                     >
-                      <Label htmlFor="company">Company/Fleet Name</Label>
+                      <Label htmlFor="company" className="font-medium">Company or Fleet Name</Label>
                       <Input
                         id="company"
                         placeholder="Your company name"
@@ -328,7 +328,7 @@ export const ApplicationFormNew = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.7 }}
                     >
-                      <Label htmlFor="email">Email Address</Label>
+                      <Label htmlFor="email" className="font-medium">Email Address</Label>
                       <Input
                         id="email"
                         type="email"
@@ -354,7 +354,7 @@ export const ApplicationFormNew = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.8 }}
                     >
-                      <Label htmlFor="whatsapp">WhatsApp Number</Label>
+                      <Label htmlFor="whatsapp" className="font-medium">WhatsApp Number</Label>
                       <Input
                         id="whatsapp"
                         type="tel"
@@ -363,7 +363,7 @@ export const ApplicationFormNew = () => {
                         onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                         className="mt-1"
                       />
-                      <p className="text-gray-500 text-sm mt-1">We'll reach you here first</p>
+                      <p className="text-gray-500 text-sm mt-1">We'll contact you here first</p>
                       {errors.whatsapp && (
                         <motion.p
                           initial={{ opacity: 0, x: -10 }}
@@ -378,14 +378,16 @@ export const ApplicationFormNew = () => {
                   </div>
                 </div>
 
-                <motion.p
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.9 }}
-                  className="text-center text-gray-600 text-sm"
+                  className="bg-gray-50 rounded-lg p-4 text-center"
                 >
-                  🔒 Your data is encrypted and never shared
-                </motion.p>
+                  <p className="text-sm text-gray-600">
+                    🔒 <strong>Privacy Guarantee:</strong> Your data is encrypted using military-grade security. We never share your information with third parties. You can request deletion anytime.
+                  </p>
+                </motion.div>
 
                 <motion.div
                   whileHover={{ scale: 1.02 }}
@@ -397,7 +399,7 @@ export const ApplicationFormNew = () => {
                     variant="cta"
                     size="lg"
                     disabled={isSubmitting}
-                    className="w-full text-lg py-6"
+                    className="w-full text-lg font-semibold py-6"
                   >
                     {isSubmitting ? "Submitting..." : "Submit Application"}
                   </Button>
@@ -421,14 +423,14 @@ export const ApplicationFormNew = () => {
                 <Check className="w-10 h-10 text-green-600" />
               </motion.div>
 
-              <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
-                You're In. We'll Contact You Soon.
+              <h2 className="text-2xl font-bold text-primary mb-4">
+                You're In. Welcome to the Founding Fleet.
               </h2>
 
-              <div className="text-gray-700 space-y-3 max-w-lg mx-auto mb-8">
-                <p>Applications reviewed weekly.</p>
-                <p>Selected members contacted via WhatsApp within 5 business days.</p>
-                <p className="font-semibold text-primary">
+              <div className="text-gray-700 space-y-3 max-w-lg mx-auto mb-6">
+                <p>Your application is submitted.</p>
+                <p>We review applications weekly and contact selected members via WhatsApp within 5 business days.</p>
+                <p>
                   You just helped shape the future of African logistics.
                 </p>
               </div>

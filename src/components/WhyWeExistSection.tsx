@@ -12,11 +12,11 @@ export const WhyWeExistSection = () => {
             transition={{ type: "spring", stiffness: 80, damping: 20 }}
           >
             <p className="text-accent uppercase tracking-wide text-sm font-bold mb-4">
-              WHY FLEETLYNK EXISTS
+              WHO WE ARE
             </p>
             
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-              African Fleets Deserve Better Than Broken Hardware and Empty Promises
+              We Understand Your Daily Struggles
             </h2>
           </motion.div>
 
@@ -28,23 +28,15 @@ export const WhyWeExistSection = () => {
             className="space-y-4 text-lg text-gray-700 leading-relaxed"
           >
             <p>
-              Every day, fleet managers across Southern Africa lose money to fuel theft, vehicle downtime, and chaos they can't see or control.
+              Every day across Southern Africa, fleet managers juggle spreadsheets, WhatsApp messages, paper receipts, and guesswork. Compliance deadlines sneak up. Fuel costs spiral. Maintenance surprises drain cash. You're working IN your business when you should be working ON it.
             </p>
 
             <p>
-              The only solutions? Expensive GPS devices that break, get stolen, or stop working when you need them most. You're stuck paying thousands per truck, locked into contracts, and still blind when hardware fails.
-            </p>
-
-            <p className="font-semibold text-primary">
-              There's a better way.
+              We built FleetLynk because we've seen these struggles firsthand. This isn't Silicon Valley software adapted for Africa—it's built from the ground up for how Southern African logistics actually works.
             </p>
 
             <p>
-              FleetLynk uses the phones your drivers already carry. No devices to install. No hardware to replace. Just software that works—tracking vehicles, monitoring fuel, and putting you back in control.
-            </p>
-
-            <p>
-              We're not building this alone. We're building it with 30 fleet managers who are tired of the old way and ready to shape the future of African logistics.
+              FleetLynk gives you one platform to manage trips, drivers, compliance, costs, invoicing, and documents. Vehicle tracking is optional (using driver smartphones or affordable hardware we're integrating soon). Everything you need, nothing you don't.
             </p>
           </motion.div>
 
@@ -53,9 +45,9 @@ export const WhyWeExistSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.4 }}
-            className="mt-6 border-l-4 border-accent bg-accent/5 p-6 italic text-gray-700"
+            className="mt-6 border-l-4 border-accent bg-accent/5 p-6 text-gray-700"
           >
-            "You're not just testing software. You're helping build the tool that will run thousands of African fleets. That's why this matters."
+            <span className="font-semibold">💡 Our mission:</span> Make professional fleet management accessible to every operator, not just the big companies with massive budgets.
           </motion.div>
         </div>
       </div>

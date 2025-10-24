@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Shield } from "lucide-react";
-import heroTruck from "@/assets/hero-truck.jpg";
+import heroTruck from "@/assets/hero-truck-new.jpg";
 
 export const HeroSection = () => {
   const scrollToForm = () => {
@@ -28,11 +28,9 @@ export const HeroSection = () => {
             transition={{ type: "spring", stiffness: 100, damping: 15, mass: 0.8 }}
             className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
           >
-            No Hardware.
+            The Smarter Way to
             <br />
-            No Hassle.
-            <br />
-            <span className="text-accent">Just Control.</span>
+            <span className="text-accent">Manage Your Fleet</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -46,9 +44,9 @@ export const HeroSection = () => {
               mass: 0.8,
               delay: 0.2 
             }}
-            className="text-xl md:text-2xl text-white/90 mb-6 max-w-2xl mx-auto"
+            className="text-xl md:text-2xl text-white/90 mb-6 max-w-3xl mx-auto"
           >
-            Track your fleet using drivers' phones. Free pilot starting next year.
+            Modern software that handles operations, compliance, costs, and communication—all in one platform. Optional vehicle tracking. Built for Southern Africa.
           </motion.p>
 
           {/* Urgency badge */}
@@ -64,7 +62,7 @@ export const HeroSection = () => {
             }}
             className="inline-flex items-center gap-2 px-4 py-2 bg-accent rounded-full mb-8"
           >
-            <span className="text-sm font-bold text-white">🔥 Applications close end of year</span>
+            <span className="text-sm font-bold text-white">⚡ Limited founding spots • Applications close end of year</span>
           </motion.div>
 
           {/* CTA Button */}

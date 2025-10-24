@@ -35,15 +35,19 @@ export const FoundingProgramSectionNew = () => {
             className="text-center text-gray-700 space-y-4 max-w-2xl mx-auto"
           >
             <p className="text-lg">
-              We're looking for <strong>30 fleet managers</strong> who'll help us build this right.
+              We're selecting <strong>30 fleet managers</strong> to help us build FleetLynk right.
             </p>
 
             <p className="text-lg">
-              Free access through the entire pilot. Direct line to founders. Your requests prioritized. First to see new features.
+              You get free access through the entire pilot, direct line to founders, your feature requests prioritized, and locked-in pricing when we launch commercially.
+            </p>
+
+            <p className="text-lg">
+              We get honest feedback, real-world testing, and the insights to build software that actually solves your problems.
             </p>
 
             <p className="text-lg font-semibold text-primary">
-              This isn't a trial. It's a partnership.
+              This isn't a trial. It's a partnership to shape the future of African fleet management.
             </p>
           </motion.div>
 
@@ -61,7 +65,7 @@ export const FoundingProgramSectionNew = () => {
             className="mt-8 text-center"
           >
             <p className="text-accent font-bold text-lg">
-              Applications close end of year • Pilot starts next year
+              🔥 Applications close end of year • Only 30 spots available
             </p>
           </motion.div>
         </motion.div>

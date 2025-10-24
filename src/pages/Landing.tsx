@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { WhyWeExistSection } from "@/components/WhyWeExistSection";
-import { ValuePropsSection } from "@/components/ValuePropsSection";
-import { ComparisonSection } from "@/components/ComparisonSection";
+import { WhySignUpNowSection } from "@/components/WhySignUpNowSection";
+import { MVPFeatureSection } from "@/components/MVPFeatureSection";
 import { FoundingProgramSectionNew } from "@/components/FoundingProgramSectionNew";
 import { ApplicationFormNew } from "@/components/ApplicationFormNew";
 import { Footer } from "@/components/Footer";
@@ -23,8 +23,8 @@ const Landing = () => {
       <Navigation />
       <HeroSection />
       <WhyWeExistSection />
-      <ValuePropsSection />
-      <ComparisonSection />
+      <WhySignUpNowSection />
+      <MVPFeatureSection />
       <FoundingProgramSectionNew />
       <ApplicationFormNew />
       <Footer />

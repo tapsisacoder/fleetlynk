@@ -17,8 +17,8 @@ export const Footer = () => {
           </motion.div>
           
           <div className="text-sm text-white/80">
-            <p className="mb-2">FleetLynk — Software-First Fleet Management</p>
-            <p>Built for Southern Africa • Pilot Starts Next Year</p>
+            <p className="mb-2">FleetLynk — Modern Fleet Management for Southern Africa</p>
+            <p>Pilot Program Starts Next Year • Built for African Logistics</p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 text-sm text-white/70">
@@ -64,7 +64,7 @@ export const Footer = () => {
           </div>
 
           <div className="pt-4 border-t border-white/20 text-sm text-white/60">
-            © 2025 FleetLynk. Your data. Your rules.
+            © 2025 FleetLynk. Your data. Your rules. Always.
           </div>
         </div>
       </div>
