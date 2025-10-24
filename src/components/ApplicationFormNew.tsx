@@ -423,9 +423,12 @@ export const ApplicationFormNew = () => {
                 <Check className="w-10 h-10 text-green-600" />
               </motion.div>
 
-              <h2 className="text-2xl font-bold text-primary mb-4">
-                You're In. Welcome to the Founding Fleet.
-              </h2>
+                <h2 className="text-2xl font-bold text-primary mb-4">
+                  You're In. Welcome to the Founding Fleet.
+                </h2>
+                <p className="text-gray-600 italic mb-4">
+                  Selected members will be contacted in December 2025.
+                </p>
 
               <div className="text-gray-700 space-y-3 max-w-lg mx-auto mb-6">
                 <p>Your application is submitted.</p>

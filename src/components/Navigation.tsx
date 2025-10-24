@@ -12,7 +12,12 @@ export const Navigation = () => {
     <nav className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <LogoHorizontal />
+          <div className="flex items-center gap-3">
+            <LogoHorizontal />
+            <span className="hidden md:block text-sm text-gray-600 italic border-l border-gray-300 pl-3">
+              Unlock Your Fleet's Full Potential
+            </span>
+          </div>
           
           <div className="flex items-center gap-4">
             <motion.div

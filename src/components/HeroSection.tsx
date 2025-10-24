@@ -62,7 +62,7 @@ export const HeroSection = () => {
             }}
             className="inline-flex items-center gap-2 px-4 py-2 bg-accent rounded-full mb-8"
           >
-            <span className="text-sm font-bold text-white">⚡ Limited founding spots • Applications close end of year</span>
+            <span className="text-sm font-bold text-white">⚡ Limited founding spots • Applications close early December 2025</span>
           </motion.div>
 
           {/* CTA Button */}

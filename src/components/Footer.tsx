@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { LogoHorizontal } from "./Logo";
-import { Linkedin, Facebook, Twitter } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -21,46 +20,12 @@ export const Footer = () => {
             <p>Pilot Program Starts Next Year • Built for African Logistics</p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4 text-sm text-white/70">
-            <a href="mailto:contact@fleetlynk.com" className="hover:text-white transition-colors">
-              📧 contact@fleetlynk.com
-            </a>
-            <span>|</span>
-            <a href="#" className="hover:text-white transition-colors">
-              📱 +27 XX XXX XXXX
-            </a>
-          </div>
-
           <div className="flex justify-center gap-4 text-sm text-white/70">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
+            <a href="https://docs.lovable.dev/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Privacy</a>
             <span>|</span>
-            <a href="#" className="hover:text-white transition-colors">Data Protection</a>
+            <a href="https://docs.lovable.dev/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Data Protection</a>
             <span>|</span>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-          </div>
-
-          <div className="flex justify-center gap-4 text-white/70">
-            <motion.a
-              href="#"
-              whileHover={{ scale: 1.2, color: "rgba(255,255,255,1)" }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            >
-              <Linkedin className="w-5 h-5" />
-            </motion.a>
-            <motion.a
-              href="#"
-              whileHover={{ scale: 1.2, color: "rgba(255,255,255,1)" }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            >
-              <Facebook className="w-5 h-5" />
-            </motion.a>
-            <motion.a
-              href="#"
-              whileHover={{ scale: 1.2, color: "rgba(255,255,255,1)" }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            >
-              <Twitter className="w-5 h-5" />
-            </motion.a>
+            <a href="https://docs.lovable.dev/legal/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Terms</a>
           </div>
 
           <div className="pt-4 border-t border-white/20 text-sm text-white/60">

@@ -74,7 +74,7 @@ export const WhySignUpNowSection = () => {
           transition={{ delay: 0.4 }}
           className="text-center text-accent font-bold text-lg mt-8"
         >
-          ⏰ Applications close end of year. Pilot starts next year. Don't miss this.
+          ⏰ Applications close early December 2025. Pilot starts next year. Don't miss this.
         </motion.p>
       </div>
     </section>
