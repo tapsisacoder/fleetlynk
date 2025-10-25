@@ -34,10 +34,10 @@ export const WhySignUpNowSection = () => {
           className="text-center max-w-4xl mx-auto mb-10"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            Why You Need to Sign Up Now
+            The Founding Fleet
           </h2>
           <p className="text-xl text-gray-600">
-            This isn't just about testing software. It's about not falling behind.
+            We're hand-picking 100 operators to test and help shape FleetLynk. This isn't just about testing software. It's about not falling behind.
           </p>
         </motion.div>
 
@@ -74,7 +74,7 @@ export const WhySignUpNowSection = () => {
           transition={{ delay: 0.4 }}
           className="text-center text-accent font-bold text-lg mt-8"
         >
-          ⏰ Applications close early December 2025. Pilot starts next year. Don't miss this.
+          ⏰ Applications close November 30th. Pilot starts next year. Don't miss this.
         </motion.p>
       </div>
     </section>

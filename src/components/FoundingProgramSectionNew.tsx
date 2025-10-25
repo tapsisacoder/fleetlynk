@@ -35,15 +35,11 @@ export const FoundingProgramSectionNew = () => {
             className="text-center text-gray-700 space-y-4 max-w-2xl mx-auto"
           >
             <p className="text-lg">
-              We're selecting <strong>30 fleet managers</strong> to help us build FleetLynk right.
+              We are selecting <strong>100 fleet managers</strong> to help test FleetLynk.
             </p>
 
             <p className="text-lg">
-              You get free access through the entire pilot, direct line to founders, your feature requests prioritized, and locked-in pricing when we launch commercially.
-            </p>
-
-            <p className="text-lg">
-              We get honest feedback, real-world testing, and the insights to build software that actually solves your problems.
+              The 100 get free unfiltered access to the product before its commercial launch, direct line to our technical team, your feature requests prioritized, and discounted pricing when we launch commercially.
             </p>
 
             <p className="text-lg font-semibold text-primary">
@@ -65,7 +61,7 @@ export const FoundingProgramSectionNew = () => {
             className="mt-8 text-center"
           >
             <p className="text-accent font-bold text-lg">
-              🔥 Applications close early December 2025 • Only 30 spots available
+              🔥 Applications close November 30th • Only 100 spots available
             </p>
           </motion.div>
         </motion.div>

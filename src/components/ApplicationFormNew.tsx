@@ -12,9 +12,6 @@ import { storage } from "@/lib/storage";
 interface FormData {
   region: string;
   vehicles: string;
-  biggestChallenge: string;
-  essentialFactor: string;
-  mustHaveFeature: string;
   company: string;
   email: string;
   whatsapp: string;
@@ -28,9 +25,6 @@ export const ApplicationFormNew = () => {
   const [formData, setFormData] = useState<FormData>({
     region: "",
     vehicles: "",
-    biggestChallenge: "",
-    essentialFactor: "",
-    mustHaveFeature: "",
     company: "",
     email: "",
     whatsapp: ""
@@ -45,9 +39,6 @@ export const ApplicationFormNew = () => {
 
     if (!formData.region) newErrors.region = "Please select your region";
     if (!formData.vehicles) newErrors.vehicles = "Please select fleet size";
-    if (formData.biggestChallenge.length < 20) newErrors.biggestChallenge = "Please write at least 20 characters";
-    if (!formData.essentialFactor) newErrors.essentialFactor = "Please select what's essential";
-    if (formData.mustHaveFeature.length < 15) newErrors.mustHaveFeature = "Please write at least 15 characters";
     if (!formData.company) newErrors.company = "Company name is required";
     if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Please enter a valid email";
@@ -94,9 +85,6 @@ export const ApplicationFormNew = () => {
     setFormData({
       region: "",
       vehicles: "",
-      biggestChallenge: "",
-      essentialFactor: "",
-      mustHaveFeature: "",
       company: "",
       email: "",
       whatsapp: ""
@@ -122,7 +110,7 @@ export const ApplicationFormNew = () => {
                   Secure Your Spot in 2 Minutes
                 </h2>
                 <p className="text-gray-600">
-                  5 precise questions. We'll contact you within 5 business days.
+                  Quick questions. We'll contact you within 5 business days.
                 </p>
               </div>
 
@@ -139,7 +127,7 @@ export const ApplicationFormNew = () => {
                     onValueChange={(value) => setFormData({ ...formData, region: value })}
                     className="mt-2 space-y-2"
                   >
-                    {["🇿🇦 South Africa", "🇿🇼 Zimbabwe", "🌍 Both SA & Zimbabwe", "🌍 Other Southern Africa"].map((option) => (
+                    {["🇿🇦 South Africa", "🇿🇼 Zimbabwe", "🇲🇿 Mozambique", "🇿🇲 Zambia", "🇧🇼 Botswana"].map((option) => (
                       <div key={option} className="flex items-center space-x-2">
                         <RadioGroupItem value={option} id={option} />
                         <Label htmlFor={option} className="cursor-pointer">{option}</Label>
@@ -189,110 +177,6 @@ export const ApplicationFormNew = () => {
                   )}
                 </motion.div>
 
-                {/* Question 3: Biggest Challenge */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <Label htmlFor="biggestChallenge" className="text-primary font-semibold">
-                    What's the biggest operational challenge you face daily?
-                  </Label>
-                  <Textarea
-                    id="biggestChallenge"
-                    placeholder="e.g., Tracking fuel usage, managing compliance deadlines, driver communication, invoice chaos"
-                    rows={3}
-                    value={formData.biggestChallenge}
-                    onChange={(e) => setFormData({ ...formData, biggestChallenge: e.target.value })}
-                    className="mt-2"
-                  />
-                  <p className="text-gray-500 text-sm mt-1">
-                    Minimum 20 characters ({formData.biggestChallenge.length}/20)
-                  </p>
-                  {errors.biggestChallenge && (
-                    <motion.p
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-red-500 text-sm mt-1 flex items-center gap-1"
-                    >
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.biggestChallenge}
-                    </motion.p>
-                  )}
-                </motion.div>
-
-                {/* Question 4: Essential Factor */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  <Label className="text-primary font-semibold">
-                    What would make fleet management software essential for you?
-                  </Label>
-                  <p className="text-gray-500 text-sm italic mt-1">This helps us prioritize what we build first</p>
-                  <RadioGroup
-                    value={formData.essentialFactor}
-                    onValueChange={(value) => setFormData({ ...formData, essentialFactor: value })}
-                    className="mt-2 space-y-2"
-                  >
-                    {[
-                      "Affordable pricing with flexible payment options",
-                      "Rock-solid reliability (no downtime, always accessible)",
-                      "Dead simple to use (my team isn't tech-savvy)",
-                      "Great support when I need help fast",
-                      "Integrates with my fuel cards or accounting software"
-                    ].map((option) => (
-                      <div key={option} className="flex items-center space-x-2">
-                        <RadioGroupItem value={option} id={option} />
-                        <Label htmlFor={option} className="cursor-pointer">{option}</Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                  {errors.essentialFactor && (
-                    <motion.p
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-red-500 text-sm mt-1 flex items-center gap-1"
-                    >
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.essentialFactor}
-                    </motion.p>
-                  )}
-                </motion.div>
-
-                {/* Question 5: Must-Have Feature */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <Label htmlFor="mustHaveFeature" className="text-primary font-semibold">
-                    One feature that would make you sign up immediately?
-                  </Label>
-                  <Textarea
-                    id="mustHaveFeature"
-                    placeholder="e.g., Automated compliance alerts, real-time fuel tracking, simple invoicing, WhatsApp notifications"
-                    rows={3}
-                    value={formData.mustHaveFeature}
-                    onChange={(e) => setFormData({ ...formData, mustHaveFeature: e.target.value })}
-                    className="mt-2"
-                  />
-                  <p className="text-gray-500 text-sm mt-1">
-                    Minimum 15 characters ({formData.mustHaveFeature.length}/15)
-                  </p>
-                  {errors.mustHaveFeature && (
-                    <motion.p
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-red-500 text-sm mt-1 flex items-center gap-1"
-                    >
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.mustHaveFeature}
-                    </motion.p>
-                  )}
-                </motion.div>
-
                 {/* Contact Details */}
                 <div className="border-t pt-6 mt-6">
                   <h3 className="text-primary font-semibold mb-4">Your Contact Details</h3>
@@ -301,7 +185,7 @@ export const ApplicationFormNew = () => {
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.6 }}
+                      transition={{ delay: 0.3 }}
                     >
                       <Label htmlFor="company" className="font-medium">Company or Fleet Name</Label>
                       <Input
@@ -326,7 +210,7 @@ export const ApplicationFormNew = () => {
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.7 }}
+                      transition={{ delay: 0.4 }}
                     >
                       <Label htmlFor="email" className="font-medium">Email Address</Label>
                       <Input
@@ -352,7 +236,7 @@ export const ApplicationFormNew = () => {
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.8 }}
+                      transition={{ delay: 0.5 }}
                     >
                       <Label htmlFor="whatsapp" className="font-medium">WhatsApp Number</Label>
                       <Input
@@ -381,7 +265,7 @@ export const ApplicationFormNew = () => {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.9 }}
+                  transition={{ delay: 0.6 }}
                   className="bg-gray-50 rounded-lg p-4 text-center"
                 >
                   <p className="text-sm text-gray-600">

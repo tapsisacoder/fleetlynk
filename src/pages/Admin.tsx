@@ -98,31 +98,19 @@ const Admin = () => {
     const headers = [
       "Timestamp",
       "Region",
-      "Name",
+      "Company",
       "Email",
       "WhatsApp",
-      "Company",
-      "Trucks",
-      "Biggest Pain",
-      "Fuel Tracking",
-      "Current Tracking",
-      "Priority Factor",
-      "Must-Have Feature"
+      "Vehicles"
     ];
 
     const rows = applications.map(app => [
       app.timestamp,
       app.region,
-      app.name,
+      app.company,
       app.email,
       app.whatsapp,
-      app.company,
-      app.trucks,
-      `"${app.biggestPain.replace(/"/g, '""')}"`,
-      app.fuelTracking,
-      `"${app.trackingMethod.join(', ')}"`,
-      app.priorityFactor,
-      `"${app.mustHaveFeature.replace(/"/g, '""')}"`
+      app.vehicles
     ]);
 
     const csv = [headers, ...rows].map(row => row.join(",")).join("\n");
@@ -136,29 +124,15 @@ const Admin = () => {
   };
 
   const getRegionFlag = (region: string) => {
-    const flags: Record<string, string> = {
-      "south-africa": "🇿🇦",
-      "zimbabwe": "🇿🇼",
-      "both": "🌍",
-      "other-southern": "🌍",
-      "outside": "🌐"
-    };
-    return flags[region] || "🌍";
-  };
-
-  const getPriorityBadgeColor = (priority: string) => {
-    const colors: Record<string, string> = {
-      "affordable": "bg-accent/10 text-accent",
-      "reliable": "bg-blue-100 text-blue-700",
-      "simple": "bg-green-100 text-green-700",
-      "support": "bg-purple-100 text-purple-700",
-      "integration": "bg-pink-100 text-pink-700"
-    };
-    return colors[priority] || "bg-gray-100 text-gray-700";
+    if (region.includes("South Africa")) return "🇿🇦";
+    if (region.includes("Zimbabwe")) return "🇿🇼";
+    if (region.includes("Mozambique")) return "🇲🇿";
+    if (region.includes("Zambia")) return "🇿🇲";
+    if (region.includes("Botswana")) return "🇧🇼";
+    return "🌍";
   };
 
   const filteredApplications = applications.filter(app =>
-    app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     app.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     app.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
     app.region.toLowerCase().includes(searchQuery.toLowerCase())
@@ -177,10 +151,7 @@ const Admin = () => {
       weekAgo.setDate(weekAgo.getDate() - 7);
       return appDate >= weekAgo;
     }).length,
-    affordablePriority: Math.round(
-      (applications.filter(app => app.priorityFactor === "affordable").length / 
-       Math.max(applications.length, 1)) * 100
-    )
+    zimbabwe: applications.filter(app => app.region.includes("Zimbabwe")).length
   };
 
   if (!isAuthenticated) {
@@ -269,8 +240,8 @@ const Admin = () => {
             <div className="flex items-center gap-3 mb-2">
               <Target className="w-8 h-8 text-purple-500" />
             </div>
-            <div className="text-3xl font-bold text-primary">{stats.affordablePriority}%</div>
-            <div className="text-sm text-muted-foreground">Price-Conscious</div>
+            <div className="text-3xl font-bold text-primary">{stats.zimbabwe}</div>
+            <div className="text-sm text-muted-foreground">Zimbabwe</div>
           </div>
         </div>
 
@@ -330,18 +301,17 @@ const Admin = () => {
                 <tr>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Date/Time</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Region</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Name</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Company</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Email</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">WhatsApp</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Trucks</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Priority</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Vehicles</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredApplications.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
+                    <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                       {applications.length === 0
                         ? "No applications yet. Time to share your page!"
                         : "No results found for your search."}
@@ -366,15 +336,10 @@ const Admin = () => {
                       <td className="px-4 py-3 text-sm">
                         <span className="text-lg">{getRegionFlag(app.region)}</span>
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium">{app.name}</td>
+                      <td className="px-4 py-3 text-sm font-medium">{app.company}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{app.email}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{app.whatsapp}</td>
-                      <td className="px-4 py-3 text-sm">{app.trucks}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getPriorityBadgeColor(app.priorityFactor)}`}>
-                          {app.priorityFactor}
-                        </span>
-                      </td>
+                      <td className="px-4 py-3 text-sm">{app.vehicles}</td>
                       <td className="px-4 py-3">
                         <Button
                           variant="outline"
@@ -400,7 +365,7 @@ const Admin = () => {
             <>
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
-                  {selectedApp.name}
+                  {selectedApp.company}
                   <span className="text-lg">{getRegionFlag(selectedApp.region)}</span>
                 </DialogTitle>
                 <p className="text-sm text-muted-foreground">
@@ -437,58 +402,11 @@ const Admin = () => {
                       <span className="text-muted-foreground">Company:</span>
                       <span className="font-medium">{selectedApp.company}</span>
                     </div>
-                  </div>
-                </div>
-
-                {/* Fleet Details */}
-                <div>
-                  <h3 className="font-semibold text-primary mb-3">Fleet Details</h3>
-                  <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Truck Count:</span>
-                      <span className="font-medium">{selectedApp.trucks}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Fuel Method:</span>
-                      <span className="font-medium">{selectedApp.fuelTracking}</span>
-                    </div>
-                    <div className="flex items-start justify-between">
-                      <span className="text-muted-foreground">Tracking:</span>
-                      <div className="flex flex-wrap gap-1 justify-end">
-                        {selectedApp.trackingMethod.map((method) => (
-                          <span
-                            key={method}
-                            className="px-2 py-1 bg-primary/10 text-primary rounded text-xs"
-                          >
-                            {method}
-                          </span>
-                        ))}
-                      </div>
+                      <span className="text-muted-foreground">Vehicles:</span>
+                      <span className="font-medium">{selectedApp.vehicles}</span>
                     </div>
                   </div>
-                </div>
-
-                {/* Insights */}
-                <div>
-                  <h3 className="font-semibold text-primary mb-3">Insights</h3>
-                  <div className="space-y-4">
-                    <div className="border-l-4 border-accent pl-4">
-                      <p className="text-sm text-muted-foreground mb-1">Biggest Pain:</p>
-                      <p className="text-sm italic">{selectedApp.biggestPain}</p>
-                    </div>
-                    <div className="border-l-4 border-accent pl-4">
-                      <p className="text-sm text-muted-foreground mb-1">Must-Have:</p>
-                      <p className="text-sm italic">{selectedApp.mustHaveFeature}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Priority */}
-                <div>
-                  <h3 className="font-semibold text-primary mb-3">Priority Factor</h3>
-                  <span className={`inline-block px-4 py-2 rounded-lg text-sm font-medium ${getPriorityBadgeColor(selectedApp.priorityFactor)}`}>
-                    {selectedApp.priorityFactor}
-                  </span>
                 </div>
 
                 {/* Actions */}
@@ -500,7 +418,7 @@ const Admin = () => {
                     }}
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
-                    WhatsApp {selectedApp.name.split(" ")[0]}
+                    WhatsApp {selectedApp.company}
                   </Button>
                   <Button
                     variant="outline"
@@ -509,7 +427,7 @@ const Admin = () => {
                     }}
                   >
                     <Mail className="w-4 h-4 mr-2" />
-                    Email {selectedApp.name.split(" ")[0]}
+                    Email {selectedApp.company}
                   </Button>
                 </div>
               </div>
