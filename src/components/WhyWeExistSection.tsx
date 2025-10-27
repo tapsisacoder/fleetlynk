@@ -12,11 +12,11 @@ export const WhyWeExistSection = () => {
             transition={{ type: "spring", stiffness: 80, damping: 20 }}
           >
             <p className="text-accent uppercase tracking-wide text-sm font-bold mb-4">
-              WHO WE ARE
+              WHO ARE WE?
             </p>
             
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-              Who We Are
+              Who are we?
             </h2>
           </motion.div>
 

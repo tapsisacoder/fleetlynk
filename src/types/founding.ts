@@ -6,7 +6,6 @@ export interface FoundingApplication {
   whatsapp: string;
   company: string;
   vehicles: string;
-  source: string;
 }
 
 export interface ApplicationFormData {

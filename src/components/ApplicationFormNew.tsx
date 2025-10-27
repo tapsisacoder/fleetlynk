@@ -7,7 +7,7 @@ import { Textarea } from "./ui/textarea";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Check, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { storage } from "@/lib/storage";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FormData {
   region: string;
@@ -62,13 +62,20 @@ export const ApplicationFormNew = () => {
     setIsSubmitting(true);
 
     try {
-      const applicationData = {
-        id: `founding_${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        ...formData
-      };
+      const { error } = await supabase
+        .from('founding_applications')
+        .insert([
+          {
+            region: formData.region,
+            company: formData.company,
+            email: formData.email,
+            whatsapp: formData.whatsapp,
+            vehicles: formData.vehicles,
+            timestamp: new Date().toISOString()
+          }
+        ]);
 
-      await storage.set(`founding:${Date.now()}`, JSON.stringify(applicationData));
+      if (error) throw error;
       
       setIsSuccess(true);
       toast.success("Application submitted successfully!");

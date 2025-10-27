@@ -18,7 +18,7 @@ import {
   MessageCircle,
   X
 } from "lucide-react";
-import { storage } from "@/lib/storage";
+import { supabase } from "@/integrations/supabase/client";
 import { FoundingApplication } from "@/types/founding";
 import { toast } from "sonner";
 import {
@@ -69,17 +69,23 @@ const Admin = () => {
   const loadApplications = async () => {
     setIsLoading(true);
     try {
-      const keys = await storage.list("founding:");
-      const apps: FoundingApplication[] = [];
+      const { data, error } = await supabase
+        .from('founding_applications')
+        .select('*')
+        .order('timestamp', { ascending: false });
 
-      for (const key of keys) {
-        const data = await storage.get(key);
-        if (data) {
-          apps.push(JSON.parse(data));
-        }
-      }
+      if (error) throw error;
 
-      apps.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      const apps: FoundingApplication[] = (data || []).map(app => ({
+        id: app.id,
+        timestamp: app.timestamp,
+        region: app.region,
+        company: app.company,
+        email: app.email,
+        whatsapp: app.whatsapp,
+        vehicles: app.vehicles
+      }));
+
       setApplications(apps);
     } catch (error) {
       console.error("Error loading applications:", error);
