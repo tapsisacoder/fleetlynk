@@ -3,11 +3,29 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Check, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const formSchema = z.object({
+  region: z.string().min(1, "Please select your region"),
+  vehicles: z.string().min(1, "Please select fleet size"),
+  company: z.string()
+    .trim()
+    .min(1, "Company name is required")
+    .max(100, "Company name must be less than 100 characters"),
+  email: z.string()
+    .trim()
+    .email("Please enter a valid email address")
+    .max(255, "Email must be less than 255 characters"),
+  whatsapp: z.string()
+    .trim()
+    .min(10, "Please enter a valid phone number")
+    .max(20, "Phone number must be less than 20 characters")
+    .regex(/^[+]?[\d\s()-]+$/, "Please enter a valid phone number")
+});
 
 interface FormData {
   region: string;
@@ -35,20 +53,22 @@ export const ApplicationFormNew = () => {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.region) newErrors.region = "Please select your region";
-    if (!formData.vehicles) newErrors.vehicles = "Please select fleet size";
-    if (!formData.company) newErrors.company = "Company name is required";
-    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
+    try {
+      formSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: FormErrors = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            newErrors[err.path[0] as string] = err.message;
+          }
+        });
+        setErrors(newErrors);
+      }
+      return false;
     }
-    if (!formData.whatsapp || formData.whatsapp.length < 10) {
-      newErrors.whatsapp = "Please enter a valid WhatsApp number";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,9 +87,9 @@ export const ApplicationFormNew = () => {
         .insert([
           {
             region: formData.region,
-            company: formData.company,
-            email: formData.email,
-            whatsapp: formData.whatsapp,
+            company: formData.company.trim(),
+            email: formData.email.trim().toLowerCase(),
+            whatsapp: formData.whatsapp.trim(),
             vehicles: formData.vehicles,
             timestamp: new Date().toISOString()
           }
@@ -80,7 +100,6 @@ export const ApplicationFormNew = () => {
       setIsSuccess(true);
       toast.success("Application submitted successfully!");
     } catch (error) {
-      console.error("Submission error:", error);
       toast.error("Something went wrong. Please WhatsApp us directly.");
     } finally {
       setIsSubmitting(false);

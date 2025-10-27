@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Logo } from "@/components/Logo";
 import { 
   Users, 
   Calendar, 
@@ -13,10 +11,8 @@ import {
   Search,
   Download,
   RefreshCw,
-  Copy,
   Mail,
-  MessageCircle,
-  X
+  MessageCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { FoundingApplication } from "@/types/founding";
@@ -27,47 +23,74 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-const ADMIN_PASSWORD = "fleetlynk2026";
+import { User } from "@supabase/supabase-js";
 
 const Admin = () => {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [applications, setApplications] = useState<FoundingApplication[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedApp, setSelectedApp] = useState<FoundingApplication | null>(null);
 
   useEffect(() => {
-    const auth = sessionStorage.getItem("fleetlynk_admin_auth");
-    if (auth === "true") {
-      setIsAuthenticated(true);
-      loadApplications();
-    }
-  }, []);
+    checkAuth();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        checkAdminRole(session.user.id);
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+        navigate("/admin-auth");
+      }
+    });
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem("fleetlynk_admin_auth", "true");
-      setIsAuthenticated(true);
-      loadApplications();
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      setUser(session.user);
+      await checkAdminRole(session.user.id);
     } else {
-      setPasswordError(true);
-      setTimeout(() => setPasswordError(false), 500);
+      navigate("/admin-auth");
+    }
+    setIsLoading(false);
+  };
+
+  const checkAdminRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (error) throw error;
+      
+      if (data) {
+        setIsAdmin(true);
+        loadApplications();
+      } else {
+        toast.error("Access denied. Admin role required.");
+        navigate("/admin-auth");
+      }
+    } catch (error) {
+      toast.error("Failed to verify admin access");
+      navigate("/admin-auth");
     }
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("fleetlynk_admin_auth");
-    setIsAuthenticated(false);
-    navigate("/");
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/admin-auth");
   };
 
   const loadApplications = async () => {
-    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('founding_applications')
@@ -88,10 +111,7 @@ const Admin = () => {
 
       setApplications(apps);
     } catch (error) {
-      console.error("Error loading applications:", error);
-      toast.error("Failed to load applications");
-    } finally {
-      setIsLoading(false);
+      toast.error("Failed to load applications. Please try again.");
     }
   };
 
@@ -160,36 +180,19 @@ const Admin = () => {
     zimbabwe: applications.filter(app => app.region.includes("Zimbabwe")).length
   };
 
-  if (!isAuthenticated) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary via-primary to-[hsl(221,47%,12%)] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md animate-scale-in">
-          <Logo className="mb-8" />
-          <h1 className="text-2xl font-bold text-primary text-center mb-6">
-            FleetLynk Admin
-          </h1>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={passwordError ? "border-destructive animate-shake" : ""}
-                placeholder="Enter admin password"
-              />
-              {passwordError && (
-                <p className="text-sm text-destructive">Wrong password</p>
-              )}
-            </div>
-            <Button type="submit" variant="hero" size="lg" className="w-full">
-              Access Dashboard
-            </Button>
-          </form>
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
+  }
+
+  if (!user || !isAdmin) {
+    return null;
   }
 
   return (
