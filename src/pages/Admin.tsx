@@ -144,7 +144,7 @@ const Admin = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `fleetlynk_founding_fleet_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `lynkfleet_founding_fleet_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     toast.success("CSV exported!");
   };

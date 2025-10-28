@@ -10,7 +10,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 
 const formSchema = z.object({
-  region: z.string().min(1, "Please select your region"),
+  region: z.string()
+    .trim()
+    .min(1, "Please enter your region")
+    .max(100, "Region must be less than 100 characters"),
   vehicles: z.string().min(1, "Please select fleet size"),
   company: z.string()
     .trim()
@@ -147,19 +150,14 @@ export const ApplicationFormNew = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <Label className="text-primary font-semibold">Where do you operate?</Label>
-                  <RadioGroup
+                  <Label htmlFor="region" className="text-primary font-semibold">Where do you operate?</Label>
+                  <Input
+                    id="region"
+                    placeholder="e.g., Johannesburg, South Africa"
                     value={formData.region}
-                    onValueChange={(value) => setFormData({ ...formData, region: value })}
-                    className="mt-2 space-y-2"
-                  >
-                    {["🇿🇦 South Africa", "🇿🇼 Zimbabwe", "🇲🇿 Mozambique", "🇿🇲 Zambia", "🇧🇼 Botswana"].map((option) => (
-                      <div key={option} className="flex items-center space-x-2">
-                        <RadioGroupItem value={option} id={option} />
-                        <Label htmlFor={option} className="cursor-pointer">{option}</Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
+                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                    className="mt-2"
+                  />
                   {errors.region && (
                     <motion.p
                       initial={{ opacity: 0, x: -10 }}

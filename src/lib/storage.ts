@@ -2,7 +2,7 @@
 // In production, this would connect to a real backend
 
 class StorageManager {
-  private prefix = "fleetlynk_";
+  private prefix = "lynkfleet_";
 
   async set(key: string, value: string): Promise<void> {
     try {

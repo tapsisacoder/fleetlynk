@@ -35,7 +35,7 @@ export const FoundingProgramSectionNew = () => {
             className="text-center text-gray-700 space-y-4 max-w-2xl mx-auto"
           >
             <p className="text-lg">
-              We are selecting <strong>100 fleet managers</strong> to help test FleetLynk.
+              We are selecting <strong>100 fleet managers</strong> to help test LynkFleet.
             </p>
 
             <p className="text-lg">

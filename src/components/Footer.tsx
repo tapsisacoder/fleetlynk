@@ -16,7 +16,7 @@ export const Footer = () => {
           </motion.div>
           
           <div className="text-sm text-white/80">
-            <p className="mb-2">FleetLynk — Modern Fleet Management for Southern Africa</p>
+            <p className="mb-2">LynkFleet — Modern Fleet Management for Southern Africa</p>
             <p>Pilot Program Starts Next Year • Built for African Logistics</p>
           </div>
 
@@ -29,7 +29,7 @@ export const Footer = () => {
           </div>
 
           <div className="pt-4 border-t border-white/20 text-sm text-white/60">
-            © 2025 FleetLynk. Your data. Your rules. Always.
+            © 2025 LynkFleet. Your data. Your rules. Always.
           </div>
         </div>
       </div>

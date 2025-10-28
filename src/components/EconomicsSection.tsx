@@ -27,7 +27,7 @@ export const EconomicsSection = () => {
               </p>
 
               <p>
-                <strong className="text-foreground">FleetLynk?</strong> Software runs on phones your drivers already have. No devices to buy. No installation crews. No hardware headaches.
+                <strong className="text-foreground">LynkFleet?</strong> Software runs on phones your drivers already have. No devices to buy. No installation crews. No hardware headaches.
               </p>
 
               <p>

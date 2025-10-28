@@ -57,7 +57,7 @@ const AdminAuth = () => {
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md animate-scale-in">
         <Logo className="mb-8" />
         <h1 className="text-2xl font-bold text-primary text-center mb-2">
-          FleetLynk Admin
+          LynkFleet Admin
         </h1>
         <p className="text-center text-muted-foreground mb-6">
           {isSignUp ? "Create your admin account" : "Sign in to access the dashboard"}
@@ -74,7 +74,7 @@ const AdminAuth = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-10"
-                placeholder="admin@fleetlynk.com"
+                placeholder="admin@lynkfleet.com"
                 required
               />
             </div>

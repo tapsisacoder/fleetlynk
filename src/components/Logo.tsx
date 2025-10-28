@@ -39,7 +39,7 @@ export const Logo = ({ className = "" }: { className?: string }) => {
           />
         </svg>
       </div>
-      <div className="font-semibold text-xl text-primary">FleetLynk</div>
+      <div className="font-semibold text-xl text-primary">LynkFleet</div>
     </motion.div>
   );
 };
@@ -68,7 +68,7 @@ export const LogoHorizontal = ({ className = "" }: { className?: string }) => {
           <circle cx="14" cy="12" r="2" fill="hsl(var(--accent))" />
         </svg>
       </div>
-      <div className="font-semibold text-xl text-primary">FleetLynk</div>
+      <div className="font-semibold text-xl text-primary">LynkFleet</div>
     </motion.div>
   );
 };

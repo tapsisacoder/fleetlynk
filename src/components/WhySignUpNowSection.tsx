@@ -18,7 +18,7 @@ const urgencyCards = [
     icon: Users,
     iconColor: "text-green-600",
     title: "Shape What We Build",
-    description: "We're building FleetLynk with 30 founding members, not for them. Your feedback becomes features. Your challenges become solutions."
+    description: "We're building LynkFleet with 30 founding members, not for them. Your feedback becomes features. Your challenges become solutions."
   }
 ];
 
@@ -37,7 +37,7 @@ export const WhySignUpNowSection = () => {
             The Founding Fleet
           </h2>
           <p className="text-xl text-gray-600">
-            We're hand-picking 100 operators to test and help shape FleetLynk. This isn't just about testing software. It's about not falling behind.
+            We're hand-picking 100 operators to test and help shape LynkFleet. This isn't just about testing software. It's about not falling behind.
           </p>
         </motion.div>
 

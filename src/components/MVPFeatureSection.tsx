@@ -46,7 +46,7 @@ export const MVPFeatureSection = () => {
           className="text-center max-w-5xl mx-auto mb-10"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            What FleetLynk Does for You
+            What LynkFleet Does for You
           </h2>
           <p className="text-lg text-gray-600">
             We're not showing you everything yet—just enough to make you curious.
