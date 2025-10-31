@@ -35,15 +35,11 @@ export const FoundingProgramSectionNew = () => {
             className="text-center text-gray-700 space-y-4 max-w-2xl mx-auto"
           >
             <p className="text-lg">
-              We are selecting <strong>100 fleet managers</strong> to help test LynkFleet.
+              We are selecting 100 fleet managers to help refine LynkFleet.
             </p>
 
             <p className="text-lg">
-              The 100 get free unfiltered access to the product before its commercial launch, direct line to our technical team, your feature requests prioritized, and discounted pricing when we launch commercially.
-            </p>
-
-            <p className="text-lg font-semibold text-primary">
-              This isn't a trial. It's a partnership to shape the future of African fleet management.
+              The 100 get free unfiltered access to the product before its commercial launch, direct line to our technical team, your feature requests prioritized, and discounted pricing of up to 50% we launch commercially.
             </p>
           </motion.div>
 
@@ -61,7 +57,7 @@ export const FoundingProgramSectionNew = () => {
             className="mt-8 text-center"
           >
             <p className="text-accent font-bold text-lg">
-              🔥 Applications close November 30th • Only 100 spots available
+              🔥 Applications close December 31st • Only 100 spots available
             </p>
           </motion.div>
         </motion.div>

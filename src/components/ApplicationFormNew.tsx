@@ -139,7 +139,7 @@ export const ApplicationFormNew = () => {
                   Secure Your Spot in 2 Minutes
                 </h2>
                 <p className="text-gray-600">
-                  Quick questions. We'll contact you within 5 business days.
+                  Quick questions. No time wasted.
                 </p>
               </div>
 
@@ -262,7 +262,7 @@ export const ApplicationFormNew = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 }}
                     >
-                      <Label htmlFor="whatsapp" className="font-medium">WhatsApp Number</Label>
+                      <Label htmlFor="whatsapp" className="font-medium">Mobile Number</Label>
                       <Input
                         id="whatsapp"
                         type="tel"
@@ -334,17 +334,9 @@ export const ApplicationFormNew = () => {
                 <h2 className="text-2xl font-bold text-primary mb-4">
                   You're In. Welcome to the Founding Fleet.
                 </h2>
-                <p className="text-gray-600 italic mb-4">
-                  Selected members will be contacted in December 2025.
+                <p className="text-gray-600">
+                  Your application to join the Founding fleet has been received, thank you for your time.
                 </p>
-
-              <div className="text-gray-700 space-y-3 max-w-lg mx-auto mb-6">
-                <p>Your application is submitted.</p>
-                <p>We review applications weekly and contact selected members via WhatsApp within 5 business days.</p>
-                <p>
-                  You just helped shape the future of African logistics.
-                </p>
-              </div>
 
               <motion.div
                 whileHover={{ scale: 1.05 }}

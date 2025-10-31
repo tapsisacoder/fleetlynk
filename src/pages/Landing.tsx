@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { WhyWeExistSection } from "@/components/WhyWeExistSection";
-import { WhySignUpNowSection } from "@/components/WhySignUpNowSection";
 import { MVPFeatureSection } from "@/components/MVPFeatureSection";
 import { FoundingProgramSectionNew } from "@/components/FoundingProgramSectionNew";
 import { ApplicationFormNew } from "@/components/ApplicationFormNew";
@@ -23,7 +22,6 @@ const Landing = () => {
       <Navigation />
       <HeroSection />
       <WhyWeExistSection />
-      <WhySignUpNowSection />
       <MVPFeatureSection />
       <FoundingProgramSectionNew />
       <ApplicationFormNew />

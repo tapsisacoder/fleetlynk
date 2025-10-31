@@ -15,7 +15,7 @@ const features = [
   {
     icon: Fuel,
     title: "Fuel & Cost Tracking",
-    description: "Per-trip fuel logs. Cost analysis. Spot anomalies before they drain your budget."
+    description: "Per-trip fuel logs. Cost analysis. Precise fuel calculation with adaptive machine learning to better understand and optimise your fleet. Spot anomalies before they drain your budget."
   },
   {
     icon: Receipt,
@@ -86,7 +86,7 @@ export const MVPFeatureSection = () => {
           transition={{ delay: 0.6 }}
           className="text-center text-gray-600 italic mt-6"
         >
-          More features launching continuously. Founding members help us prioritize what matters most.
+          More features launching continuously.
         </motion.p>
       </div>
     </section>

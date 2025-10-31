@@ -27,12 +27,8 @@ export const WhyWeExistSection = () => {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-lg text-gray-700 leading-relaxed"
           >
-            <p className="mb-4">
-              We are operators who got tired of watching good fleet managers drown in chaos.
-            </p>
-
             <p>
-              We are a fleet management platform designed for African logistics —affordable, mobile-first, convenient and efficient.
+              LynkFleet is a next-generation fleet management platform built for Southern Africa's trucking industry. We empower transport operators to take full control of their fleets — no expensive hardware required. From live trip tracking and fuel intelligence to driver performance and maintenance insights, FleetLynk brings every moving part of your business into one simple, powerful dashboard. Built for Africa's roads, designed for its realities, and ready to drive your fleet further.
             </p>
           </motion.div>
         </div>

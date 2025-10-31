@@ -46,7 +46,7 @@ export const HeroSection = () => {
             }}
             className="text-xl md:text-2xl text-white/90 mb-6 max-w-3xl mx-auto"
           >
-            Modern Fleet Management software that handles operations, compliance, costs, communication and more —all in one platform.
+            Modern Fleet Management software that handles operations, compliance, costs, communication and more —all on one platform.
           </motion.p>
 
           {/* Urgency badge */}
@@ -62,7 +62,7 @@ export const HeroSection = () => {
             }}
             className="inline-flex items-center gap-2 px-4 py-2 bg-accent rounded-full mb-8"
           >
-            <span className="text-sm font-bold text-white">⚡ Limited founding spots • Applications close November 30th</span>
+            <span className="text-sm font-bold text-white">⚡ Limited founding spots • Applications close December 31st</span>
           </motion.div>
 
           {/* CTA Button */}
