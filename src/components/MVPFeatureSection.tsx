@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Route, FileCheck, Fuel, Receipt, Smartphone, Cpu } from "lucide-react";
+import { Route, FileCheck, Fuel, Receipt, Smartphone, Cpu, MessageCircle, WifiOff } from "lucide-react";
 
 const features = [
   {
@@ -31,6 +31,16 @@ const features = [
     icon: Cpu,
     title: "Affordable Hardware Coming",
     description: "We're integrating low-cost tracking hardware soon. Software first, hardware when you're ready."
+  },
+  {
+    icon: MessageCircle,
+    title: "WhatsApp Integration",
+    description: "Stay connected in low-bandwidth areas. Get trip updates, alerts, and notifications via WhatsApp. Your drivers don't need smartphones—just WhatsApp. Built for Africa's connectivity reality."
+  },
+  {
+    icon: WifiOff,
+    title: "Offline Mode",
+    description: "No internet? No problem. Log trips, record fuel stops, deploy trucks—all offline. Everything syncs automatically when you're back online."
   }
 ];
 
@@ -48,9 +58,6 @@ export const MVPFeatureSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
             What LynkFleet Does for You
           </h2>
-          <p className="text-lg text-gray-600">
-            We're not showing you everything yet—just enough to make you curious.
-          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">

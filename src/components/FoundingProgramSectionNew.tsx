@@ -35,11 +35,11 @@ export const FoundingProgramSectionNew = () => {
             className="text-center text-gray-700 space-y-4 max-w-2xl mx-auto"
           >
             <p className="text-lg">
-              We are selecting 100 fleet managers to help refine LynkFleet.
+              We are selecting 100 fleet managers for our Beta test Founding Fleet program.
             </p>
 
             <p className="text-lg">
-              The 100 get free unfiltered access to the product before its commercial launch, direct line to our technical team, your feature requests prioritized, and discounted pricing of up to 50% we launch commercially.
+              The 100 get unfiltered access to the product before its commercial launch, direct contact with our technical team and all at discounted pricing of up to 50% for a limited time only.
             </p>
           </motion.div>
 

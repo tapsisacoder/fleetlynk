@@ -17,7 +17,7 @@ export const Footer = () => {
           
           <div className="text-sm text-white/80">
             <p className="mb-2">LynkFleet — Modern Fleet Management for Southern Africa</p>
-            <p>Founding Fleet Program Starts Next Year • Built for African Logistics</p>
+            <p>Founding Fleet Program Starts early Next Year • Built for African Logistics</p>
           </div>
 
           <div className="flex justify-center gap-4 text-sm text-white/70">
