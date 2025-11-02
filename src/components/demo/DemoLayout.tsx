@@ -40,9 +40,21 @@ export const DemoLayout = ({ children }: DemoLayoutProps) => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">LF</span>
+            <div className="flex items-center gap-2">
+                <div className="relative w-8 h-8">
+                  <svg viewBox="0 0 32 32" className="w-full h-full">
+                    <path
+                      d="M6 6 L26 6 L26 12 L14 12 L14 18 L22 18"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                    />
+                    <circle cx="6" cy="6" r="2" fill="hsl(var(--accent))" />
+                    <circle cx="26" cy="6" r="2" fill="hsl(var(--accent))" />
+                    <circle cx="14" cy="12" r="2" fill="hsl(var(--accent))" />
+                  </svg>
                 </div>
                 <span className="font-bold text-primary text-lg">LynkFleet</span>
               </div>
@@ -87,20 +99,6 @@ export const DemoLayout = ({ children }: DemoLayoutProps) => {
             })}
           </nav>
 
-          <div className="mt-8 p-4 bg-accent/10 rounded-lg">
-            <p className="text-xs text-gray-600 mb-2">DEMO MODE</p>
-            <p className="text-sm font-medium text-gray-800">
-              This is a visual prototype with dummy data
-            </p>
-            <Button
-              onClick={() => navigate("/")}
-              variant="outline"
-              size="sm"
-              className="w-full mt-3"
-            >
-              Exit Demo
-            </Button>
-          </div>
         </div>
 
         {/* Main Content */}

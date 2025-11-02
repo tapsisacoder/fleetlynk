@@ -92,7 +92,6 @@ export default function DemoHistory() {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Route</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Distance</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Fuel</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Variance</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Date</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
                 </tr>
@@ -118,17 +117,6 @@ export default function DemoHistory() {
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-sm text-gray-700">{trip.fuel} L</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div>
-                          <span className={`text-sm font-medium ${trip.variance < 0 ? 'text-green-600' : 'text-orange-600'}`}>
-                            {trip.variance > 0 ? '+' : ''}{trip.variance}L
-                          </span>
-                          <br />
-                          <span className={`text-xs ${status.color}`}>
-                            {status.text} ({variancePercent}% {trip.variance < 0 ? 'under' : 'over'})
-                          </span>
-                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-sm text-gray-700">{trip.date}</span>

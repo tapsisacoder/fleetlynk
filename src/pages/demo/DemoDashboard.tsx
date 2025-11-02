@@ -49,7 +49,7 @@ export default function DemoDashboard() {
                 <p className="text-sm text-gray-600">This Month</p>
                 <p className="text-2xl font-bold text-gray-900">12,480 L Fuel Used</p>
                 <p className="text-xs text-green-600 font-medium mt-1">
-                  vs 13,200 L Expected • -720 L Saved! (R15,840)
+                  vs 13,200 L Expected • -720 L Saved
                 </p>
               </div>
             </div>
@@ -125,37 +125,19 @@ export default function DemoDashboard() {
                     <p className="text-sm text-gray-600">
                       Route: <span className="font-medium text-gray-900">{trip.route.from} → {trip.route.to}</span>
                     </p>
+                    <p className="text-sm text-gray-600">
+                      Driver: <span className="font-medium text-gray-900">{trip.reference === "TRIP-2025-042" ? "T Mpofu" : "M Ndlovhu"}</span>
+                    </p>
                   </div>
 
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="text-gray-600">Progress</span>
-                      <span className="font-medium">{trip.progress}%</span>
-                    </div>
-                    <Progress value={trip.progress} className="h-2" />
-                  </div>
-
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-sm">
-                      <span className="text-gray-600">Expected Fuel:</span>{" "}
-                      <span className="font-medium">{trip.fuel.expected} L</span>
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-gray-600">Used So Far:</span>{" "}
-                      <span className="font-medium">{trip.fuel.used} L</span>
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-gray-600">Variance:</span>{" "}
-                      <span className={`font-medium ${trip.fuel.variance < 0 ? 'text-green-600' : 'text-orange-600'}`}>
-                        {trip.fuel.variance > 0 ? '+' : ''}{trip.fuel.variance}L ✅{" "}
-                        ({Math.abs((trip.fuel.variance / trip.fuel.expected) * 100).toFixed(1)}% {trip.fuel.variance < 0 ? 'under' : 'over'})
-                      </span>
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <p className="text-sm text-blue-700 font-medium">
+                      ⏳ Awaiting Proof of Delivery...
                     </p>
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Started: {trip.started}</span>
-                    <span className="text-gray-600">ETA: {trip.eta}</span>
                   </div>
 
                   <div className="flex gap-2 pt-2">

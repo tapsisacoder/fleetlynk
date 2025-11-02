@@ -164,6 +164,15 @@ export default function DemoDeploy() {
               </div>
 
               <div>
+                <Label htmlFor="bookout" className="text-base">Book Out</Label>
+                <Input
+                  id="bookout"
+                  value="$ 280"
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
                 <Label htmlFor="notes-deploy" className="text-base">Notes (optional):</Label>
                 <Textarea
                   id="notes-deploy"
@@ -172,6 +181,22 @@ export default function DemoDeploy() {
                   className="mt-2"
                   rows={3}
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="documents" className="text-base">Trip Documents (optional):</Label>
+                <Select>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Add waybills, border papers..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="waybill">Waybill</SelectItem>
+                    <SelectItem value="border">Border Papers</SelectItem>
+                    <SelectItem value="customs">Customs Declaration</SelectItem>
+                    <SelectItem value="insurance">Insurance Certificate</SelectItem>
+                    <SelectItem value="other">Other Documents</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex gap-4 pt-4">
@@ -224,11 +249,6 @@ export default function DemoDeploy() {
                 <p className="font-medium text-gray-900">03 Dec 2025, 08:00</p>
               </div>
 
-              <div>
-                <p className="text-sm text-gray-600">Expected Arrival:</p>
-                <p className="font-medium text-gray-900">04 Dec 2025, 16:00</p>
-                <p className="text-xs text-gray-500">(estimated)</p>
-              </div>
             </div>
           </Card>
         </div>

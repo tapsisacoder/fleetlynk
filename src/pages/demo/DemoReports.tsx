@@ -43,7 +43,7 @@ export default function DemoReports() {
         </div>
 
         {/* Big Numbers */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           <Card className="p-8 text-center">
             <p className="text-sm text-gray-600 mb-2">TOTAL FUEL USED</p>
             <p className="text-4xl font-bold text-gray-900 mb-1">
@@ -55,19 +55,6 @@ export default function DemoReports() {
             <p className="text-sm text-gray-600 mb-2">EXPECTED FUEL</p>
             <p className="text-4xl font-bold text-gray-900 mb-1">
               {monthlyReport.expectedFuel.toLocaleString()} L
-            </p>
-          </Card>
-
-          <Card className="p-8 text-center bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-            <p className="text-sm text-gray-600 mb-2">SAVINGS</p>
-            <p className="text-4xl font-bold text-green-600 mb-1">
-              {monthlyReport.savings} L
-            </p>
-            <p className="text-sm text-gray-700">
-              ({monthlyReport.savingsPercent}% under)
-            </p>
-            <p className="text-2xl font-bold text-green-700 mt-2">
-              💰 R{monthlyReport.savingsAmount.toLocaleString()} saved
             </p>
           </Card>
         </div>
@@ -195,7 +182,7 @@ export default function DemoReports() {
             <li>• <strong>ZWE-9123</strong> is your most efficient vehicle with 6.6% fuel savings</li>
             <li>• <strong>RSA-2341</strong> needs attention - consuming 2.6% more fuel than expected</li>
             <li>• Overall fleet performance trending positively - savings increasing each week</li>
-            <li>• Estimated monthly savings: <strong>R15,840</strong> compared to traditional estimation methods</li>
+            <li>• You are saving 720L of fuel per month compared to expected consumption</li>
           </ul>
         </Card>
       </div>

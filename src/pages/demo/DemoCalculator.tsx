@@ -12,20 +12,24 @@ import { vehicles } from "@/data/demoData";
 
 export default function DemoCalculator() {
   const navigate = useNavigate();
-  const [distance, setDistance] = useState("560");
+  const [startPoint, setStartPoint] = useState("Beira");
+  const [endPoint, setEndPoint] = useState("Harare");
   const [loadStatus, setLoadStatus] = useState("loaded");
-  const [engineFactor, setEngineFactor] = useState("1.0");
+  const [selectedEngine, setSelectedEngine] = useState("Scania DC13");
+  const [buffer, setBuffer] = useState("5");
   const [calculated, setCalculated] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState("");
   const [notes, setNotes] = useState("Harare to Beira route");
+  
+  const distance = 560;
 
   const handleCalculate = () => {
     setCalculated(true);
   };
 
+  const bufferValue = 17.5;
   const fuelNeeded = 297.5;
   const baseFuel = 280.0;
-  const buffer = 17.5;
   const emptyFuel = 241.5;
   const fuelEfficiency = loadStatus === "loaded" ? 2 : 2.5;
 
@@ -34,7 +38,7 @@ export default function DemoCalculator() {
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-primary mb-2">
-            Fuel Calculator - Stop Guessing, Start Saving
+            Fuel Calculator
           </h1>
         </div>
 
@@ -43,14 +47,44 @@ export default function DemoCalculator() {
 
           <div className="space-y-6">
             <div>
-              <Label htmlFor="distance" className="text-base">Distance Traveled (km):</Label>
-              <Input
-                id="distance"
-                type="number"
-                value={distance}
-                onChange={(e) => setDistance(e.target.value)}
-                className="mt-2"
-              />
+              <Label className="text-base mb-2 block">Route:</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="start" className="text-sm">Start Point:</Label>
+                  <Select value={startPoint} onValueChange={setStartPoint}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Harare">Harare, Zimbabwe</SelectItem>
+                      <SelectItem value="Beira">Beira, Mozambique</SelectItem>
+                      <SelectItem value="Johannesburg">Johannesburg, South Africa</SelectItem>
+                      <SelectItem value="Lusaka">Lusaka, Zambia</SelectItem>
+                      <SelectItem value="Bulawayo">Bulawayo, Zimbabwe</SelectItem>
+                      <SelectItem value="Mutare">Mutare, Zimbabwe</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="end" className="text-sm">End Point:</Label>
+                  <Select value={endPoint} onValueChange={setEndPoint}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Harare">Harare, Zimbabwe</SelectItem>
+                      <SelectItem value="Beira">Beira, Mozambique</SelectItem>
+                      <SelectItem value="Johannesburg">Johannesburg, South Africa</SelectItem>
+                      <SelectItem value="Lusaka">Lusaka, Zambia</SelectItem>
+                      <SelectItem value="Bulawayo">Bulawayo, Zimbabwe</SelectItem>
+                      <SelectItem value="Mutare">Mutare, Zimbabwe</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">
+                Distance: <span className="font-medium">{distance} km</span>
+              </p>
             </div>
 
             <div>
@@ -70,17 +104,45 @@ export default function DemoCalculator() {
             </div>
 
             <div>
-              <Label htmlFor="engine" className="text-base">Engine Size Factor (optional):</Label>
-              <Input
-                id="engine"
-                type="number"
-                step="0.1"
-                value={engineFactor}
-                onChange={(e) => setEngineFactor(e.target.value)}
-                className="mt-2"
-              />
+              <Label htmlFor="engine" className="text-base">Engine:</Label>
+              <Select value={selectedEngine} onValueChange={setSelectedEngine}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Scania DC13">Scania DC13</SelectItem>
+                  <SelectItem value="Cummins X15">Cummins X15</SelectItem>
+                  <SelectItem value="Volvo D13">Volvo D13</SelectItem>
+                  <SelectItem value="Mercedes OM 471">Mercedes OM 471</SelectItem>
+                  <SelectItem value="Detroit DD15">Detroit DD15</SelectItem>
+                  <SelectItem value="Renault DTI 13">Renault DTI 13</SelectItem>
+                  <SelectItem value="Scania DC16">Scania DC16</SelectItem>
+                  <SelectItem value="Cummins X12">Cummins X12</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="buffer" className="text-base">Buffer for Uncertainty:</Label>
+              <Select value={buffer} onValueChange={setBuffer}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1% - Ideal conditions</SelectItem>
+                  <SelectItem value="2">2% - Good conditions</SelectItem>
+                  <SelectItem value="3">3% - Normal conditions</SelectItem>
+                  <SelectItem value="4">4% - Some traffic</SelectItem>
+                  <SelectItem value="5">5% - Moderate traffic/terrain</SelectItem>
+                  <SelectItem value="6">6% - Heavy traffic</SelectItem>
+                  <SelectItem value="7">7% - Difficult terrain</SelectItem>
+                  <SelectItem value="8">8% - Very difficult</SelectItem>
+                  <SelectItem value="9">9% - Extreme conditions</SelectItem>
+                  <SelectItem value="10">10% - Maximum buffer</SelectItem>
+                </SelectContent>
+              </Select>
               <p className="text-sm text-gray-500 mt-1">
-                ℹ️ Adjust if your engine is larger or smaller than standard
+                ℹ️ Account for terrain, idling, and traffic conditions
               </p>
             </div>
 
@@ -120,14 +182,18 @@ export default function DemoCalculator() {
                   <span className="font-medium">{fuelEfficiency} km/litre ({loadStatus})</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Engine Factor:</span>
-                  <span className="font-medium">{engineFactor}</span>
+                  <span className="text-gray-600">Engine:</span>
+                  <span className="font-medium">{selectedEngine}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Buffer:</span>
+                  <span className="font-medium">{buffer}%</span>
                 </div>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg mb-6">
                 <p className="font-mono text-sm mb-2">Formula Used:</p>
-                <p className="font-mono text-sm">({distance} ÷ {fuelEfficiency}) × {engineFactor} + {buffer} = {fuelNeeded} litres</p>
+                <p className="font-mono text-sm">({distance} ÷ {fuelEfficiency}) + buffer ({buffer}%) = {fuelNeeded} litres</p>
               </div>
 
               <div className="space-y-2 mb-6">
@@ -137,7 +203,7 @@ export default function DemoCalculator() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Buffer Reserve:</span>
-                  <span className="font-medium">+{buffer} L</span>
+                  <span className="font-medium">+{bufferValue} L</span>
                 </div>
                 <div className="border-t border-gray-300 pt-2 flex justify-between">
                   <span className="font-bold text-gray-900">Total Fuel Needed:</span>
@@ -153,7 +219,7 @@ export default function DemoCalculator() {
                   {emptyFuel} litres (-{(fuelNeeded - emptyFuel).toFixed(1)}L difference)
                 </p>
                 <p className="text-xs text-gray-600 mt-1 font-mono">
-                  Formula for empty: ({distance} ÷ 2.5) × {engineFactor} + {buffer} = {emptyFuel} litres
+                  Formula for empty: ({distance} ÷ 2.5) + buffer ({buffer}%) = {emptyFuel} litres
                 </p>
               </div>
             </Card>

@@ -100,7 +100,8 @@ export const activeTrips = [
     progress: 65,
     fuel: { expected: 240, used: 155, variance: -5 },
     started: "2 days ago",
-    eta: "Tomorrow 14:00"
+    eta: "Tomorrow 14:00",
+    driver: "T Mpofu"
   },
   {
     reference: "TRIP-2025-041",
@@ -112,7 +113,8 @@ export const activeTrips = [
     progress: 30,
     fuel: { expected: 420, used: 130, variance: 2 },
     started: "Yesterday",
-    eta: "3 Dec 18:00"
+    eta: "3 Dec 18:00",
+    driver: "M Ndlovhu"
   }
 ];
 
