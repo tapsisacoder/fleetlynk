@@ -140,15 +140,10 @@ export default function DemoHistory() {
         </Card>
 
         {/* Summary Stats */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           <Card className="p-6">
             <p className="text-sm text-gray-600 mb-1">Total Trips</p>
             <p className="text-3xl font-bold text-gray-900">{tripHistory.length}</p>
-          </Card>
-          <Card className="p-6 bg-green-50 border-green-200">
-            <p className="text-sm text-gray-600 mb-1">Average Variance</p>
-            <p className="text-3xl font-bold text-green-600">-3.2%</p>
-            <p className="text-xs text-gray-600 mt-1">Better than expected</p>
           </Card>
           <Card className="p-6">
             <p className="text-sm text-gray-600 mb-1">Total Distance</p>

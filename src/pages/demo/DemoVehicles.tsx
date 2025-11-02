@@ -60,7 +60,8 @@ export default function DemoVehicles() {
           <Button variant="ghost">Available (6)</Button>
           <Button variant="ghost">Deployed (2)</Button>
           <Button variant="ghost">Inactive (0)</Button>
-          <Button variant="ghost">Trailers (0)</Button>
+          <Button variant="ghost">Trailers (8)</Button>
+          <Button variant="ghost">Drivers (8)</Button>
         </div>
 
         {/* Vehicle Cards Grid */}

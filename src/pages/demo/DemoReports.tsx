@@ -52,9 +52,9 @@ export default function DemoReports() {
           </Card>
 
           <Card className="p-8 text-center">
-            <p className="text-sm text-gray-600 mb-2">EXPECTED FUEL</p>
+            <p className="text-sm text-gray-600 mb-2">TOTAL BOOKOUT COSTS</p>
             <p className="text-4xl font-bold text-gray-900 mb-1">
-              {monthlyReport.expectedFuel.toLocaleString()} L
+              $ 2,800
             </p>
           </Card>
         </div>

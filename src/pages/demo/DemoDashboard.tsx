@@ -48,8 +48,8 @@ export default function DemoDashboard() {
               <div>
                 <p className="text-sm text-gray-600">This Month</p>
                 <p className="text-2xl font-bold text-gray-900">12,480 L Fuel Used</p>
-                <p className="text-xs text-green-600 font-medium mt-1">
-                  vs 13,200 L Expected • -720 L Saved
+                <p className="text-xs text-gray-500 mt-1">
+                  Total fuel consumption this month
                 </p>
               </div>
             </div>
