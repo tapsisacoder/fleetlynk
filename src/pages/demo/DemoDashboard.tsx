@@ -3,7 +3,7 @@ import { DemoLayout } from "@/components/demo/DemoLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { activeTrips, recentActivity } from "@/data/demoData";
+import { recentActivity } from "@/data/demoData";
 import { Truck, MapPin, TrendingDown, AlertTriangle, Plus } from "lucide-react";
 
 export default function DemoDashboard() {
@@ -57,14 +57,29 @@ export default function DemoDashboard() {
 
           <Card className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-100 rounded-lg">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <TrendingDown className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Alerts</p>
-                <p className="text-2xl font-bold text-gray-900">3 Documents Expiring</p>
+                <p className="text-sm text-gray-600">Fuel Cost</p>
+                <p className="text-2xl font-bold text-gray-900">$19,596.3</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Last month fuel expenditure
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <AlertTriangle className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Operational Costs</p>
+                <p className="text-2xl font-bold text-gray-900">$4,670</p>
                 <button 
-                  onClick={() => navigate("/demo/documents")}
+                  onClick={() => navigate("/demo/reports")}
                   className="text-xs text-accent font-medium mt-1 hover:underline"
                 >
                   View Details →
@@ -94,67 +109,7 @@ export default function DemoDashboard() {
           </Button>
         </div>
 
-        {/* Active Trips Section */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-900">Active Trips</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">All</Button>
-              <Button variant="ghost" size="sm">In Transit</Button>
-              <Button variant="ghost" size="sm">Arriving Today</Button>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {activeTrips.map((trip) => (
-              <Card key={trip.reference} className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="font-bold text-lg">{trip.reference}</h3>
-                    <p className="text-sm text-gray-600">
-                      Status: <span className="text-green-600 font-medium">IN TRANSIT 🟢</span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-600">
-                      Vehicle: <span className="font-medium text-gray-900">{trip.vehicle} ({trip.vehicleModel})</span>
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Route: <span className="font-medium text-gray-900">{trip.route.from} → {trip.route.to}</span>
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Driver: <span className="font-medium text-gray-900">{trip.reference === "TRIP-2025-042" ? "T Mpofu" : "M Ndlovhu"}</span>
-                    </p>
-                  </div>
-
-                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <p className="text-sm text-blue-700 font-medium">
-                      ⏳ Awaiting Proof of Delivery...
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Started: {trip.started}</span>
-                  </div>
-
-                  <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      Log Fuel Stop
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      View Details
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Recent Activity Sidebar */}
+        {/* Recent Activity Section */}
         <Card className="p-6">
           <h3 className="font-bold text-lg mb-4">Recent Activity</h3>
           <div className="space-y-3">

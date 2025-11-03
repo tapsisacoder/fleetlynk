@@ -1,6 +1,7 @@
 import { DemoLayout } from "@/components/demo/DemoLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { monthlyReport } from "@/data/demoData";
 import { Download, Mail } from "lucide-react";
 
@@ -24,7 +25,19 @@ export default function DemoReports() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-primary mb-2">Fuel Consumption Report</h1>
-            <p className="text-gray-600">Date Range: November 2025</p>
+            <div className="flex items-center gap-4">
+              <Select defaultValue="november-2025">
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="november-2025">November 2025</SelectItem>
+                  <SelectItem value="october-2025">October 2025</SelectItem>
+                  <SelectItem value="september-2025">September 2025</SelectItem>
+                  <SelectItem value="august-2025">August 2025</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" className="gap-2">
@@ -43,7 +56,7 @@ export default function DemoReports() {
         </div>
 
         {/* Big Numbers */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           <Card className="p-8 text-center">
             <p className="text-sm text-gray-600 mb-2">TOTAL FUEL USED</p>
             <p className="text-4xl font-bold text-gray-900 mb-1">
@@ -55,6 +68,13 @@ export default function DemoReports() {
             <p className="text-sm text-gray-600 mb-2">TOTAL BOOKOUT COSTS</p>
             <p className="text-4xl font-bold text-gray-900 mb-1">
               $ 2,800
+            </p>
+          </Card>
+
+          <Card className="p-8 text-center">
+            <p className="text-sm text-gray-600 mb-2">FUEL COST</p>
+            <p className="text-4xl font-bold text-gray-900 mb-1">
+              $ 19,596.3
             </p>
           </Card>
         </div>

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Route, FileCheck, Fuel, Receipt, Smartphone, Cpu, MessageCircle, WifiOff } from "lucide-react";
+import { Route, FileCheck, Fuel, Receipt, MessageCircle, WifiOff } from "lucide-react";
 
 const features = [
   {
@@ -21,16 +21,6 @@ const features = [
     icon: Receipt,
     title: "Simple Invoicing",
     description: "Generate invoices fast. Track payments. Manage documents. No more Excel chaos."
-  },
-  {
-    icon: Smartphone,
-    title: "Optional Vehicle Tracking",
-    description: "Track vehicles using driver smartphones. See location and trip history when you need it."
-  },
-  {
-    icon: Cpu,
-    title: "Affordable Hardware Coming",
-    description: "We're integrating low-cost tracking hardware soon. Software first, hardware when you're ready."
   },
   {
     icon: MessageCircle,

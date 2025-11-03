@@ -28,7 +28,7 @@ export const WhyWeExistSection = () => {
             className="text-lg text-gray-700 leading-relaxed"
           >
             <p>
-              LynkFleet is a next-generation fleet management platform built for Southern Africa's trucking industry. We empower transport operators to take full control of their fleets — no expensive hardware required. From live trip tracking and fuel intelligence to driver performance and maintenance insights, LynkFleet brings every moving part of your business onto one simple, powerful dashboard. Built for Africa's roads, designed for its realities, and ready to drive your fleet further.
+              LynkFleet is a next-generation fleet management platform built for Southern Africa's trucking industry. We empower transport operators to take full control of their fleets — no expensive hardware required. From fuel intelligence to driver performance and maintenance insights, LynkFleet brings every moving part of your business onto one simple, powerful dashboard. Built for Africa's roads, designed for its realities, and ready to drive your fleet further.
             </p>
           </motion.div>
         </div>

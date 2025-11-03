@@ -15,6 +15,7 @@ import DemoVehicles from "./pages/demo/DemoVehicles";
 import DemoHistory from "./pages/demo/DemoHistory";
 import DemoReports from "./pages/demo/DemoReports";
 import DemoDocuments from "./pages/demo/DemoDocuments";
+import DemoActiveTrips from "./pages/demo/DemoActiveTrips";
 import "@/lib/storage";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/demo/calculator" element={<DemoCalculator />} />
           <Route path="/demo/deploy" element={<DemoDeploy />} />
           <Route path="/demo/vehicles" element={<DemoVehicles />} />
+          <Route path="/demo/active-trips" element={<DemoActiveTrips />} />
           <Route path="/demo/history" element={<DemoHistory />} />
           <Route path="/demo/reports" element={<DemoReports />} />
           <Route path="/demo/documents" element={<DemoDocuments />} />

@@ -1,7 +1,7 @@
 // Dummy data for the LynkFleet demo prototype
 
 export const company = {
-  name: "Masvingo Haulage",
+  name: "Horizon Logistics",
   owner: "John Masvingo",
   fleetSize: 8
 };

@@ -9,7 +9,8 @@ import {
   BarChart3, 
   FileText,
   Menu,
-  User
+  User,
+  MapPin
 } from "lucide-react";
 import { company } from "@/data/demoData";
 
@@ -28,6 +29,7 @@ export const DemoLayout = ({ children }: DemoLayoutProps) => {
     { path: "/demo/calculator", icon: Calculator, label: "Fuel Calculator" },
     { path: "/demo/deploy", icon: Truck, label: "Deploy Trip" },
     { path: "/demo/vehicles", icon: Truck, label: "Fleet" },
+    { path: "/demo/active-trips", icon: MapPin, label: "Active Trips" },
     { path: "/demo/history", icon: History, label: "Trip History" },
     { path: "/demo/reports", icon: BarChart3, label: "Reports" },
     { path: "/demo/documents", icon: FileText, label: "Documents" }

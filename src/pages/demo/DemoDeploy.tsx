@@ -164,30 +164,59 @@ export default function DemoDeploy() {
               </div>
 
               <div>
-                <Label htmlFor="bookout" className="text-base">Book Out</Label>
+                <Label htmlFor="tripCosts" className="text-base">Trip Costs</Label>
                 <Input
-                  id="bookout"
+                  id="tripCosts"
                   value="$ 280"
                   className="mt-2"
                 />
               </div>
 
               <div>
-                <Label htmlFor="notes-deploy" className="text-base">Notes (optional):</Label>
-                <Textarea
-                  id="notes-deploy"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
+                <Label htmlFor="tollgates" className="text-base">Tollgates</Label>
+                <Input
+                  id="tollgates"
+                  placeholder="Enter tollgate costs..."
                   className="mt-2"
-                  rows={3}
                 />
               </div>
 
               <div>
-                <Label htmlFor="documents" className="text-base">Trip Documents (optional):</Label>
+                <Label htmlFor="cargo" className="text-base">Cargo</Label>
+                <Textarea
+                  id="cargo"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="mt-2"
+                  rows={2}
+                  placeholder="e.g., Steel coils, 22 tons"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="rate" className="text-base">Rate</Label>
+                <Input
+                  id="rate"
+                  placeholder="Enter rate..."
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="tonnage" className="text-base">Tonnage</Label>
+                <Input
+                  id="tonnage"
+                  type="number"
+                  placeholder="Enter tonnage..."
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="documents" className="text-base">Trip Documents</Label>
                 <Select>
                   <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Add waybills, border papers..." />
+                    <SelectValue placeholder="Select document type..." />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="waybill">Waybill</SelectItem>
@@ -197,6 +226,12 @@ export default function DemoDeploy() {
                     <SelectItem value="other">Other Documents</SelectItem>
                   </SelectContent>
                 </Select>
+                <Input
+                  type="file"
+                  className="mt-2"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                />
+                <p className="text-sm text-gray-500 mt-1">Upload selected document</p>
               </div>
 
               <div className="flex gap-4 pt-4">

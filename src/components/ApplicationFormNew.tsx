@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Check, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +36,7 @@ interface FormData {
   vehicles: string;
   company: string;
   email: string;
+  countryCode: string;
   whatsapp: string;
 }
 
@@ -48,6 +50,7 @@ export const ApplicationFormNew = () => {
     vehicles: "",
     company: "",
     email: "",
+    countryCode: "+27",
     whatsapp: ""
   });
 
@@ -116,6 +119,7 @@ export const ApplicationFormNew = () => {
       vehicles: "",
       company: "",
       email: "",
+      countryCode: "+27",
       whatsapp: ""
     });
     setErrors({});
@@ -262,15 +266,45 @@ export const ApplicationFormNew = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 }}
                     >
+                      <Label htmlFor="countryCode" className="font-medium">Country</Label>
+                      <Select value={formData.countryCode} onValueChange={(value) => setFormData({ ...formData, countryCode: value })}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="+27">🇿🇦 South Africa (+27)</SelectItem>
+                          <SelectItem value="+263">🇿🇼 Zimbabwe (+263)</SelectItem>
+                          <SelectItem value="+267">🇧🇼 Botswana (+267)</SelectItem>
+                          <SelectItem value="+258">🇲🇿 Mozambique (+258)</SelectItem>
+                          <SelectItem value="+260">🇿🇲 Zambia (+260)</SelectItem>
+                          <SelectItem value="+264">🇳🇦 Namibia (+264)</SelectItem>
+                          <SelectItem value="+266">🇱🇸 Lesotho (+266)</SelectItem>
+                          <SelectItem value="+268">🇸🇿 Eswatini (+268)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.55 }}
+                    >
                       <Label htmlFor="whatsapp" className="font-medium">Mobile Number</Label>
-                      <Input
-                        id="whatsapp"
-                        type="tel"
-                        placeholder="082 123 4567"
-                        value={formData.whatsapp}
-                        onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                        className="mt-1"
-                      />
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          value={formData.countryCode}
+                          readOnly
+                          className="w-20 bg-gray-50"
+                        />
+                        <Input
+                          id="whatsapp"
+                          type="tel"
+                          placeholder="82 123 4567"
+                          value={formData.whatsapp}
+                          onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                          className="flex-1"
+                        />
+                      </div>
                       <p className="text-gray-500 text-sm mt-1">We'll contact you here first</p>
                       {errors.whatsapp && (
                         <motion.p
