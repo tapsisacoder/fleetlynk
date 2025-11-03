@@ -92,7 +92,7 @@ export default function DemoDeploy() {
                     <Input id="to" value="Beira, Mozambique" className="mt-1" />
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-2">Distance: 600 km</p>
+                <p className="text-sm text-gray-600 mt-2">Distance: 560 km</p>
               </div>
 
               <div>
@@ -131,7 +131,7 @@ export default function DemoDeploy() {
               <div>
                 <Label className="text-base">⛽ Fuel Allocation</Label>
                 <Input
-                  value="228 liters"
+                  value="297.5 liters"
                   readOnly
                   className="mt-2 bg-gray-50 font-medium"
                 />
@@ -269,13 +269,13 @@ export default function DemoDeploy() {
 
               <div className="pb-3 border-b border-gray-200">
                 <p className="text-sm text-gray-600">Route:</p>
-                <p className="font-medium text-gray-900">600 km</p>
+                <p className="font-medium text-gray-900">560 km</p>
                 <p className="text-sm text-gray-600">Harare → Beira</p>
               </div>
 
               <div className="pb-3 border-b border-gray-200">
                 <p className="text-sm text-gray-600">Fuel:</p>
-                <p className="font-medium text-gray-900">228 L</p>
+                <p className="font-medium text-gray-900">297.5 L</p>
                 <p className="text-sm text-gray-600">Load: {loadStatus}</p>
               </div>
 

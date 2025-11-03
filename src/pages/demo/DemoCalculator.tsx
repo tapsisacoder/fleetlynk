@@ -15,7 +15,7 @@ export default function DemoCalculator() {
   const [startPoint, setStartPoint] = useState("Beira");
   const [endPoint, setEndPoint] = useState("Harare");
   const [loadStatus, setLoadStatus] = useState("loaded");
-  const [selectedEngine, setSelectedEngine] = useState("Scania DC13");
+  const [selectedEngine, setSelectedEngine] = useState("Detroit DD15");
   const [buffer, setBuffer] = useState("5");
   const [calculated, setCalculated] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState("");
