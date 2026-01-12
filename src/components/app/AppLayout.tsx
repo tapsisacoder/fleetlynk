@@ -33,18 +33,14 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   const navItems = [
     { path: "/app/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { path: "/app/trips", icon: MapPin, label: "Active Trips" },
+    { path: "/app/trips", icon: MapPin, label: "Trips" },
     { path: "/app/deploy", icon: Truck, label: "Deploy Trip" },
     { path: "/app/vehicles", icon: Truck, label: "Fleet" },
     { path: "/app/drivers", icon: Users, label: "Drivers" },
     { path: "/app/clients", icon: Users, label: "Clients" },
-    { path: "/app/history", icon: History, label: "Trip History" },
     { path: "/app/calculator", icon: Calculator, label: "Fuel Calculator" },
     { divider: true },
-    { path: "/app/invoices", icon: Receipt, label: "Invoices" },
-    { path: "/app/expenses", icon: CreditCard, label: "Expenses" },
-    { path: "/app/reports", icon: BarChart3, label: "Reports" },
-    { path: "/app/documents", icon: FileText, label: "Documents" },
+    { path: "/app/transactions", icon: DollarSign, label: "Daily Transactions" },
   ];
 
   if (loading) {

@@ -17,19 +17,12 @@ import Onboarding from "./pages/auth/Onboarding";
 // App pages
 import Dashboard from "./pages/app/Dashboard";
 import Vehicles from "./pages/app/Vehicles";
-
-// Demo pages (legacy - can be removed later)
-import DemoLogin from "./pages/demo/DemoLogin";
-import DemoDashboard from "./pages/demo/DemoDashboard";
-import DemoCalculator from "./pages/demo/DemoCalculator";
-import DemoDeploy from "./pages/demo/DemoDeploy";
-import DemoVehicles from "./pages/demo/DemoVehicles";
-import DemoHistory from "./pages/demo/DemoHistory";
-import DemoReports from "./pages/demo/DemoReports";
-import DemoDocuments from "./pages/demo/DemoDocuments";
-import DemoActiveTrips from "./pages/demo/DemoActiveTrips";
-
-import "@/lib/storage";
+import Trips from "./pages/app/Trips";
+import DeployTrip from "./pages/app/DeployTrip";
+import Drivers from "./pages/app/Drivers";
+import Clients from "./pages/app/Clients";
+import FuelCalculator from "./pages/app/FuelCalculator";
+import DailyTransactions from "./pages/app/DailyTransactions";
 
 const queryClient = new QueryClient();
 
@@ -54,17 +47,12 @@ const App = () => (
             {/* Main App (authenticated) */}
             <Route path="/app/dashboard" element={<Dashboard />} />
             <Route path="/app/vehicles" element={<Vehicles />} />
-            
-            {/* Demo pages (legacy) */}
-            <Route path="/demo" element={<DemoLogin />} />
-            <Route path="/demo/dashboard" element={<DemoDashboard />} />
-            <Route path="/demo/calculator" element={<DemoCalculator />} />
-            <Route path="/demo/deploy" element={<DemoDeploy />} />
-            <Route path="/demo/vehicles" element={<DemoVehicles />} />
-            <Route path="/demo/active-trips" element={<DemoActiveTrips />} />
-            <Route path="/demo/history" element={<DemoHistory />} />
-            <Route path="/demo/reports" element={<DemoReports />} />
-            <Route path="/demo/documents" element={<DemoDocuments />} />
+            <Route path="/app/trips" element={<Trips />} />
+            <Route path="/app/deploy" element={<DeployTrip />} />
+            <Route path="/app/drivers" element={<Drivers />} />
+            <Route path="/app/clients" element={<Clients />} />
+            <Route path="/app/calculator" element={<FuelCalculator />} />
+            <Route path="/app/transactions" element={<DailyTransactions />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
