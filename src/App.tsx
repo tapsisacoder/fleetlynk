@@ -23,6 +23,10 @@ import Drivers from "./pages/app/Drivers";
 import Clients from "./pages/app/Clients";
 import FuelCalculator from "./pages/app/FuelCalculator";
 import DailyTransactions from "./pages/app/DailyTransactions";
+import Invoices from "./pages/app/Invoices";
+import Expenses from "./pages/app/Expenses";
+import Reports from "./pages/app/Reports";
+import TripBookout from "./pages/app/TripBookout";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +57,11 @@ const App = () => (
             <Route path="/app/clients" element={<Clients />} />
             <Route path="/app/calculator" element={<FuelCalculator />} />
             <Route path="/app/transactions" element={<DailyTransactions />} />
+            <Route path="/app/invoices" element={<Invoices />} />
+            <Route path="/app/expenses" element={<Expenses />} />
+            <Route path="/app/reports" element={<Reports />} />
+            <Route path="/app/bookout" element={<TripBookout />} />
+            <Route path="/app/bookout/:tripId" element={<TripBookout />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

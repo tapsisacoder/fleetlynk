@@ -43,24 +43,30 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     { path: "/app/transactions", icon: DollarSign, label: "Daily Transactions" },
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-muted flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Skeleton className="h-12 w-12 rounded-full mx-auto" />
-          <Skeleton className="h-4 w-32 mx-auto" />
-        </div>
-      </div>
-    );
-  }
+  // Auth disabled for demo - remove these checks when auth is re-enabled
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen bg-muted flex items-center justify-center">
+  //       <div className="text-center space-y-4">
+  //         <Skeleton className="h-12 w-12 rounded-full mx-auto" />
+  //         <Skeleton className="h-4 w-32 mx-auto" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  // if (!user) {
+  //   return <Navigate to="/login" replace />;
+  // }
 
-  if (!company) {
-    return <Navigate to="/onboarding" replace />;
-  }
+  // if (!company) {
+  //   return <Navigate to="/onboarding" replace />;
+  // }
+
+  // Demo mode - use placeholder data when not authenticated
+  const demoCompany = company || { name: 'Demo Fleet Company' };
+  const demoProfile = profile || { full_name: 'Demo User' };
+  const demoUser = user || { email: 'demo@lynkfleet.com' };
 
   const handleSignOut = async () => {
     await signOut();
@@ -93,7 +99,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 <span className="font-bold text-primary text-lg">LynkFleet</span>
               </div>
               <span className="text-muted-foreground">|</span>
-              <span className="font-semibold text-foreground">{company.name}</span>
+              <span className="font-semibold text-foreground">{demoCompany.name}</span>
             </div>
 
             <div className="flex items-center gap-4">
@@ -105,7 +111,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 <User className="w-4 h-4 text-primary-foreground" />
               </div>
               <span className="text-sm font-medium text-foreground">
-                {profile?.full_name || user.email?.split('@')[0]}
+                {demoProfile?.full_name || demoUser.email?.split('@')[0]}
               </span>
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4" />

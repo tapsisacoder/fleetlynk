@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Route, FileCheck, Fuel, Receipt, MessageCircle, WifiOff } from "lucide-react";
+import { Route, FileCheck, Fuel, Receipt, Cloud, Calculator } from "lucide-react";
 
 const features = [
   {
@@ -23,14 +23,14 @@ const features = [
     description: "Generate invoices fast. Track payments. Manage documents. No more Excel chaos."
   },
   {
-    icon: MessageCircle,
-    title: "WhatsApp Integration",
-    description: "Stay connected in low-bandwidth areas. Get trip updates, alerts, and notifications via WhatsApp. Your drivers don't need smartphones—just WhatsApp. Built for Africa's connectivity reality."
+    icon: Cloud,
+    title: "Paperless & Connected",
+    description: "Go completely paperless. Access your fleet data from anywhere, on any device. Your office travels with you—whether you're on-site or across borders."
   },
   {
-    icon: WifiOff,
-    title: "Offline Mode",
-    description: "No internet? No problem. Log trips, record fuel stops, deploy trucks—all offline. Everything syncs automatically when you're back online."
+    icon: Calculator,
+    title: "Full In-House Accounting",
+    description: "Complete accounting module built-in. Track income, expenses, invoices, and payments. Daily transaction logging with automated journal entries. No need for separate accounting software."
   }
 ];
 
