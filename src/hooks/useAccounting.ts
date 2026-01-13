@@ -204,6 +204,25 @@ export const useUpdateInvoice = () => {
   });
 };
 
+export const useDeleteInvoice = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('invoices')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+    },
+  });
+  });
+};
+
 // Expense Records
 export interface ExpenseRecord {
   id: string;
@@ -291,6 +310,46 @@ export const useCreateExpense = () => {
     },
   });
 };
+
+export const useExpenses = useExpenseRecords;
+
+export const useUpdateExpense = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<ExpenseRecord> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('expense_records')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expense-records'] });
+    },
+  });
+};
+
+export const useDeleteExpense = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('expense_records')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expense-records'] });
+    },
+  });
 
 export const useApproveExpense = () => {
   const queryClient = useQueryClient();

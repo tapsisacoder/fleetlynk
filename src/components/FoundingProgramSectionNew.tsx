@@ -57,7 +57,7 @@ export const FoundingProgramSectionNew = () => {
             className="mt-8 text-center"
           >
             <p className="text-accent font-bold text-lg">
-              🔥 Applications close December 31st • Only 100 spots available
+              Applications close April 30th • Only 100 spots available
             </p>
           </motion.div>
         </motion.div>
