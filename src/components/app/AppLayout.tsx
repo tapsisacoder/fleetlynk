@@ -15,7 +15,9 @@ import {
   LogOut,
   User,
   DollarSign,
-  Settings
+  Settings,
+  AlertTriangle,
+  Wrench
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,6 +42,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     { path: "/app/drivers", icon: Users, label: "Drivers" },
     { path: "/app/clients", icon: Users, label: "Clients" },
     { path: "/app/calculator", icon: Calculator, label: "Fuel Calculator" },
+    { path: "/app/documents", icon: AlertTriangle, label: "Doc Reminders" },
+    { path: "/app/maintenance", icon: Wrench, label: "Maintenance Log" },
     { divider: true },
     { path: "/app/transactions", icon: DollarSign, label: "Daily Transactions" },
     { path: "/app/invoices", icon: FileText, label: "Invoices" },

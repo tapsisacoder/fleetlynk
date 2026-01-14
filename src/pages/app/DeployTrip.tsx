@@ -371,6 +371,27 @@ export default function DeployTrip() {
             </CardContent>
           </Card>
 
+          {/* Bookout */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-secondary" />
+                Trip Bookout
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                <div>
+                  <p className="text-sm text-muted-foreground">Estimated Trip Bookout</p>
+                  <p className="text-2xl font-bold text-foreground">$ 280</p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Includes tolls, food, accommodation, and other expenses
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Notes */}
           <Card>
             <CardHeader>
