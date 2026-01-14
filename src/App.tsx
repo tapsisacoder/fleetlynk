@@ -27,6 +27,8 @@ import Invoices from "./pages/app/Invoices";
 import Expenses from "./pages/app/Expenses";
 import Reports from "./pages/app/Reports";
 import TripBookout from "./pages/app/TripBookout";
+import Documents from "./pages/app/Documents";
+import MaintenanceLog from "./pages/app/MaintenanceLog";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,8 @@ const App = () => (
             <Route path="/app/reports" element={<Reports />} />
             <Route path="/app/bookout" element={<TripBookout />} />
             <Route path="/app/bookout/:tripId" element={<TripBookout />} />
+            <Route path="/app/documents" element={<Documents />} />
+            <Route path="/app/maintenance" element={<MaintenanceLog />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
