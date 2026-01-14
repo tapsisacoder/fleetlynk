@@ -35,12 +35,16 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     { path: "/app/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/app/trips", icon: MapPin, label: "Trips" },
     { path: "/app/deploy", icon: Truck, label: "Deploy Trip" },
+    { path: "/app/bookout", icon: CreditCard, label: "Trip Bookout" },
     { path: "/app/vehicles", icon: Truck, label: "Fleet" },
     { path: "/app/drivers", icon: Users, label: "Drivers" },
     { path: "/app/clients", icon: Users, label: "Clients" },
     { path: "/app/calculator", icon: Calculator, label: "Fuel Calculator" },
     { divider: true },
     { path: "/app/transactions", icon: DollarSign, label: "Daily Transactions" },
+    { path: "/app/invoices", icon: FileText, label: "Invoices" },
+    { path: "/app/expenses", icon: Receipt, label: "Expenses" },
+    { path: "/app/reports", icon: BarChart3, label: "Reports" },
   ];
 
   // Auth disabled for demo - remove these checks when auth is re-enabled

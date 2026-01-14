@@ -220,7 +220,6 @@ export const useDeleteInvoice = () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
     },
   });
-  });
 };
 
 // Expense Records
@@ -350,6 +349,7 @@ export const useDeleteExpense = () => {
       queryClient.invalidateQueries({ queryKey: ['expense-records'] });
     },
   });
+};
 
 export const useApproveExpense = () => {
   const queryClient = useQueryClient();
