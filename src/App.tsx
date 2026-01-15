@@ -29,6 +29,9 @@ import Reports from "./pages/app/Reports";
 import TripBookout from "./pages/app/TripBookout";
 import Documents from "./pages/app/Documents";
 import MaintenanceLog from "./pages/app/MaintenanceLog";
+import Inventory from "./pages/app/Inventory";
+import Suppliers from "./pages/app/Suppliers";
+import Tracking from "./pages/app/Tracking";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +69,9 @@ const App = () => (
             <Route path="/app/bookout/:tripId" element={<TripBookout />} />
             <Route path="/app/documents" element={<Documents />} />
             <Route path="/app/maintenance" element={<MaintenanceLog />} />
+            <Route path="/app/inventory" element={<Inventory />} />
+            <Route path="/app/suppliers" element={<Suppliers />} />
+            <Route path="/app/tracking" element={<Tracking />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

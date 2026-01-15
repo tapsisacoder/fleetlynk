@@ -51,6 +51,8 @@ const Vehicles = () => {
     tank_capacity_liters: 800,
     year: new Date().getFullYear(),
     current_odometer: 0,
+    fuel_consumption_loaded: 2.0, // 1L per Xkm when loaded
+    fuel_consumption_empty: 2.5, // 1L per Xkm when empty
   });
   
   const { data: vehicles, isLoading } = useVehicles();
@@ -82,6 +84,8 @@ const Vehicles = () => {
         tank_capacity_liters: 800,
         year: new Date().getFullYear(),
         current_odometer: 0,
+        fuel_consumption_loaded: 2.0,
+        fuel_consumption_empty: 2.5,
       });
     } catch (error: any) {
       toast({
@@ -180,7 +184,52 @@ const Vehicles = () => {
                     onChange={(e) => setNewVehicle({ ...newVehicle, current_odometer: parseInt(e.target.value) })}
                   />
                 </div>
-                <Button 
+
+                {/* Fuel Consumption Ratios */}
+                <div className="border-t pt-4 mt-4">
+                  <Label className="text-base font-semibold mb-2 block">Fuel Consumption Ratios</Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Set how many kilometers your vehicle travels per 1 liter of fuel
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>When Loaded (km/L)</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">1L per</span>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          min="1.5"
+                          max="4"
+                          value={newVehicle.fuel_consumption_loaded}
+                          onChange={(e) => setNewVehicle({ ...newVehicle, fuel_consumption_loaded: parseFloat(e.target.value) || 2 })}
+                          className="w-20"
+                        />
+                        <span className="text-sm text-muted-foreground">km</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Range: 2-3 km/L typical</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>When Empty (km/L)</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">1L per</span>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          min="1.5"
+                          max="4"
+                          value={newVehicle.fuel_consumption_empty}
+                          onChange={(e) => setNewVehicle({ ...newVehicle, fuel_consumption_empty: parseFloat(e.target.value) || 2.5 })}
+                          className="w-20"
+                        />
+                        <span className="text-sm text-muted-foreground">km</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Range: 2.5-3.5 km/L typical</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
                   className="w-full" 
                   onClick={handleAddVehicle}
                   disabled={createVehicle.isPending || !newVehicle.registration_number}
