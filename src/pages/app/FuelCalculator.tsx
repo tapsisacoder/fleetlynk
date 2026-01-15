@@ -23,25 +23,27 @@ export default function FuelCalculator() {
   const [selectedVehicle, setSelectedVehicle] = useState("");
   const [distance, setDistance] = useState("");
   const [loadStatus, setLoadStatus] = useState<"loaded" | "empty">("loaded");
-  const [engineFactor, setEngineFactor] = useState("1.0");
+  const [trafficAllowance, setTrafficAllowance] = useState("0");
   const [calculated, setCalculated] = useState(false);
 
   const selectedVehicleData = vehicles.find(v => v.id === selectedVehicle);
 
-  // Get consumption rates from vehicle or use defaults
-  const loadedConsumption = selectedVehicleData?.fuel_consumption_loaded || 38; // Default 2 km/L
-  const emptyConsumption = selectedVehicleData?.fuel_consumption_empty || 30; // Default 2.5 km/L
+  // Get consumption rates from vehicle (km per liter)
+  const loadedRatio = selectedVehicleData?.fuel_consumption_loaded || 2; // 1L per 2km when loaded
+  const emptyRatio = selectedVehicleData?.fuel_consumption_empty || 2.5; // 1L per 2.5km when empty
 
-  // Calculate fuel using the formula from the demo
-  // Formula: (distance ÷ divisor) × engineFactor + reserve
-  const divisor = loadStatus === "loaded" ? 2 : 2.5;
-  const factor = parseFloat(engineFactor) || 1.0;
   const distanceNum = parseFloat(distance) || 0;
+  const allowancePercent = parseFloat(trafficAllowance) || 0;
   const reserve = 17.5;
 
-  const fuelNeeded = distanceNum > 0 ? (distanceNum / divisor) * factor + reserve : 0;
-  const fuelIfEmpty = distanceNum > 0 ? (distanceNum / 2.5) * factor + reserve : 0;
-  const fuelIfLoaded = distanceNum > 0 ? (distanceNum / 2) * factor + reserve : 0;
+  // Calculate fuel: distance / ratio + reserve + allowance
+  const ratio = loadStatus === "loaded" ? loadedRatio : emptyRatio;
+  const baseFuel = distanceNum > 0 ? (distanceNum / ratio) + reserve : 0;
+  const allowanceFuel = baseFuel * (allowancePercent / 100);
+  const fuelNeeded = baseFuel + allowanceFuel;
+
+  const fuelIfEmpty = distanceNum > 0 ? (distanceNum / emptyRatio) + reserve : 0;
+  const fuelIfLoaded = distanceNum > 0 ? (distanceNum / loadedRatio) + reserve : 0;
   const fuelSavings = Math.abs(fuelIfLoaded - fuelIfEmpty);
 
   const handleCalculate = () => {
@@ -54,7 +56,7 @@ export default function FuelCalculator() {
     setSelectedVehicle("");
     setDistance("");
     setLoadStatus("loaded");
-    setEngineFactor("1.0");
+    setTrafficAllowance("0");
     setCalculated(false);
   };
 
@@ -99,8 +101,8 @@ export default function FuelCalculator() {
                 </Select>
                 {selectedVehicleData && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    Loaded: {selectedVehicleData.fuel_consumption_loaded}L/100km | 
-                    Empty: {selectedVehicleData.fuel_consumption_empty}L/100km
+                    Loaded: 1L per {selectedVehicleData.fuel_consumption_loaded}km | 
+                    Empty: 1L per {selectedVehicleData.fuel_consumption_empty}km
                   </p>
                 )}
               </div>
@@ -160,22 +162,24 @@ export default function FuelCalculator() {
                 </Select>
               </div>
 
-              {/* Engine Factor */}
+              {/* Traffic/Terrain Allowance */}
               <div>
-                <Label htmlFor="engineFactor">Engine Size Factor</Label>
+                <Label htmlFor="trafficAllowance">Allowance for Traffic/Terrain/Idling (%)</Label>
                 <Input
-                  id="engineFactor"
+                  id="trafficAllowance"
                   type="number"
-                  step="0.1"
-                  value={engineFactor}
+                  step="1"
+                  min="0"
+                  max="50"
+                  value={trafficAllowance}
                   onChange={(e) => {
-                    setEngineFactor(e.target.value);
+                    setTrafficAllowance(e.target.value);
                     setCalculated(false);
                   }}
-                  placeholder="1.0"
+                  placeholder="0"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Default: 1.0 | Increase for larger engines, decrease for more efficient ones
+                  Add extra fuel buffer for uncertain conditions (0-50%)
                 </p>
               </div>
 
@@ -215,10 +219,21 @@ export default function FuelCalculator() {
                   <p className="text-xl text-muted-foreground mt-2">LITERS</p>
                 </div>
                 {calculated && (
-                  <div className="bg-muted/50 rounded-lg p-3 text-sm">
+                  <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1">
                     <p className="font-medium mb-1">Formula Used:</p>
                     <p className="font-mono text-muted-foreground">
-                      ({distance} ÷ {divisor}) × {factor} + {reserve} = {fuelNeeded.toFixed(1)} liters
+                      ({distance}km ÷ {ratio}km/L) + {reserve}L reserve = {baseFuel.toFixed(1)}L
+                    </p>
+                    {allowancePercent > 0 && (
+                      <p className="font-mono text-muted-foreground">
+                        + {allowancePercent}% allowance = {fuelNeeded.toFixed(1)}L total
+                      </p>
+                    )}
+                    <p className="text-xs text-blue-600 mt-2">
+                      📊 ML Ready: This calculation will be used to improve future predictions
+                    </p>
+                  </div>
+                )}
                     </p>
                   </div>
                 )}
