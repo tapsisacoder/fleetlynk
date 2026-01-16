@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { 
   Plus, Save, Trash2, Undo, ArrowUpCircle, ArrowDownCircle, 
-  CreditCard, DollarSign, Calendar, Building2
+  CreditCard, DollarSign, Calendar, Building2, Upload, Paperclip
 } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { useTransactions, useChartOfAccounts, Transaction } from "@/hooks/useAccounting";
@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { ReceiptUpload } from "@/components/app/ReceiptUpload";
 
 interface DailyEntry {
   id: string;
@@ -29,6 +30,7 @@ interface DailyEntry {
   party: string;
   reference: string;
   notes: string;
+  receiptPath: string;
 }
 
 const emptyEntry = (): DailyEntry => ({
@@ -40,6 +42,7 @@ const emptyEntry = (): DailyEntry => ({
   party: "",
   reference: "",
   notes: "",
+  receiptPath: "",
 });
 
 export default function DailyTransactions() {
@@ -188,6 +191,15 @@ export default function DailyTransactions() {
                       <Input placeholder="Invoice #, Receipt #" value={entry.reference}
                         onChange={(e) => updateEntry(entry.id, 'reference', e.target.value)} />
                     </div>
+                  </div>
+                  
+                  {/* Receipt Upload */}
+                  <div className="pt-2">
+                    <ReceiptUpload 
+                      onUpload={(path) => updateEntry(entry.id, 'receiptPath', path)}
+                      existingUrl={entry.receiptPath}
+                      label="Attach Receipt/Document (optional)"
+                    />
                   </div>
                 </CardContent>
               </Card>

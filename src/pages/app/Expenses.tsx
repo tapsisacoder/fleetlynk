@@ -32,9 +32,10 @@ import { useExpenses, useCreateExpense, useUpdateExpense, useDeleteExpense } fro
 import { useTrips } from '@/hooks/useTrips';
 import { useVehicles } from '@/hooks/useVehicles';
 import { useDrivers } from '@/hooks/useDrivers';
-import { Plus, Search, Receipt, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Plus, Search, Receipt, Trash2, CheckCircle, XCircle, Clock, FileImage, Paperclip } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { ReceiptUpload } from '@/components/app/ReceiptUpload';
 
 const EXPENSE_TYPES = [
   'Fuel',
@@ -65,6 +66,7 @@ const Expenses = () => {
   const [selectedVehicle, setSelectedVehicle] = useState('');
   const [selectedDriver, setSelectedDriver] = useState('');
   const [selectedTrip, setSelectedTrip] = useState('');
+  const [receiptPath, setReceiptPath] = useState('');
   const [expenseDate, setExpenseDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
   const { data: expenses, isLoading } = useExpenses();
@@ -101,6 +103,7 @@ const Expenses = () => {
       trip_id: selectedTrip || null,
       expense_date: expenseDate,
       status: 'pending',
+      receipt_photo_url: receiptPath || null,
     });
 
     setIsOpen(false);
@@ -117,6 +120,7 @@ const Expenses = () => {
     setSelectedDriver('');
     setSelectedTrip('');
     setExpenseDate(format(new Date(), 'yyyy-MM-dd'));
+    setReceiptPath('');
   };
 
   const handleApprove = async (id: string) => {
@@ -274,6 +278,13 @@ const Expenses = () => {
                   </div>
                 </div>
 
+                {/* Receipt Upload */}
+                <ReceiptUpload 
+                  onUpload={setReceiptPath}
+                  existingUrl={receiptPath}
+                  label="Receipt/Invoice (optional)"
+                />
+
                 <div className="flex justify-end gap-2 pt-4">
                   <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
                   <Button onClick={handleCreate} disabled={createExpense.isPending}>
@@ -359,6 +370,7 @@ const Expenses = () => {
                   <TableHead>Description</TableHead>
                   <TableHead>Vendor</TableHead>
                   <TableHead>Amount</TableHead>
+                  <TableHead>Receipt</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -373,6 +385,16 @@ const Expenses = () => {
                     <TableCell className="max-w-[200px] truncate">{expense.description}</TableCell>
                     <TableCell>{expense.vendor || '-'}</TableCell>
                     <TableCell className="font-semibold">${expense.amount.toLocaleString()}</TableCell>
+                    <TableCell>
+                      {expense.receipt_photo_url ? (
+                        <Badge variant="secondary" className="gap-1">
+                          <Paperclip className="w-3 h-3" />
+                          Attached
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(expense.status || 'pending')}>
                         {expense.status}
@@ -414,7 +436,7 @@ const Expenses = () => {
                 ))}
                 {(!filteredExpenses || filteredExpenses.length === 0) && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       <Receipt className="w-12 h-12 mx-auto mb-2 opacity-50" />
                       <p>No expenses found</p>
                     </TableCell>
