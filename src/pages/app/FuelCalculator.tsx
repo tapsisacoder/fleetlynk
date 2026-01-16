@@ -234,9 +234,6 @@ export default function FuelCalculator() {
                     </p>
                   </div>
                 )}
-                    </p>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
@@ -255,14 +252,14 @@ export default function FuelCalculator() {
                       <p className="text-sm text-muted-foreground">If Loaded</p>
                       <p className="text-2xl font-bold">{fuelIfLoaded.toFixed(1)} L</p>
                       <p className="text-xs text-muted-foreground font-mono">
-                        ({distance} ÷ 2) × {factor} + {reserve}
+                        ({distance} ÷ {loadedRatio}) + {reserve}
                       </p>
                     </div>
                     <div className={`p-4 rounded-lg ${loadStatus === 'empty' ? 'bg-secondary/10 ring-2 ring-secondary' : 'bg-muted/50'}`}>
                       <p className="text-sm text-muted-foreground">If Empty</p>
                       <p className="text-2xl font-bold">{fuelIfEmpty.toFixed(1)} L</p>
                       <p className="text-xs text-muted-foreground font-mono">
-                        ({distance} ÷ 2.5) × {factor} + {reserve}
+                        ({distance} ÷ {emptyRatio}) + {reserve}
                       </p>
                     </div>
                   </div>
