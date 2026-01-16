@@ -20,6 +20,7 @@ import { useActiveTrips } from '@/hooks/useTrips';
 import { useVehicles } from '@/hooks/useVehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
+import { GPSTrackingWidget } from '@/components/app/GPSTrackingWidget';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -174,7 +175,9 @@ const Dashboard = () => {
           </Card>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* GPS Tracking Widget */}
+          <GPSTrackingWidget />
           {/* Active Trips */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
