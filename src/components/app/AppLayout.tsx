@@ -17,7 +17,9 @@ import {
   DollarSign,
   Settings,
   AlertTriangle,
-  Wrench
+  Wrench,
+  Package,
+  Building2
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,16 +42,17 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     { path: "/app/tracking", icon: MapPin, label: "GPS Tracking" },
     { path: "/app/vehicles", icon: Truck, label: "Fleet" },
     { path: "/app/drivers", icon: Users, label: "Drivers" },
-    { path: "/app/clients", icon: Users, label: "Clients" },
     { path: "/app/calculator", icon: Calculator, label: "Fuel Calculator" },
     { path: "/app/documents", icon: AlertTriangle, label: "Doc Reminders" },
+    { divider: true, label: "Workshop" },
     { path: "/app/maintenance", icon: Wrench, label: "Maintenance Log" },
-    { path: "/app/inventory", icon: Receipt, label: "Inventory" },
-    { path: "/app/suppliers", icon: Users, label: "Suppliers" },
-    { divider: true },
+    { path: "/app/inventory", icon: Package, label: "Inventory" },
+    { divider: true, label: "Accounting" },
     { path: "/app/transactions", icon: DollarSign, label: "Daily Transactions" },
     { path: "/app/invoices", icon: FileText, label: "Invoices" },
     { path: "/app/expenses", icon: Receipt, label: "Expenses" },
+    { path: "/app/clients", icon: Building2, label: "Clients" },
+    { path: "/app/suppliers", icon: Users, label: "Suppliers" },
     { path: "/app/reports", icon: BarChart3, label: "Reports" },
   ];
 
@@ -140,7 +143,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 return (
                   <div key={index} className="my-4 border-t border-border">
                     <p className="text-xs text-muted-foreground uppercase tracking-wider mt-4 mb-2 px-4">
-                      Accounting
+                      {item.label}
                     </p>
                   </div>
                 );
