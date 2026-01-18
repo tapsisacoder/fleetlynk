@@ -32,6 +32,7 @@ import MaintenanceLog from "./pages/app/MaintenanceLog";
 import Inventory from "./pages/app/Inventory";
 import Suppliers from "./pages/app/Suppliers";
 import Tracking from "./pages/app/Tracking";
+import AuditDocumentation from "./pages/app/AuditDocumentation";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
             <Route path="/app/inventory" element={<Inventory />} />
             <Route path="/app/suppliers" element={<Suppliers />} />
             <Route path="/app/tracking" element={<Tracking />} />
+            <Route path="/app/audit" element={<AuditDocumentation />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
