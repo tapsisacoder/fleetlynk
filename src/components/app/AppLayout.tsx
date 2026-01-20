@@ -56,30 +56,25 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     { path: "/app/reports", icon: BarChart3, label: "Reports" },
   ];
 
-  // Auth disabled for demo - remove these checks when auth is re-enabled
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen bg-muted flex items-center justify-center">
-  //       <div className="text-center space-y-4">
-  //         <Skeleton className="h-12 w-12 rounded-full mx-auto" />
-  //         <Skeleton className="h-4 w-32 mx-auto" />
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  // Auth guards - redirect unauthenticated users
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Skeleton className="h-12 w-12 rounded-full mx-auto" />
+          <Skeleton className="h-4 w-32 mx-auto" />
+        </div>
+      </div>
+    );
+  }
 
-  // if (!user) {
-  //   return <Navigate to="/login" replace />;
-  // }
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
-  // if (!company) {
-  //   return <Navigate to="/onboarding" replace />;
-  // }
-
-  // Demo mode - use placeholder data when not authenticated
-  const demoCompany = company || { name: 'Demo Fleet Company' };
-  const demoProfile = profile || { full_name: 'Demo User' };
-  const demoUser = user || { email: 'demo@lynkfleet.com' };
+  if (!company) {
+    return <Navigate to="/onboarding" replace />;
+  }
 
   const handleSignOut = async () => {
     await signOut();
