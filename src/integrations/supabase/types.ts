@@ -413,6 +413,60 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_items: {
+        Row: {
+          category: string | null
+          company_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          last_restocked_at: string | null
+          location: string | null
+          min_stock_level: number | null
+          name: string
+          part_number: string
+          quantity: number
+          supplier: string | null
+          unit_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          company_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_restocked_at?: string | null
+          location?: string | null
+          min_stock_level?: number | null
+          name: string
+          part_number: string
+          quantity?: number
+          supplier?: string | null
+          unit_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          company_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_restocked_at?: string | null
+          location?: string | null
+          min_stock_level?: number | null
+          name?: string
+          part_number?: string
+          quantity?: number
+          supplier?: string | null
+          unit_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           client_email: string | null
@@ -572,6 +626,152 @@ export type Database = {
           },
         ]
       }
+      maintenance_records: {
+        Row: {
+          attachments: Json | null
+          company_id: string
+          created_at: string | null
+          description: string
+          driver_id: string | null
+          id: string
+          labor_cost: number | null
+          next_service_date: string | null
+          next_service_odometer: number | null
+          notes: string | null
+          odometer_reading: number | null
+          parts_cost: number | null
+          parts_used: Json | null
+          performed_by: string | null
+          priority: string | null
+          service_category: string | null
+          service_date: string
+          service_type: string
+          status: string | null
+          total_cost: number | null
+          updated_at: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          company_id: string
+          created_at?: string | null
+          description: string
+          driver_id?: string | null
+          id?: string
+          labor_cost?: number | null
+          next_service_date?: string | null
+          next_service_odometer?: number | null
+          notes?: string | null
+          odometer_reading?: number | null
+          parts_cost?: number | null
+          parts_used?: Json | null
+          performed_by?: string | null
+          priority?: string | null
+          service_category?: string | null
+          service_date: string
+          service_type: string
+          status?: string | null
+          total_cost?: number | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          company_id?: string
+          created_at?: string | null
+          description?: string
+          driver_id?: string | null
+          id?: string
+          labor_cost?: number | null
+          next_service_date?: string | null
+          next_service_odometer?: number | null
+          notes?: string | null
+          odometer_reading?: number | null
+          parts_cost?: number | null
+          parts_used?: Json | null
+          performed_by?: string | null
+          priority?: string | null
+          service_category?: string | null
+          service_date?: string
+          service_type?: string
+          status?: string | null
+          total_cost?: number | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_records_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_schedules: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          id: string
+          interval_days: number | null
+          interval_km: number | null
+          is_active: boolean | null
+          last_service_date: string | null
+          last_service_odometer: number | null
+          next_due_date: string | null
+          next_due_odometer: number | null
+          service_type: string
+          updated_at: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          id?: string
+          interval_days?: number | null
+          interval_km?: number | null
+          is_active?: boolean | null
+          last_service_date?: string | null
+          last_service_odometer?: number | null
+          next_due_date?: string | null
+          next_due_odometer?: number | null
+          service_type: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          id?: string
+          interval_days?: number | null
+          interval_km?: number | null
+          is_active?: boolean | null
+          last_service_date?: string | null
+          last_service_odometer?: number | null
+          next_due_date?: string | null
+          next_due_odometer?: number | null
+          service_type?: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_schedules_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_records: {
         Row: {
           amount: number
@@ -698,6 +898,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      purchase_orders: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          company_id: string
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          expected_delivery_date: string | null
+          id: string
+          items: Json
+          notes: string | null
+          order_date: string
+          po_number: string
+          received_date: string | null
+          status: string | null
+          subtotal: number | null
+          supplier_contact: string | null
+          supplier_email: string | null
+          supplier_name: string
+          tax_amount: number | null
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          company_id: string
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          expected_delivery_date?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          order_date: string
+          po_number: string
+          received_date?: string | null
+          status?: string | null
+          subtotal?: number | null
+          supplier_contact?: string | null
+          supplier_email?: string | null
+          supplier_name: string
+          tax_amount?: number | null
+          total_amount: number
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          company_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          expected_delivery_date?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          order_date?: string
+          po_number?: string
+          received_date?: string | null
+          status?: string | null
+          subtotal?: number | null
+          supplier_contact?: string | null
+          supplier_email?: string | null
+          supplier_name?: string
+          tax_amount?: number | null
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       transactions: {
         Row: {
@@ -1085,6 +1357,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vehicle_documents: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          document_name: string
+          document_type: string
+          document_url: string | null
+          expiry_date: string | null
+          id: string
+          issue_date: string | null
+          notes: string | null
+          reminder_days: number | null
+          status: string | null
+          updated_at: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          document_name: string
+          document_type: string
+          document_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          notes?: string | null
+          reminder_days?: number | null
+          status?: string | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          document_name?: string
+          document_type?: string
+          document_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          notes?: string | null
+          reminder_days?: number | null
+          status?: string | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_documents_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vehicles: {
         Row: {

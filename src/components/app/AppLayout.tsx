@@ -107,7 +107,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 <span className="font-bold text-primary text-lg">LynkFleet</span>
               </div>
               <span className="text-muted-foreground">|</span>
-              <span className="font-semibold text-foreground">{demoCompany.name}</span>
+              <span className="font-semibold text-foreground">{company.name}</span>
             </div>
 
             <div className="flex items-center gap-4">
@@ -119,7 +119,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 <User className="w-4 h-4 text-primary-foreground" />
               </div>
               <span className="text-sm font-medium text-foreground">
-                {demoProfile?.full_name || demoUser.email?.split('@')[0]}
+                {profile?.full_name || user.email?.split('@')[0]}
               </span>
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4" />
