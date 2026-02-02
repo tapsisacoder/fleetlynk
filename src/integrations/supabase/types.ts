@@ -413,6 +413,48 @@ export type Database = {
         }
         Relationships: []
       }
+      gps_integrations: {
+        Row: {
+          additional_config: Json | null
+          api_key: string
+          api_secret: string | null
+          api_url: string
+          company_id: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          provider_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          additional_config?: Json | null
+          api_key: string
+          api_secret?: string | null
+          api_url: string
+          company_id: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          provider_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          additional_config?: Json | null
+          api_key?: string
+          api_secret?: string | null
+          api_url?: string
+          company_id?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          provider_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       inventory_items: {
         Row: {
           category: string | null

@@ -54,6 +54,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     { path: "/app/clients", icon: Building2, label: "Clients" },
     { path: "/app/suppliers", icon: Users, label: "Suppliers" },
     { path: "/app/reports", icon: BarChart3, label: "Reports" },
+    { divider: true, label: "System" },
+    { path: "/app/settings", icon: Settings, label: "Settings" },
   ];
 
   // Auth guards - redirect unauthenticated users
