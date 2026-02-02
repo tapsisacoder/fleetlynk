@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { LogoHorizontal } from "./Logo";
 
@@ -30,6 +31,16 @@ export const Navigation = () => {
                 Pilot: Free
               </span>
             </motion.div>
+            
+            <Link to="/login">
+              <Button 
+                variant="outline" 
+                size="default"
+                className="font-semibold"
+              >
+                Login
+              </Button>
+            </Link>
             
             <motion.div
               whileHover={{ scale: 1.05 }}
