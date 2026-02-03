@@ -1,19 +1,22 @@
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Shield, Smartphone } from "lucide-react";
+import heroTruckBg from "@/assets/hero-truck-bg.jpg";
 
 export const HeroSection = () => {
-  const scrollToForm = () => {
-    const formSection = document.getElementById("application-form");
-    formSection?.scrollIntoView({ behavior: "smooth" });
-  };
-
   const openWhatsApp = () => {
     window.open("https://wa.me/263780009785?text=Hi%20LynkFleet%2C%20I%27m%20interested%20in%20the%20Founding%20Fleet%20program", "_blank");
   };
 
   return (
-    <section className="relative min-h-[90vh] overflow-hidden bg-gradient-to-br from-primary via-primary to-[hsl(221,47%,8%)]">
+    <section 
+      className="relative min-h-[90vh] overflow-hidden"
+      style={{
+        backgroundImage: `linear-gradient(to bottom right, hsla(221, 47%, 11%, 0.85), hsla(221, 47%, 8%, 0.9)), url(${heroTruckBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
       <div className="container relative z-10 mx-auto px-4 py-20 md:py-28">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Copy */}
@@ -46,7 +49,7 @@ export const HeroSection = () => {
               LynkFleet is the Command Center for fleet operators who are tired of manual chaos. Get total visibility of your fleet, fuel, finance, compliance and more —all from your phone.
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Button */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -68,21 +71,7 @@ export const HeroSection = () => {
                   onClick={openWhatsApp}
                   className="shadow-2xl w-full sm:w-auto"
                 >
-                  SECURE YOUR MARGINS ON WHATSAPP
-                </Button>
-              </motion.div>
-              
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button 
-                  variant="outline" 
-                  size="xl"
-                  onClick={scrollToForm}
-                  className="border-white/30 text-white hover:bg-white/10 w-full sm:w-auto"
-                >
-                  Apply for the Founding Fleet
+                  CONTACT US ON WHATSAPP AND SECURE YOUR MARGINS
                 </Button>
               </motion.div>
             </motion.div>

@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
-import { ThreePillarsSection } from "@/components/ThreePillarsSection";
+import { PentaIntegrationSection } from "@/components/PentaIntegrationSection";
 import { FoundingFleetSection } from "@/components/FoundingFleetSection";
 import { RiskReversalSection } from "@/components/RiskReversalSection";
-import { ApplicationFormNew } from "@/components/ApplicationFormNew";
 import { Footer } from "@/components/Footer";
 
 const Landing = () => {
@@ -21,10 +20,9 @@ const Landing = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       <HeroSection />
-      <ThreePillarsSection />
+      <PentaIntegrationSection />
       <FoundingFleetSection />
       <RiskReversalSection />
-      <ApplicationFormNew />
       <Footer />
     </div>
   );
