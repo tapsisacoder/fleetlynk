@@ -4,9 +4,8 @@ import { Button } from "./ui/button";
 import { LogoHorizontal } from "./Logo";
 
 export const Navigation = () => {
-  const scrollToForm = () => {
-    const formSection = document.getElementById("application-form");
-    formSection?.scrollIntoView({ behavior: "smooth" });
+  const openWhatsApp = () => {
+    window.open("https://wa.me/263780009785?text=Hi%20LynkFleet%2C%20I%27m%20interested%20in%20the%20Founding%20Fleet%20program", "_blank");
   };
 
   return (
@@ -16,7 +15,7 @@ export const Navigation = () => {
           <div className="flex items-center gap-3">
             <LogoHorizontal />
             <span className="hidden md:block text-sm text-gray-600 italic border-l border-gray-300 pl-3">
-              Unlock Your Fleet's Full Potential
+              Master your Margins
             </span>
           </div>
           
@@ -50,10 +49,10 @@ export const Navigation = () => {
               <Button 
                 variant="cta" 
                 size="default"
-                onClick={scrollToForm}
+                onClick={openWhatsApp}
                 className="font-semibold"
               >
-                Apply Now
+                Contact Us
               </Button>
             </motion.div>
           </div>

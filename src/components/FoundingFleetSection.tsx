@@ -1,29 +1,28 @@
 import { motion } from "framer-motion";
-import { Check, Users, Percent, Headphones } from "lucide-react";
+import { Lock, Users, Headphones, AlertTriangle } from "lucide-react";
 import { Button } from "./ui/button";
 
 const perks = [
   {
-    icon: Percent,
-    title: "50% Off for 3 Months",
-    description: "Lock in founder pricing before we go full commercial.",
+    icon: Lock,
+    title: "Locked-in Pricing",
+    description: "50% discount for the first 3 months of your commercial rollout.",
   },
   {
     icon: Users,
-    title: "Direct Product Input",
-    description: "Shape the software that will run the SADC region.",
+    title: "Direct Architecture Access",
+    description: "You work directly with the founders to tailor the dashboard to your specific routes (Harare, Beira, Jo'burg).",
   },
   {
     icon: Headphones,
-    title: "White-Glove Onboarding",
-    description: "We set it up for you. Zero tech headaches.",
+    title: "VIP Implementation",
+    description: "We don't just give you a login; we ensure your fleet is optimized from Day 1.",
   },
 ];
 
 export const FoundingFleetSection = () => {
-  const scrollToForm = () => {
-    const formSection = document.getElementById("application-form");
-    formSection?.scrollIntoView({ behavior: "smooth" });
+  const openWhatsApp = () => {
+    window.open("https://wa.me/263780009785?text=Hi%20LynkFleet%2C%20I%27m%20interested%20in%20the%20Founding%20Fleet%20program", "_blank");
   };
 
   return (
@@ -45,56 +44,90 @@ export const FoundingFleetSection = () => {
               transition={{ delay: 0.2, type: "spring", stiffness: 100, damping: 20 }}
             >
               <div className="inline-block px-4 py-2 bg-accent text-white rounded-full font-bold text-sm mb-6">
-                EXCLUSIVE BETA PROGRAM
+                2026 COMMERCIAL PRE-LAUNCH
               </div>
               
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                Join the Elite 20
+                The Founding Fleet
               </h2>
               
-              <p className="text-xl text-white/80 max-w-2xl mx-auto">
-                We are selecting 20 forward-thinking operators for our private Beta. 
-                Limited spots to ensure every operator succeeds.
+              <p className="text-xl text-white/80 max-w-2xl mx-auto mb-4">
+                Only 20 Spots for the 2026 Commercial Pre-Launch
+              </p>
+              
+              <p className="text-lg text-white/70 max-w-2xl mx-auto">
+                We are officially launching LynkFleet across Zimbabwe. To ensure the first wave of operators dominates their routes, we are opening 20 Founding Spots.
               </p>
             </motion.div>
           </div>
 
           {/* Perks Grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            {perks.map((perk, index) => (
-              <motion.div
-                key={perk.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ 
-                  delay: 0.3 + index * 0.1, 
-                  type: "spring", 
-                  stiffness: 100, 
-                  damping: 20 
-                }}
-                className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20"
-              >
-                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mb-4">
-                  <perk.icon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">{perk.title}</h3>
-                <p className="text-white/70 text-sm">{perk.description}</p>
-              </motion.div>
-            ))}
+          <div className="mb-8">
+            <motion.h3
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.25, type: "spring", stiffness: 100, damping: 20 }}
+              className="text-2xl font-bold text-white text-center mb-6"
+            >
+              The Founding Advantage
+            </motion.h3>
+            
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              {perks.map((perk, index) => (
+                <motion.div
+                  key={perk.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ 
+                    delay: 0.3 + index * 0.1, 
+                    type: "spring", 
+                    stiffness: 100, 
+                    damping: 20 
+                  }}
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20"
+                >
+                  <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mb-4">
+                    <perk.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{perk.title}</h3>
+                  <p className="text-white/70 text-sm">{perk.description}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
+
+          {/* The Catch */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5, type: "spring", stiffness: 100, damping: 20 }}
+            className="bg-yellow-500/20 border border-yellow-500/40 rounded-2xl p-6 mb-8"
+          >
+            <div className="flex items-start gap-4">
+              <AlertTriangle className="w-8 h-8 text-yellow-400 flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="text-lg font-bold text-yellow-400 mb-2">The Catch</h4>
+                <p className="text-white/90">
+                  Once the 20 spots are filled, the commercial rate doubles and the public waitlist begins.
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* CTA Card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.5, type: "spring", stiffness: 100, damping: 20 }}
+            transition={{ delay: 0.6, type: "spring", stiffness: 100, damping: 20 }}
             className="bg-white rounded-2xl p-8 text-center shadow-2xl"
           >
             <div className="flex items-center justify-center gap-2 text-accent font-bold text-lg mb-4">
               <span>⚡</span>
-              <span>Applications close March 31st • Only 20 spots available</span>
+              <span>Only 20 spots available • Don't miss out</span>
             </div>
             
             <motion.div
@@ -104,10 +137,10 @@ export const FoundingFleetSection = () => {
               <Button 
                 variant="hero" 
                 size="xl"
-                onClick={scrollToForm}
+                onClick={openWhatsApp}
                 className="shadow-xl"
               >
-                Apply for Founding Fleet
+                Contact Us on WhatsApp
               </Button>
             </motion.div>
           </motion.div>
