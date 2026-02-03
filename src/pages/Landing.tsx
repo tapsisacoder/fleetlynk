@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
-import { WhyWeExistSection } from "@/components/WhyWeExistSection";
-import { MVPFeatureSection } from "@/components/MVPFeatureSection";
-import { FoundingProgramSectionNew } from "@/components/FoundingProgramSectionNew";
+import { ThreePillarsSection } from "@/components/ThreePillarsSection";
+import { FoundingFleetSection } from "@/components/FoundingFleetSection";
+import { RiskReversalSection } from "@/components/RiskReversalSection";
 import { ApplicationFormNew } from "@/components/ApplicationFormNew";
 import { Footer } from "@/components/Footer";
 
@@ -21,9 +21,9 @@ const Landing = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       <HeroSection />
-      <WhyWeExistSection />
-      <MVPFeatureSection />
-      <FoundingProgramSectionNew />
+      <ThreePillarsSection />
+      <FoundingFleetSection />
+      <RiskReversalSection />
       <ApplicationFormNew />
       <Footer />
     </div>
