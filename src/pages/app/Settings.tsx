@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useGPSIntegrations, useCreateGPSIntegration, useUpdateGPSIntegration, useDeleteGPSIntegration, GPSIntegration } from '@/hooks/useGPSIntegrations';
-import { Settings as SettingsIcon, Plus, Trash2, Edit2, MapPin, Eye, EyeOff, Loader2, ExternalLink } from 'lucide-react';
+import { Settings as SettingsIcon, Plus, Trash2, Edit2, MapPin, Loader2, ExternalLink } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const PROVIDER_PRESETS = [
@@ -29,7 +29,6 @@ const Settings = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedIntegration, setSelectedIntegration] = useState<GPSIntegration | null>(null);
-  const [showApiKey, setShowApiKey] = useState<Record<string, boolean>>({});
 
   const [formData, setFormData] = useState({
     provider_name: '',
@@ -118,10 +117,6 @@ const Settings = () => {
   const resetForm = () => {
     setFormData({ provider_name: '', api_url: '', api_key: '', api_secret: '' });
     setSelectedIntegration(null);
-  };
-
-  const toggleShowApiKey = (id: string) => {
-    setShowApiKey(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
@@ -266,26 +261,13 @@ const Settings = () => {
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">{integration.api_url}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-muted-foreground">API Key:</span>
-                          <code className="text-xs bg-muted px-1 rounded">
-                            {showApiKey[integration.id] 
-                              ? integration.api_key 
-                              : '••••••••••••'}
-                          </code>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-5 w-5 p-0"
-                            onClick={() => toggleShowApiKey(integration.id)}
-                          >
-                            {showApiKey[integration.id] ? (
-                              <EyeOff className="w-3 h-3" />
-                            ) : (
-                              <Eye className="w-3 h-3" />
-                            )}
-                          </Button>
-                        </div>
+                         <div className="flex items-center gap-2 mt-1">
+                           <span className="text-xs text-muted-foreground">API Key:</span>
+                           <code className="text-xs bg-muted px-1 rounded">
+                             ••••••••{integration.api_key?.slice(-4) || '••••'}
+                           </code>
+                           <span className="text-xs text-muted-foreground">(last 4 chars only)</span>
+                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
