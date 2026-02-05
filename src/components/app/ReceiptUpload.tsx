@@ -63,7 +63,7 @@ export function ReceiptUpload({ onUpload, existingUrl, label = "Receipt/Document
       // For private buckets, we need to create a signed URL instead
       const { data: signedData } = await supabase.storage
         .from('receipts')
-        .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year
+        .createSignedUrl(fileName, 60 * 60 * 24); // 24 hours - shorter expiry for better security
 
       const finalUrl = signedData?.signedUrl || publicUrl;
       
