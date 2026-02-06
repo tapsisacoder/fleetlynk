@@ -15,176 +15,71 @@ import {
   Calendar, 
   DollarSign, 
   User,
-  Filter,
   Search,
   Clock,
   CheckCircle,
-  AlertTriangle
+  Package
 } from "lucide-react";
 import { useVehicles } from "@/hooks/useVehicles";
+import { useMaintenanceRecords, useCreateMaintenance, useUpdateMaintenance } from "@/hooks/useMaintenance";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
-interface MaintenanceRecord {
-  id: string;
-  vehicleId: string;
-  vehicleReg: string;
-  serviceType: string;
-  serviceCategory: string;
-  description: string;
-  laborHours: number;
-  laborCost: number;
-  partsCost: number;
-  totalCost: number;
-  mechanic: string;
-  serviceDate: string;
-  odometer: number;
-  status: 'scheduled' | 'in_progress' | 'completed';
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  notes: string;
-}
+const serviceTypes = [
+  'Scheduled Maintenance',
+  'Repair',
+  'Breakdown Repair',
+  'Pre-trip Inspection Fix',
+  'Accident Repair',
+  'Modification/Upgrade'
+];
 
-// Demo data for maintenance records
-const demoRecords: MaintenanceRecord[] = [
-  {
-    id: '1',
-    vehicleId: '1',
-    vehicleReg: 'ABC-123-GP',
-    serviceType: 'Scheduled Maintenance',
-    serviceCategory: 'General Service',
-    description: '50,000 km service - Oil change, filter replacement, brake inspection',
-    laborHours: 4,
-    laborCost: 200,
-    partsCost: 450,
-    totalCost: 650,
-    mechanic: 'John Mthembu',
-    serviceDate: '2025-01-10',
-    odometer: 50234,
-    status: 'completed',
-    priority: 'medium',
-    notes: 'All filters replaced. Brakes at 60% wear.'
-  },
-  {
-    id: '2',
-    vehicleId: '2',
-    vehicleReg: 'XYZ-789-GP',
-    serviceType: 'Repair',
-    serviceCategory: 'Brakes',
-    description: 'Front brake pad replacement',
-    laborHours: 2,
-    laborCost: 100,
-    partsCost: 320,
-    totalCost: 420,
-    mechanic: 'Peter Ndlovu',
-    serviceDate: '2025-01-12',
-    odometer: 78500,
-    status: 'completed',
-    priority: 'high',
-    notes: 'Brake pads worn to 10%. Replaced with premium pads.'
-  },
-  {
-    id: '3',
-    vehicleId: '1',
-    vehicleReg: 'ABC-123-GP',
-    serviceType: 'Breakdown Repair',
-    serviceCategory: 'Electrical',
-    description: 'Alternator replacement - vehicle broke down on N1',
-    laborHours: 3,
-    laborCost: 150,
-    partsCost: 850,
-    totalCost: 1000,
-    mechanic: 'John Mthembu',
-    serviceDate: '2025-01-08',
-    odometer: 49800,
-    status: 'completed',
-    priority: 'critical',
-    notes: 'Emergency roadside repair. New alternator installed.'
-  },
-  {
-    id: '4',
-    vehicleId: '3',
-    vehicleReg: 'DEF-456-GP',
-    serviceType: 'Scheduled Maintenance',
-    serviceCategory: 'Tyre Service',
-    description: 'Tyre rotation and balancing',
-    laborHours: 1,
-    laborCost: 50,
-    partsCost: 0,
-    totalCost: 50,
-    mechanic: 'Peter Ndlovu',
-    serviceDate: '2025-01-15',
-    odometer: 35000,
-    status: 'scheduled',
-    priority: 'low',
-    notes: 'Scheduled for next week'
-  },
-  {
-    id: '5',
-    vehicleId: '2',
-    vehicleReg: 'XYZ-789-GP',
-    serviceType: 'Pre-trip Inspection Fix',
-    serviceCategory: 'Body Work',
-    description: 'Side mirror replacement - damaged in parking lot',
-    laborHours: 0.5,
-    laborCost: 25,
-    partsCost: 180,
-    totalCost: 205,
-    mechanic: 'John Mthembu',
-    serviceDate: '2025-01-14',
-    odometer: 78600,
-    status: 'in_progress',
-    priority: 'medium',
-    notes: 'Waiting for part delivery'
-  }
+const serviceCategories = [
+  'General Service',
+  'Engine Work',
+  'Transmission/Drivetrain',
+  'Brakes',
+  'Suspension',
+  'Electrical',
+  'Body Work',
+  'Tyre Service'
 ];
 
 export default function MaintenanceLog() {
-  const { data: vehicles = [] } = useVehicles();
-  const [records, setRecords] = useState<MaintenanceRecord[]>(demoRecords);
+  const { data: vehicles = [], isLoading: vehiclesLoading } = useVehicles();
+  const { data: records = [], isLoading: recordsLoading } = useMaintenanceRecords();
+  const createMaintenance = useCreateMaintenance();
+  const updateMaintenance = useUpdateMaintenance();
+  const { toast } = useToast();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterVehicle, setFilterVehicle] = useState<string>('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newRecord, setNewRecord] = useState({
-    vehicleId: '',
-    serviceType: '',
-    serviceCategory: '',
+    vehicle_id: '',
+    service_type: '',
+    service_category: '',
     description: '',
-    laborHours: '',
-    laborCost: '',
-    partsCost: '',
-    mechanic: '',
-    serviceDate: '',
-    odometer: '',
+    labor_cost: '',
+    parts_cost: '',
+    performed_by: '',
+    service_date: '',
+    odometer_reading: '',
     priority: 'medium',
     notes: ''
   });
 
-  const serviceTypes = [
-    'Scheduled Maintenance',
-    'Repair',
-    'Breakdown Repair',
-    'Pre-trip Inspection Fix',
-    'Accident Repair',
-    'Modification/Upgrade'
-  ];
-
-  const serviceCategories = [
-    'General Service',
-    'Engine Work',
-    'Transmission/Drivetrain',
-    'Brakes',
-    'Suspension',
-    'Electrical',
-    'Body Work',
-    'Tyre Service'
-  ];
+  const isLoading = vehiclesLoading || recordsLoading;
 
   const filteredRecords = records.filter(record => {
-    const matchesSearch = record.vehicleReg.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const vehicleReg = record.vehicle?.registration_number || '';
+    const matchesSearch = vehicleReg.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          record.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         record.mechanic.toLowerCase().includes(searchTerm.toLowerCase());
+                         (record.performed_by || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || record.status === filterStatus;
-    const matchesVehicle = filterVehicle === 'all' || record.vehicleId === filterVehicle;
+    const matchesVehicle = filterVehicle === 'all' || record.vehicle_id === filterVehicle;
     return matchesSearch && matchesStatus && matchesVehicle;
   });
 
@@ -194,6 +89,7 @@ export default function MaintenanceLog() {
         return <Badge className="bg-green-500">Completed</Badge>;
       case 'in_progress':
         return <Badge className="bg-blue-500">In Progress</Badge>;
+      case 'pending':
       case 'scheduled':
         return <Badge className="bg-yellow-500 text-black">Scheduled</Badge>;
       default:
@@ -208,6 +104,7 @@ export default function MaintenanceLog() {
       case 'high':
         return <Badge className="bg-orange-500">High</Badge>;
       case 'medium':
+      case 'normal':
         return <Badge className="bg-yellow-500 text-black">Medium</Badge>;
       case 'low':
         return <Badge variant="secondary">Low</Badge>;
@@ -216,52 +113,61 @@ export default function MaintenanceLog() {
     }
   };
 
-  const handleSubmit = () => {
-    const vehicle = vehicles.find(v => v.id === newRecord.vehicleId);
-    const laborCost = parseFloat(newRecord.laborCost) || 0;
-    const partsCost = parseFloat(newRecord.partsCost) || 0;
-    
-    const record: MaintenanceRecord = {
-      id: Date.now().toString(),
-      vehicleId: newRecord.vehicleId,
-      vehicleReg: vehicle?.registration_number || 'Unknown',
-      serviceType: newRecord.serviceType,
-      serviceCategory: newRecord.serviceCategory,
-      description: newRecord.description,
-      laborHours: parseFloat(newRecord.laborHours) || 0,
-      laborCost,
-      partsCost,
-      totalCost: laborCost + partsCost,
-      mechanic: newRecord.mechanic,
-      serviceDate: newRecord.serviceDate,
-      odometer: parseFloat(newRecord.odometer) || 0,
-      status: 'scheduled',
-      priority: newRecord.priority as MaintenanceRecord['priority'],
-      notes: newRecord.notes
-    };
+  const handleSubmit = async () => {
+    if (!newRecord.vehicle_id || !newRecord.service_type || !newRecord.description || !newRecord.service_date) {
+      toast({ title: 'Please fill required fields', variant: 'destructive' });
+      return;
+    }
 
-    setRecords([record, ...records]);
-    setIsDialogOpen(false);
-    setNewRecord({
-      vehicleId: '',
-      serviceType: '',
-      serviceCategory: '',
-      description: '',
-      laborHours: '',
-      laborCost: '',
-      partsCost: '',
-      mechanic: '',
-      serviceDate: '',
-      odometer: '',
-      priority: 'medium',
-      notes: ''
-    });
+    try {
+      await createMaintenance.mutateAsync({
+        vehicle_id: newRecord.vehicle_id,
+        service_type: newRecord.service_type,
+        service_category: newRecord.service_category || undefined,
+        description: newRecord.description,
+        service_date: newRecord.service_date,
+        odometer_reading: newRecord.odometer_reading ? parseInt(newRecord.odometer_reading) : undefined,
+        labor_cost: parseFloat(newRecord.labor_cost) || 0,
+        parts_cost: parseFloat(newRecord.parts_cost) || 0,
+        performed_by: newRecord.performed_by || undefined,
+        priority: newRecord.priority,
+        notes: newRecord.notes || undefined,
+        status: 'pending'
+      });
+
+      toast({ title: 'Service entry created successfully' });
+      setIsDialogOpen(false);
+      setNewRecord({
+        vehicle_id: '',
+        service_type: '',
+        service_category: '',
+        description: '',
+        labor_cost: '',
+        parts_cost: '',
+        performed_by: '',
+        service_date: '',
+        odometer_reading: '',
+        priority: 'medium',
+        notes: ''
+      });
+    } catch (error: any) {
+      toast({ title: 'Error creating service entry', description: error.message, variant: 'destructive' });
+    }
+  };
+
+  const handleStatusChange = async (recordId: string, newStatus: string) => {
+    try {
+      await updateMaintenance.mutateAsync({ id: recordId, status: newStatus });
+      toast({ title: `Status updated to ${newStatus}` });
+    } catch (error: any) {
+      toast({ title: 'Error updating status', description: error.message, variant: 'destructive' });
+    }
   };
 
   // Calculate summary stats
   const totalCostThisMonth = records
     .filter(r => r.status === 'completed')
-    .reduce((sum, r) => sum + r.totalCost, 0);
+    .reduce((sum, r) => sum + (r.total_cost || 0), 0);
   const completedThisMonth = records.filter(r => r.status === 'completed').length;
   const pendingJobs = records.filter(r => r.status !== 'completed').length;
 
@@ -287,8 +193,8 @@ export default function MaintenanceLog() {
               <div className="space-y-4 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Vehicle</Label>
-                    <Select value={newRecord.vehicleId} onValueChange={(v) => setNewRecord({...newRecord, vehicleId: v})}>
+                    <Label>Vehicle *</Label>
+                    <Select value={newRecord.vehicle_id} onValueChange={(v) => setNewRecord({...newRecord, vehicle_id: v})}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select vehicle" />
                       </SelectTrigger>
@@ -302,19 +208,19 @@ export default function MaintenanceLog() {
                     </Select>
                   </div>
                   <div>
-                    <Label>Service Date</Label>
+                    <Label>Service Date *</Label>
                     <Input 
                       type="date" 
-                      value={newRecord.serviceDate}
-                      onChange={(e) => setNewRecord({...newRecord, serviceDate: e.target.value})}
+                      value={newRecord.service_date}
+                      onChange={(e) => setNewRecord({...newRecord, service_date: e.target.value})}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Service Type</Label>
-                    <Select value={newRecord.serviceType} onValueChange={(v) => setNewRecord({...newRecord, serviceType: v})}>
+                    <Label>Service Type *</Label>
+                    <Select value={newRecord.service_type} onValueChange={(v) => setNewRecord({...newRecord, service_type: v})}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
@@ -327,7 +233,7 @@ export default function MaintenanceLog() {
                   </div>
                   <div>
                     <Label>Category</Label>
-                    <Select value={newRecord.serviceCategory} onValueChange={(v) => setNewRecord({...newRecord, serviceCategory: v})}>
+                    <Select value={newRecord.service_category} onValueChange={(v) => setNewRecord({...newRecord, service_category: v})}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
@@ -341,7 +247,7 @@ export default function MaintenanceLog() {
                 </div>
 
                 <div>
-                  <Label>Description</Label>
+                  <Label>Description *</Label>
                   <Textarea 
                     placeholder="Describe the work to be done..."
                     value={newRecord.description}
@@ -355,16 +261,16 @@ export default function MaintenanceLog() {
                     <Input 
                       type="number" 
                       placeholder="Current reading"
-                      value={newRecord.odometer}
-                      onChange={(e) => setNewRecord({...newRecord, odometer: e.target.value})}
+                      value={newRecord.odometer_reading}
+                      onChange={(e) => setNewRecord({...newRecord, odometer_reading: e.target.value})}
                     />
                   </div>
                   <div>
                     <Label>Mechanic</Label>
                     <Input 
                       placeholder="Technician name"
-                      value={newRecord.mechanic}
-                      onChange={(e) => setNewRecord({...newRecord, mechanic: e.target.value})}
+                      value={newRecord.performed_by}
+                      onChange={(e) => setNewRecord({...newRecord, performed_by: e.target.value})}
                     />
                   </div>
                   <div>
@@ -383,23 +289,14 @@ export default function MaintenanceLog() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label>Labor Hours</Label>
-                    <Input 
-                      type="number" 
-                      placeholder="0"
-                      value={newRecord.laborHours}
-                      onChange={(e) => setNewRecord({...newRecord, laborHours: e.target.value})}
-                    />
-                  </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Labor Cost ($)</Label>
                     <Input 
                       type="number" 
                       placeholder="0"
-                      value={newRecord.laborCost}
-                      onChange={(e) => setNewRecord({...newRecord, laborCost: e.target.value})}
+                      value={newRecord.labor_cost}
+                      onChange={(e) => setNewRecord({...newRecord, labor_cost: e.target.value})}
                     />
                   </div>
                   <div>
@@ -407,8 +304,8 @@ export default function MaintenanceLog() {
                     <Input 
                       type="number" 
                       placeholder="0"
-                      value={newRecord.partsCost}
-                      onChange={(e) => setNewRecord({...newRecord, partsCost: e.target.value})}
+                      value={newRecord.parts_cost}
+                      onChange={(e) => setNewRecord({...newRecord, parts_cost: e.target.value})}
                     />
                   </div>
                 </div>
@@ -424,8 +321,12 @@ export default function MaintenanceLog() {
 
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                  <Button onClick={handleSubmit} className="bg-secondary hover:bg-secondary/90">
-                    Create Service Entry
+                  <Button 
+                    onClick={handleSubmit} 
+                    className="bg-secondary hover:bg-secondary/90"
+                    disabled={createMaintenance.isPending}
+                  >
+                    {createMaintenance.isPending ? 'Creating...' : 'Create Service Entry'}
                   </Button>
                 </div>
               </div>
@@ -439,7 +340,7 @@ export default function MaintenanceLog() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Spend (Month)</p>
+                  <p className="text-sm text-muted-foreground">Total Spend</p>
                   <p className="text-2xl font-bold text-foreground">${totalCostThisMonth.toLocaleString()}</p>
                 </div>
                 <DollarSign className="w-8 h-8 text-muted-foreground" />
@@ -493,9 +394,9 @@ export default function MaintenanceLog() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     placeholder="Search by vehicle, description, or mechanic..."
-                    className="pl-10"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
                   />
                 </div>
               </div>
@@ -505,7 +406,7 @@ export default function MaintenanceLog() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="pending">Scheduled</SelectItem>
                   <SelectItem value="in_progress">In Progress</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                 </SelectContent>
@@ -525,62 +426,102 @@ export default function MaintenanceLog() {
           </CardContent>
         </Card>
 
-        {/* Service Records */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wrench className="w-5 h-5" />
-              Service History
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {filteredRecords.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Wrench className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>No maintenance records found</p>
-                </div>
-              ) : (
-                filteredRecords.map(record => (
-                  <div key={record.id} className="border border-border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-foreground">{record.vehicleReg}</span>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="text-muted-foreground">{record.serviceType}</span>
-                          {getPriorityBadge(record.priority)}
-                        </div>
-                        <p className="text-foreground">{record.description}</p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {format(new Date(record.serviceDate), 'dd MMM yyyy')}
-                          </span>
+        {/* Records List */}
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map(i => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <Skeleton className="h-6 w-48 mb-2" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-2/3" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : filteredRecords.length > 0 ? (
+          <div className="space-y-4">
+            {filteredRecords.map((record) => (
+              <Card key={record.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Truck className="w-5 h-5 text-muted-foreground" />
+                        <span className="font-bold text-lg">
+                          {record.vehicle?.registration_number || 'Unknown Vehicle'}
+                        </span>
+                        {getStatusBadge(record.status)}
+                        {getPriorityBadge(record.priority)}
+                      </div>
+                      <p className="text-muted-foreground mb-2">{record.description}</p>
+                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          {format(new Date(record.service_date), 'MMM d, yyyy')}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Wrench className="w-4 h-4" />
+                          {record.service_type}
+                        </span>
+                        {record.performed_by && (
                           <span className="flex items-center gap-1">
                             <User className="w-4 h-4" />
-                            {record.mechanic}
+                            {record.performed_by}
                           </span>
-                          <span>Odometer: {record.odometer.toLocaleString()} km</span>
-                        </div>
-                        {record.notes && (
-                          <p className="text-sm text-muted-foreground italic">{record.notes}</p>
+                        )}
+                        {record.odometer_reading && (
+                          <span>{record.odometer_reading.toLocaleString()} km</span>
                         )}
                       </div>
-                      <div className="text-right space-y-2">
-                        {getStatusBadge(record.status)}
-                        <p className="text-lg font-bold text-foreground">${record.totalCost}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Labor: ${record.laborCost} | Parts: ${record.partsCost}
-                        </p>
-                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold">${(record.total_cost || 0).toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Labor: ${record.labor_cost || 0} | Parts: ${record.parts_cost || 0}
+                      </p>
+                      {record.status !== 'completed' && (
+                        <div className="mt-2 flex gap-2 justify-end">
+                          {record.status === 'pending' && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleStatusChange(record.id, 'in_progress')}
+                            >
+                              Start
+                            </Button>
+                          )}
+                          <Button 
+                            size="sm"
+                            onClick={() => handleStatusChange(record.id, 'completed')}
+                          >
+                            Complete
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Package className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No maintenance records found</h3>
+              <p className="text-muted-foreground mb-4">
+                {searchTerm || filterStatus !== 'all' || filterVehicle !== 'all' 
+                  ? 'Try adjusting your filters' 
+                  : 'Create your first service entry to get started'}
+              </p>
+              <Button onClick={() => setIsDialogOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                New Service Entry
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </AppLayout>
   );
