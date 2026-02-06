@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import { Shield, Smartphone } from "lucide-react";
+import { Shield, Smartphone, Truck, MapPin, TrendingUp, DollarSign, BarChart3, PieChart } from "lucide-react";
 import heroTruckBg from "@/assets/hero-truck-bg.jpg";
 
 export const HeroSection = () => {
@@ -88,10 +88,10 @@ export const HeroSection = () => {
             </motion.div>
           </div>
 
-          {/* Right Column - Phone Mockup */}
+          {/* Right Column - Laptop + Phone Mockup */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, rotateY: -10 }}
-            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ 
               type: "spring", 
               stiffness: 80, 
@@ -101,78 +101,189 @@ export const HeroSection = () => {
             className="relative flex justify-center lg:justify-end"
           >
             <div className="relative">
-              {/* Phone Frame */}
-              <div className="relative w-[280px] md:w-[320px] h-[560px] md:h-[640px] bg-gray-900 rounded-[3rem] p-3 shadow-2xl border-4 border-gray-800">
-                {/* Screen */}
-                <div className="w-full h-full bg-background rounded-[2.5rem] overflow-hidden relative">
-                  {/* Status Bar */}
-                  <div className="h-8 bg-primary flex items-center justify-between px-6 text-white text-xs">
-                    <span>9:41</span>
-                    <div className="flex gap-1">
-                      <div className="w-4 h-2 bg-white/80 rounded-sm"></div>
+              {/* Laptop Frame */}
+              <div className="relative">
+                {/* Laptop Screen */}
+                <div className="relative w-[500px] md:w-[580px] bg-gray-800 rounded-t-xl p-2 shadow-2xl">
+                  {/* Screen bezel */}
+                  <div className="w-full h-[320px] md:h-[360px] bg-background rounded-lg overflow-hidden relative">
+                    {/* Dashboard Preview Content */}
+                    <div className="p-4 h-full overflow-hidden">
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
+                            <span className="text-primary-foreground text-xs font-bold">L</span>
+                          </div>
+                          <span className="font-semibold text-foreground text-sm">LynkFleet Dashboard</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span className="text-xs text-muted-foreground">Live</span>
+                        </div>
+                      </div>
+
+                      {/* Stats Row */}
+                      <div className="grid grid-cols-4 gap-3 mb-4">
+                        <div className="bg-muted/50 p-3 rounded-lg">
+                          <p className="text-[10px] text-muted-foreground">Active Vehicles</p>
+                          <div className="flex items-center gap-2">
+                            <Truck className="w-4 h-4 text-primary" />
+                            <span className="text-lg font-bold text-foreground">12/15</span>
+                          </div>
+                        </div>
+                        <div className="bg-muted/50 p-3 rounded-lg">
+                          <p className="text-[10px] text-muted-foreground">Active Trips</p>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-accent" />
+                            <span className="text-lg font-bold text-foreground">8</span>
+                          </div>
+                        </div>
+                        <div className="bg-muted/50 p-3 rounded-lg">
+                          <p className="text-[10px] text-muted-foreground">Monthly Revenue</p>
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-green-500" />
+                            <span className="text-lg font-bold text-green-500">$48,250</span>
+                          </div>
+                        </div>
+                        <div className="bg-muted/50 p-3 rounded-lg">
+                          <p className="text-[10px] text-muted-foreground">Profit Margin</p>
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-green-500" />
+                            <span className="text-lg font-bold text-green-500">24%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Chart and Trips Row */}
+                      <div className="grid grid-cols-3 gap-3">
+                        {/* Mini Chart */}
+                        <div className="col-span-2 bg-muted/30 p-3 rounded-lg">
+                          <p className="text-[10px] text-muted-foreground mb-2">Revenue vs Expenses</p>
+                          <div className="flex items-end gap-1 h-20">
+                            {[65, 80, 45, 90, 70, 85, 55].map((height, i) => (
+                              <div key={i} className="flex-1 flex flex-col gap-0.5">
+                                <div className="bg-primary rounded-t" style={{ height: `${height}%` }}></div>
+                                <div className="bg-destructive/50 rounded-b" style={{ height: `${height * 0.4}%` }}></div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Active Trips List */}
+                        <div className="bg-muted/30 p-3 rounded-lg">
+                          <p className="text-[10px] text-muted-foreground mb-2">In Transit</p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-[10px]">
+                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                              <span className="text-foreground">HRE→Beira</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px]">
+                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                              <span className="text-foreground">JHB→Maputo</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px]">
+                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                              <span className="text-foreground">Durban→HRE</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
-                  {/* Dashboard Preview */}
-                  <div className="p-4 space-y-4">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
-                        <Smartphone className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Good morning</p>
-                        <p className="font-semibold text-foreground text-sm">Fleet Manager</p>
-                      </div>
-                    </div>
-                    
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-accent/10 p-3 rounded-xl">
-                        <p className="text-xs text-muted-foreground">Active Trips</p>
-                        <p className="text-2xl font-bold text-accent">4</p>
-                      </div>
-                      <div className="bg-green-500/10 p-3 rounded-xl">
-                        <p className="text-xs text-muted-foreground">Today's Profit</p>
-                        <p className="text-2xl font-bold text-green-500">$2,450</p>
-                      </div>
-                    </div>
-                    
-                    {/* Fuel Card */}
-                    <div className="bg-muted/50 p-4 rounded-xl">
-                      <div className="flex justify-between items-center mb-2">
-                        <p className="text-xs font-medium text-foreground">Fuel Efficiency</p>
-                        <span className="text-xs text-green-500">↓ 12% saved</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div className="bg-accent h-2 rounded-full" style={{ width: '78%' }}></div>
+                  {/* Camera notch */}
+                  <div className="absolute top-3 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-600 rounded-full"></div>
+                </div>
+                
+                {/* Laptop Base */}
+                <div className="w-[540px] md:w-[620px] h-4 bg-gray-700 rounded-b-xl mx-auto relative">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-gray-600 rounded-b"></div>
+                </div>
+                <div className="w-[600px] md:w-[680px] h-2 bg-gray-800 rounded-b-lg mx-auto"></div>
+              </div>
+
+              {/* Phone Frame - Positioned to overlap */}
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6, type: "spring", stiffness: 80 }}
+                className="absolute -right-4 -bottom-8 md:-right-8 md:-bottom-12"
+              >
+                <div className="relative w-[160px] md:w-[180px] h-[320px] md:h-[360px] bg-gray-900 rounded-[2rem] p-2 shadow-2xl border-2 border-gray-800">
+                  {/* Screen */}
+                  <div className="w-full h-full bg-background rounded-[1.5rem] overflow-hidden relative">
+                    {/* Status Bar */}
+                    <div className="h-6 bg-primary flex items-center justify-between px-4 text-white text-[10px]">
+                      <span>9:41</span>
+                      <div className="flex gap-0.5">
+                        <div className="w-3 h-1.5 bg-white/80 rounded-sm"></div>
                       </div>
                     </div>
                     
-                    {/* Compliance Alert */}
-                    <div className="bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-xl">
-                      <p className="text-xs font-medium text-yellow-600">⚠️ License expires in 12 days</p>
-                      <p className="text-xs text-muted-foreground">ZWE-8472 • Renew now</p>
-                    </div>
-                    
-                    {/* Trip Card */}
-                    <div className="bg-muted/50 p-3 rounded-xl">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="text-xs text-muted-foreground">In Transit</p>
-                          <p className="text-sm font-medium text-foreground">Harare → Beira</p>
+                    {/* Reports Preview */}
+                    <div className="p-3 space-y-3">
+                      <div className="flex items-center gap-2 mb-3">
+                        <BarChart3 className="w-4 h-4 text-primary" />
+                        <span className="text-xs font-semibold text-foreground">Reports</span>
+                      </div>
+
+                      {/* Mini Pie Chart */}
+                      <div className="bg-muted/50 p-3 rounded-xl">
+                        <p className="text-[9px] text-muted-foreground mb-2">Expenses</p>
+                        <div className="flex items-center gap-2">
+                          <div className="w-12 h-12 rounded-full border-4 border-primary relative">
+                            <div className="absolute inset-1 rounded-full border-4 border-accent"></div>
+                          </div>
+                          <div className="text-[9px] space-y-1">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-primary rounded"></div>
+                              <span className="text-muted-foreground">Fuel 45%</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-accent rounded"></div>
+                              <span className="text-muted-foreground">Tolls 25%</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-xs text-muted-foreground">ETA</p>
-                          <p className="text-sm font-medium text-accent">14:00</p>
+                      </div>
+
+                      {/* Stats */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-green-500/10 p-2 rounded-lg">
+                          <p className="text-[8px] text-muted-foreground">Revenue</p>
+                          <p className="text-sm font-bold text-green-500">$48K</p>
                         </div>
+                        <div className="bg-red-500/10 p-2 rounded-lg">
+                          <p className="text-[8px] text-muted-foreground">Expenses</p>
+                          <p className="text-sm font-bold text-red-500">$36K</p>
+                        </div>
+                      </div>
+
+                      {/* Profit */}
+                      <div className="bg-accent/10 p-2 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-[8px] text-muted-foreground">Net Profit</p>
+                            <p className="text-base font-bold text-accent">$12,250</p>
+                          </div>
+                          <TrendingUp className="w-5 h-5 text-green-500" />
+                        </div>
+                      </div>
+
+                      {/* Mini Bar Chart */}
+                      <div className="flex items-end gap-0.5 h-8">
+                        {[40, 60, 35, 80, 55, 70, 45].map((h, i) => (
+                          <div key={i} className="flex-1 bg-primary/60 rounded-t" style={{ height: `${h}%` }}></div>
+                        ))}
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Notch */}
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-4 bg-gray-900 rounded-full"></div>
                 </div>
-                
-                {/* Notch */}
-                <div className="absolute top-6 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-900 rounded-full"></div>
-              </div>
+              </motion.div>
               
               {/* Glow Effect */}
               <div className="absolute -inset-10 bg-accent/20 blur-3xl rounded-full -z-10"></div>

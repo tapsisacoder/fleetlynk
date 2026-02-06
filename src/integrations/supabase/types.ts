@@ -1027,6 +1027,77 @@ export type Database = {
         }
         Relationships: []
       }
+      trailers: {
+        Row: {
+          axle_count: number | null
+          capacity_tons: number | null
+          company_id: string
+          created_at: string | null
+          id: string
+          insurance_expiry: string | null
+          is_active: boolean | null
+          length_meters: number | null
+          license_expiry: string | null
+          make: string | null
+          model: string | null
+          notes: string | null
+          registration_number: string
+          roadworthy_expiry: string | null
+          status: string | null
+          trailer_type: string | null
+          updated_at: string | null
+          year: number | null
+        }
+        Insert: {
+          axle_count?: number | null
+          capacity_tons?: number | null
+          company_id: string
+          created_at?: string | null
+          id?: string
+          insurance_expiry?: string | null
+          is_active?: boolean | null
+          length_meters?: number | null
+          license_expiry?: string | null
+          make?: string | null
+          model?: string | null
+          notes?: string | null
+          registration_number: string
+          roadworthy_expiry?: string | null
+          status?: string | null
+          trailer_type?: string | null
+          updated_at?: string | null
+          year?: number | null
+        }
+        Update: {
+          axle_count?: number | null
+          capacity_tons?: number | null
+          company_id?: string
+          created_at?: string | null
+          id?: string
+          insurance_expiry?: string | null
+          is_active?: boolean | null
+          length_meters?: number | null
+          license_expiry?: string | null
+          make?: string | null
+          model?: string | null
+          notes?: string | null
+          registration_number?: string
+          roadworthy_expiry?: string | null
+          status?: string | null
+          trailer_type?: string | null
+          updated_at?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trailers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           attachments: Json | null
@@ -1484,6 +1555,61 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "vehicle_documents_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_trailers: {
+        Row: {
+          attached_at: string | null
+          attached_by: string | null
+          company_id: string
+          detached_at: string | null
+          id: string
+          position: number
+          trailer_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          attached_at?: string | null
+          attached_by?: string | null
+          company_id: string
+          detached_at?: string | null
+          id?: string
+          position?: number
+          trailer_id: string
+          vehicle_id: string
+        }
+        Update: {
+          attached_at?: string | null
+          attached_by?: string | null
+          company_id?: string
+          detached_at?: string | null
+          id?: string
+          position?: number
+          trailer_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_trailers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_trailers_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_trailers_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
