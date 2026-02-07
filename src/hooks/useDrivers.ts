@@ -24,6 +24,7 @@ export interface Driver {
 export interface DriverInsert {
   full_name: string;
   id_number?: string;
+  passport_number?: string;
   license_number?: string;
   license_expiry?: string;
   phone?: string;

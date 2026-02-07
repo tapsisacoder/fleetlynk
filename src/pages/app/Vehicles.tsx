@@ -20,12 +20,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Plus, Truck, Search, MoreVertical, Gauge, Fuel, Container, Link2, Unlink } from 'lucide-react';
-import { useVehicles, useCreateVehicle, Vehicle } from '@/hooks/useVehicles';
-import { useTrailers, useCreateTrailer, useAttachTrailer, useDetachTrailer, useVehicleTrailers, Trailer } from '@/hooks/useTrailers';
+import { Plus, Truck, Search, MoreVertical, Gauge, Fuel, Container, Link2, Unlink, Trash2 } from 'lucide-react';
+import { useVehicles, useCreateVehicle, useDeleteVehicle, Vehicle } from '@/hooks/useVehicles';
+import { useTrailers, useCreateTrailer, useDeleteTrailer, useAttachTrailer, useDetachTrailer, useVehicleTrailers, Trailer } from '@/hooks/useTrailers';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -61,6 +77,8 @@ const Vehicles = () => {
   const [trailerDialogOpen, setTrailerDialogOpen] = useState(false);
   const [attachDialogOpen, setAttachDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
+  const [trailerToDelete, setTrailerToDelete] = useState<string | null>(null);
   
   const [newVehicle, setNewVehicle] = useState({
     registration_number: '',
@@ -88,7 +106,9 @@ const Vehicles = () => {
   const { data: vehicles, isLoading: vehiclesLoading } = useVehicles();
   const { data: trailers, isLoading: trailersLoading } = useTrailers();
   const createVehicle = useCreateVehicle();
+  const deleteVehicle = useDeleteVehicle();
   const createTrailer = useCreateTrailer();
+  const deleteTrailer = useDeleteTrailer();
   const attachTrailer = useAttachTrailer();
   const detachTrailer = useDetachTrailer();
   const { toast } = useToast();
@@ -171,6 +191,28 @@ const Vehicles = () => {
         description: error.message,
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleDeleteVehicle = async () => {
+    if (!vehicleToDelete) return;
+    try {
+      await deleteVehicle.mutateAsync(vehicleToDelete);
+      toast({ title: 'Vehicle deleted successfully' });
+      setVehicleToDelete(null);
+    } catch (error: any) {
+      toast({ title: 'Error deleting vehicle', description: error.message, variant: 'destructive' });
+    }
+  };
+
+  const handleDeleteTrailer = async () => {
+    if (!trailerToDelete) return;
+    try {
+      await deleteTrailer.mutateAsync(trailerToDelete);
+      toast({ title: 'Trailer deleted successfully' });
+      setTrailerToDelete(null);
+    } catch (error: any) {
+      toast({ title: 'Error deleting trailer', description: error.message, variant: 'destructive' });
     }
   };
 
@@ -487,6 +529,7 @@ const Vehicles = () => {
                       setSelectedVehicle(vehicle);
                       setAttachDialogOpen(true);
                     }}
+                    onDelete={() => setVehicleToDelete(vehicle.id)}
                   />
                 ))}
               </div>
@@ -523,7 +566,11 @@ const Vehicles = () => {
             ) : filteredTrailers && filteredTrailers.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredTrailers.map((trailer) => (
-                  <TrailerCard key={trailer.id} trailer={trailer} />
+                  <TrailerCard 
+                    key={trailer.id} 
+                    trailer={trailer}
+                    onDelete={() => setTrailerToDelete(trailer.id)}
+                  />
                 ))}
               </div>
             ) : (
@@ -551,13 +598,49 @@ const Vehicles = () => {
           vehicle={selectedVehicle}
           trailers={trailers?.filter(t => t.status === 'available') || []}
         />
+
+        {/* Delete Vehicle Dialog */}
+        <AlertDialog open={!!vehicleToDelete} onOpenChange={() => setVehicleToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Vehicle?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove the vehicle from your active fleet. Past trips and records will be preserved.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteVehicle} className="bg-destructive hover:bg-destructive/90">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Delete Trailer Dialog */}
+        <AlertDialog open={!!trailerToDelete} onOpenChange={() => setTrailerToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Trailer?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove the trailer from your active fleet. Past trip records will be preserved.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteTrailer} className="bg-destructive hover:bg-destructive/90">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AppLayout>
   );
 };
 
-// Vehicle Card Component
-function VehicleCard({ vehicle, trailers, onAttachTrailer }: { vehicle: Vehicle; trailers: Trailer[]; onAttachTrailer: () => void }) {
+// Vehicle Card Component with fuel tank display
+function VehicleCard({ vehicle, trailers, onAttachTrailer, onDelete }: { vehicle: Vehicle; trailers: Trailer[]; onAttachTrailer: () => void; onDelete: () => void }) {
   const { data: attachedTrailers } = useVehicleTrailers(vehicle.id);
   const detachTrailer = useDetachTrailer();
   const { toast } = useToast();
@@ -570,6 +653,12 @@ function VehicleCard({ vehicle, trailers, onAttachTrailer }: { vehicle: Vehicle;
       toast({ title: 'Error detaching trailer', description: error.message, variant: 'destructive' });
     }
   };
+
+  // Calculate fuel level percentage
+  const fuelLevel = (vehicle as any).current_fuel_level || 0;
+  const tankCapacity = vehicle.tank_capacity_liters || 800;
+  const fuelPercentage = Math.min(Math.round((fuelLevel / tankCapacity) * 100), 100);
+  const fuelColor = fuelPercentage > 50 ? 'bg-green-500' : fuelPercentage > 25 ? 'bg-yellow-500' : 'bg-red-500';
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -589,10 +678,25 @@ function VehicleCard({ vehicle, trailers, onAttachTrailer }: { vehicle: Vehicle;
             <Gauge className="w-4 h-4 text-muted-foreground" />
             <span>{vehicle.current_odometer.toLocaleString()} km</span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Fuel className="w-4 h-4 text-muted-foreground" />
-            <span>{vehicle.tank_capacity_liters}L tank</span>
+          
+          {/* Fuel Tank Display */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2">
+                <Fuel className="w-4 h-4 text-muted-foreground" />
+                <span>Fuel Tank</span>
+              </div>
+              <span className="font-medium">{fuelLevel}L / {tankCapacity}L</span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-3">
+              <div 
+                className={`h-3 rounded-full transition-all ${fuelColor}`}
+                style={{ width: `${fuelPercentage}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground text-right">{fuelPercentage}%</p>
           </div>
+          
           {vehicle.engine_type && (
             <div className="flex items-center gap-2 text-sm">
               <Truck className="w-4 h-4 text-muted-foreground" />
@@ -637,9 +741,19 @@ function VehicleCard({ vehicle, trailers, onAttachTrailer }: { vehicle: Vehicle;
             <Link2 className="w-4 h-4 mr-1" />
             Attach Trailer
           </Button>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="w-4 h-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onDelete} className="text-destructive">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Vehicle
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </CardContent>
     </Card>
@@ -647,7 +761,7 @@ function VehicleCard({ vehicle, trailers, onAttachTrailer }: { vehicle: Vehicle;
 }
 
 // Trailer Card Component
-function TrailerCard({ trailer }: { trailer: Trailer }) {
+function TrailerCard({ trailer, onDelete }: { trailer: Trailer; onDelete: () => void }) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-6">
@@ -688,9 +802,19 @@ function TrailerCard({ trailer }: { trailer: Trailer }) {
           <Button variant="outline" size="sm">
             View Details
           </Button>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="w-4 h-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onDelete} className="text-destructive">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Trailer
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </CardContent>
     </Card>

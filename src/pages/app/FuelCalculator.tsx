@@ -7,9 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Calculator, 
-  Fuel, 
   Truck, 
-  TrendingDown,
   Droplets,
   RefreshCw
 } from "lucide-react";
@@ -23,7 +21,7 @@ export default function FuelCalculator() {
   const [selectedVehicle, setSelectedVehicle] = useState("");
   const [distance, setDistance] = useState("");
   const [loadStatus, setLoadStatus] = useState<"loaded" | "empty">("loaded");
-  const [trafficAllowance, setTrafficAllowance] = useState("0");
+  const [uncertaintyLiters, setUncertaintyLiters] = useState("0");
   const [calculated, setCalculated] = useState(false);
 
   const selectedVehicleData = vehicles.find(v => v.id === selectedVehicle);
@@ -33,18 +31,13 @@ export default function FuelCalculator() {
   const emptyRatio = selectedVehicleData?.fuel_consumption_empty || 2.5; // 1L per 2.5km when empty
 
   const distanceNum = parseFloat(distance) || 0;
-  const allowancePercent = parseFloat(trafficAllowance) || 0;
+  const uncertaintyNum = parseFloat(uncertaintyLiters) || 0;
   const reserve = 17.5;
 
-  // Calculate fuel: distance / ratio + reserve + allowance
+  // Calculate fuel: distance / ratio + reserve + uncertainty
   const ratio = loadStatus === "loaded" ? loadedRatio : emptyRatio;
   const baseFuel = distanceNum > 0 ? (distanceNum / ratio) + reserve : 0;
-  const allowanceFuel = baseFuel * (allowancePercent / 100);
-  const fuelNeeded = baseFuel + allowanceFuel;
-
-  const fuelIfEmpty = distanceNum > 0 ? (distanceNum / emptyRatio) + reserve : 0;
-  const fuelIfLoaded = distanceNum > 0 ? (distanceNum / loadedRatio) + reserve : 0;
-  const fuelSavings = Math.abs(fuelIfLoaded - fuelIfEmpty);
+  const fuelNeeded = baseFuel + uncertaintyNum;
 
   const handleCalculate = () => {
     if (distanceNum > 0) {
@@ -56,7 +49,7 @@ export default function FuelCalculator() {
     setSelectedVehicle("");
     setDistance("");
     setLoadStatus("loaded");
-    setTrafficAllowance("0");
+    setUncertaintyLiters("0");
     setCalculated(false);
   };
 
@@ -162,24 +155,23 @@ export default function FuelCalculator() {
                 </Select>
               </div>
 
-              {/* Traffic/Terrain Allowance */}
+              {/* Uncertainty Allowance - Now in Liters */}
               <div>
-                <Label htmlFor="trafficAllowance">Allowance for Traffic/Terrain/Idling (%)</Label>
+                <Label htmlFor="uncertaintyLiters">Allowance for Uncertainties (Liters)</Label>
                 <Input
-                  id="trafficAllowance"
+                  id="uncertaintyLiters"
                   type="number"
                   step="1"
                   min="0"
-                  max="50"
-                  value={trafficAllowance}
+                  value={uncertaintyLiters}
                   onChange={(e) => {
-                    setTrafficAllowance(e.target.value);
+                    setUncertaintyLiters(e.target.value);
                     setCalculated(false);
                   }}
                   placeholder="0"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Add extra fuel buffer for uncertain conditions (0-50%)
+                  Add extra fuel buffer for traffic, terrain, or idling
                 </p>
               </div>
 
@@ -208,7 +200,7 @@ export default function FuelCalculator() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Droplets className="w-5 h-5 text-secondary" />
-                  THE BIG RESULT
+                  Fuel Required
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -224,53 +216,15 @@ export default function FuelCalculator() {
                     <p className="font-mono text-muted-foreground">
                       ({distance}km ÷ {ratio}km/L) + {reserve}L reserve = {baseFuel.toFixed(1)}L
                     </p>
-                    {allowancePercent > 0 && (
+                    {uncertaintyNum > 0 && (
                       <p className="font-mono text-muted-foreground">
-                        + {allowancePercent}% allowance = {fuelNeeded.toFixed(1)}L total
+                        + {uncertaintyNum}L uncertainty = {fuelNeeded.toFixed(1)}L total
                       </p>
                     )}
-                    <p className="text-xs text-blue-600 mt-2">
-                      📊 ML Ready: This calculation will be used to improve future predictions
-                    </p>
                   </div>
                 )}
               </CardContent>
             </Card>
-
-            {/* Comparison Card */}
-            {calculated && (
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <TrendingDown className="w-5 h-5" />
-                    Comparison
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className={`p-4 rounded-lg ${loadStatus === 'loaded' ? 'bg-secondary/10 ring-2 ring-secondary' : 'bg-muted/50'}`}>
-                      <p className="text-sm text-muted-foreground">If Loaded</p>
-                      <p className="text-2xl font-bold">{fuelIfLoaded.toFixed(1)} L</p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        ({distance} ÷ {loadedRatio}) + {reserve}
-                      </p>
-                    </div>
-                    <div className={`p-4 rounded-lg ${loadStatus === 'empty' ? 'bg-secondary/10 ring-2 ring-secondary' : 'bg-muted/50'}`}>
-                      <p className="text-sm text-muted-foreground">If Empty</p>
-                      <p className="text-2xl font-bold">{fuelIfEmpty.toFixed(1)} L</p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        ({distance} ÷ {emptyRatio}) + {reserve}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="bg-green-500/10 p-4 rounded-lg">
-                    <p className="text-sm text-green-600">
-                      Empty trips use <span className="font-bold">{fuelSavings.toFixed(1)} liters less</span> fuel
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Vehicle Tank Info */}
             {calculated && selectedVehicleData && (
