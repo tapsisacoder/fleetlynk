@@ -28,9 +28,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { 
-  Plus, Search, Building2, Phone, Mail, MapPin, Star, MoreVertical,
-  DollarSign, Clock, CheckCircle
+  Plus, Search, Building2, Phone, Star, Edit, Trash2,
+  Clock, CheckCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -52,55 +62,6 @@ const PAYMENT_TERMS = [
   { value: '60days', label: '60 Days' },
 ];
 
-// Demo suppliers
-const demoSuppliers = [
-  { 
-    id: '1', 
-    code: 'SUP-001',
-    name: 'TyrePro Distributors',
-    type: 'Tyre Supplier',
-    contactPerson: 'John Smith',
-    phone: '+263 77 123 4567',
-    email: 'orders@tyrepro.co.zw',
-    address: '123 Industrial Ave, Harare',
-    paymentTerms: '30days',
-    rating: 5,
-    isPreferred: true,
-    balance: 2500,
-    isActive: true,
-  },
-  { 
-    id: '2', 
-    code: 'SUP-002',
-    name: 'AutoParts Direct',
-    type: 'Parts Distributor',
-    contactPerson: 'Sarah Moyo',
-    phone: '+263 77 234 5678',
-    email: 'sales@autoparts.co.zw',
-    address: '45 Commerce St, Bulawayo',
-    paymentTerms: '14days',
-    rating: 4,
-    isPreferred: false,
-    balance: 850,
-    isActive: true,
-  },
-  { 
-    id: '3', 
-    code: 'SUP-003',
-    name: 'Mobil Oil Zimbabwe',
-    type: 'Fluid/Lubricant Supplier',
-    contactPerson: 'Peter Ncube',
-    phone: '+263 78 345 6789',
-    email: 'corporate@mobil.co.zw',
-    address: '78 Depot Road, Harare',
-    paymentTerms: '30days',
-    rating: 5,
-    isPreferred: true,
-    balance: 0,
-    isActive: true,
-  },
-];
-
 interface Supplier {
   id: string;
   code: string;
@@ -119,9 +80,12 @@ interface Supplier {
 
 const Suppliers = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [suppliers, setSuppliers] = useState<Supplier[]>(demoSuppliers);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [supplierToDelete, setSupplierToDelete] = useState<string | null>(null);
   const { toast } = useToast();
 
   const [newSupplier, setNewSupplier] = useState({
@@ -177,10 +141,36 @@ const Suppliers = () => {
     toast({ title: 'Supplier added successfully' });
   };
 
+  const handleEditSupplier = () => {
+    if (!editingSupplier) return;
+    
+    setSuppliers(suppliers.map(s => 
+      s.id === editingSupplier.id ? editingSupplier : s
+    ));
+    setIsEditOpen(false);
+    setEditingSupplier(null);
+    toast({ title: 'Supplier updated successfully' });
+  };
+
+  const handleDeleteSupplier = () => {
+    if (!supplierToDelete) return;
+    
+    setSuppliers(suppliers.map(s => 
+      s.id === supplierToDelete ? { ...s, isActive: false } : s
+    ));
+    setSupplierToDelete(null);
+    toast({ title: 'Supplier deleted successfully' });
+  };
+
   const togglePreferred = (id: string) => {
     setSuppliers(suppliers.map(s => 
       s.id === id ? { ...s, isPreferred: !s.isPreferred } : s
     ));
+  };
+
+  const openEditDialog = (supplier: Supplier) => {
+    setEditingSupplier({ ...supplier });
+    setIsEditOpen(true);
   };
 
   return (
@@ -330,7 +320,7 @@ const Suppliers = () => {
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Paid Up</p>
               <p className="text-2xl font-bold text-green-600">
-                {suppliers.filter(s => s.balance === 0).length}
+                {suppliers.filter(s => s.balance === 0 && s.isActive).length}
               </p>
             </CardContent>
           </Card>
@@ -433,14 +423,31 @@ const Suppliers = () => {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => togglePreferred(supplier.id)}
-                        title={supplier.isPreferred ? 'Remove preferred' : 'Mark as preferred'}
-                      >
-                        <Star className={`w-4 h-4 ${supplier.isPreferred ? 'text-amber-500 fill-amber-500' : 'text-muted-foreground'}`} />
-                      </Button>
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => togglePreferred(supplier.id)}
+                          title={supplier.isPreferred ? 'Remove preferred' : 'Mark as preferred'}
+                        >
+                          <Star className={`w-4 h-4 ${supplier.isPreferred ? 'text-amber-500 fill-amber-500' : 'text-muted-foreground'}`} />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openEditDialog(supplier)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setSupplierToDelete(supplier.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -449,6 +456,7 @@ const Suppliers = () => {
                     <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       <Building2 className="w-12 h-12 mx-auto mb-2 opacity-50" />
                       <p>No suppliers found</p>
+                      <p className="text-sm">Add your first supplier to get started</p>
                     </TableCell>
                   </TableRow>
                 )}
@@ -456,6 +464,112 @@ const Suppliers = () => {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Edit Dialog */}
+        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Edit Supplier</DialogTitle>
+            </DialogHeader>
+            {editingSupplier && (
+              <div className="space-y-4 pt-4 max-h-[70vh] overflow-y-auto">
+                <div className="space-y-2">
+                  <Label>Supplier Name *</Label>
+                  <Input
+                    value={editingSupplier.name}
+                    onChange={(e) => setEditingSupplier({ ...editingSupplier, name: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Supplier Type *</Label>
+                  <Select value={editingSupplier.type} onValueChange={(v) => setEditingSupplier({ ...editingSupplier, type: v })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SUPPLIER_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Contact Person</Label>
+                    <Input
+                      value={editingSupplier.contactPerson}
+                      onChange={(e) => setEditingSupplier({ ...editingSupplier, contactPerson: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Phone</Label>
+                    <Input
+                      value={editingSupplier.phone}
+                      onChange={(e) => setEditingSupplier({ ...editingSupplier, phone: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    value={editingSupplier.email}
+                    onChange={(e) => setEditingSupplier({ ...editingSupplier, email: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Address</Label>
+                  <Textarea
+                    value={editingSupplier.address}
+                    onChange={(e) => setEditingSupplier({ ...editingSupplier, address: e.target.value })}
+                    rows={2}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Payment Terms</Label>
+                  <Select value={editingSupplier.paymentTerms} onValueChange={(v) => setEditingSupplier({ ...editingSupplier, paymentTerms: v })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAYMENT_TERMS.map((term) => (
+                        <SelectItem key={term.value} value={term.value}>{term.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
+                  <Button onClick={handleEditSupplier}>Save Changes</Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation */}
+        <AlertDialog open={!!supplierToDelete} onOpenChange={() => setSupplierToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Supplier?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove the supplier from your list. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteSupplier} className="bg-destructive hover:bg-destructive/90">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AppLayout>
   );

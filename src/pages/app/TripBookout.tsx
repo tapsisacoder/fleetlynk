@@ -46,7 +46,7 @@ const TripBookout = () => {
   const [operatorName, setOperatorName] = useState('');
   const [bookoutDate, setBookoutDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   
-  // Cash allocations
+  // Cash allocations - all manual entry, no suggestions
   const [foodAllowance, setFoodAllowance] = useState('');
   const [tollFees, setTollFees] = useState('');
   const [borderFees, setBorderFees] = useState('');
@@ -212,7 +212,7 @@ const TripBookout = () => {
                       type="number"
                       value={foodAllowance}
                       onChange={(e) => setFoodAllowance(e.target.value)}
-                      placeholder="0.00"
+                      placeholder="Enter amount"
                     />
                   </div>
                   <div className="space-y-2">
@@ -221,7 +221,7 @@ const TripBookout = () => {
                       type="number"
                       value={tollFees}
                       onChange={(e) => setTollFees(e.target.value)}
-                      placeholder="0.00"
+                      placeholder="Enter amount"
                     />
                   </div>
                   <div className="space-y-2">
@@ -230,7 +230,7 @@ const TripBookout = () => {
                       type="number"
                       value={borderFees}
                       onChange={(e) => setBorderFees(e.target.value)}
-                      placeholder="0.00"
+                      placeholder="Enter amount"
                     />
                   </div>
                   <div className="space-y-2">
@@ -239,7 +239,7 @@ const TripBookout = () => {
                       type="number"
                       value={accommodation}
                       onChange={(e) => setAccommodation(e.target.value)}
-                      placeholder="0.00"
+                      placeholder="Enter amount"
                     />
                   </div>
                   <div className="space-y-2">
@@ -248,7 +248,7 @@ const TripBookout = () => {
                       type="number"
                       value={airtime}
                       onChange={(e) => setAirtime(e.target.value)}
-                      placeholder="0.00"
+                      placeholder="Enter amount"
                     />
                   </div>
                   <div className="space-y-2">
@@ -257,7 +257,7 @@ const TripBookout = () => {
                       type="number"
                       value={emergencyFund}
                       onChange={(e) => setEmergencyFund(e.target.value)}
-                      placeholder="0.00"
+                      placeholder="Enter amount"
                     />
                   </div>
                 </div>
@@ -268,7 +268,7 @@ const TripBookout = () => {
                     type="number"
                     value={otherExpenses}
                     onChange={(e) => setOtherExpenses(e.target.value)}
-                    placeholder="0.00"
+                    placeholder="Enter amount"
                   />
                 </div>
 

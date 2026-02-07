@@ -11,12 +11,12 @@ import {
   Plus, 
   Search, 
   Phone, 
-  Mail, 
   Edit, 
   Trash2,
   Calendar,
   IdCard,
-  Save
+  Save,
+  BookOpen
 } from "lucide-react";
 import { useDrivers, useCreateDriver, useUpdateDriver, useDeleteDriver, Driver } from "@/hooks/useDrivers";
 import { useToast } from "@/hooks/use-toast";
@@ -35,11 +35,10 @@ import { format } from "date-fns";
 interface DriverFormData {
   full_name: string;
   phone: string;
-  email: string;
   id_number: string;
+  passport_number: string;
   license_number: string;
   license_expiry: string;
-  address: string;
   emergency_contact: string;
   emergency_phone: string;
 }
@@ -47,11 +46,10 @@ interface DriverFormData {
 const emptyForm: DriverFormData = {
   full_name: "",
   phone: "",
-  email: "",
   id_number: "",
+  passport_number: "",
   license_number: "",
   license_expiry: "",
-  address: "",
   emergency_contact: "",
   emergency_phone: "",
 };
@@ -81,11 +79,10 @@ export default function Drivers() {
       setFormData({
         full_name: driver.full_name,
         phone: driver.phone || "",
-        email: driver.email || "",
         id_number: driver.id_number || "",
+        passport_number: (driver as any).passport_number || "",
         license_number: driver.license_number || "",
         license_expiry: driver.license_expiry || "",
-        address: driver.address || "",
         emergency_contact: driver.emergency_contact || "",
         emergency_phone: driver.emergency_phone || "",
       });
@@ -123,7 +120,7 @@ export default function Drivers() {
     if (!driverToDelete) return;
     try {
       await deleteDriver.mutateAsync(driverToDelete);
-      toast({ title: "Driver deleted" });
+      toast({ title: "Driver removed from active roster" });
       setDriverToDelete(null);
     } catch (error) {
       toast({ title: "Failed to delete driver", variant: "destructive" });
@@ -224,16 +221,22 @@ export default function Drivers() {
                         <span>{driver.phone}</span>
                       </div>
                     )}
-                    {driver.email && (
+                    {driver.id_number && (
                       <div className="flex items-center gap-2 text-muted-foreground">
-                        <Mail className="w-4 h-4" />
-                        <span>{driver.email}</span>
+                        <IdCard className="w-4 h-4" />
+                        <span>ID: {driver.id_number}</span>
+                      </div>
+                    )}
+                    {(driver as any).passport_number && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <BookOpen className="w-4 h-4" />
+                        <span>Passport: {(driver as any).passport_number}</span>
                       </div>
                     )}
                     {driver.license_number && (
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <IdCard className="w-4 h-4" />
-                        <span>{driver.license_number}</span>
+                        <span>License: {driver.license_number}</span>
                       </div>
                     )}
                     {driver.license_expiry && (
@@ -280,22 +283,21 @@ export default function Drivers() {
                 />
               </div>
               <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  placeholder="john@example.com"
-                />
-              </div>
-              <div>
                 <Label htmlFor="id_number">ID Number</Label>
                 <Input
                   id="id_number"
                   value={formData.id_number}
                   onChange={(e) => setFormData(prev => ({ ...prev, id_number: e.target.value }))}
                   placeholder="National ID"
+                />
+              </div>
+              <div>
+                <Label htmlFor="passport_number">Passport Number</Label>
+                <Input
+                  id="passport_number"
+                  value={formData.passport_number}
+                  onChange={(e) => setFormData(prev => ({ ...prev, passport_number: e.target.value }))}
+                  placeholder="Passport number"
                 />
               </div>
               <div>
@@ -314,15 +316,6 @@ export default function Drivers() {
                   type="date"
                   value={formData.license_expiry}
                   onChange={(e) => setFormData(prev => ({ ...prev, license_expiry: e.target.value }))}
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                  placeholder="Full address"
                 />
               </div>
               <div>
@@ -361,15 +354,15 @@ export default function Drivers() {
       <AlertDialog open={!!driverToDelete} onOpenChange={() => setDriverToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Driver?</AlertDialogTitle>
+            <AlertDialogTitle>Remove Driver?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the driver record.
+              This will remove the driver from your active roster. Past trips and records associated with this driver will be preserved.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-              Delete
+              Remove
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

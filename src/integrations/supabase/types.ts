@@ -223,6 +223,7 @@ export type Database = {
           is_active: boolean | null
           license_expiry: string | null
           license_number: string | null
+          passport_number: string | null
           phone: string | null
           updated_at: string | null
           user_id: string | null
@@ -242,6 +243,7 @@ export type Database = {
           is_active?: boolean | null
           license_expiry?: string | null
           license_number?: string | null
+          passport_number?: string | null
           phone?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -261,6 +263,7 @@ export type Database = {
           is_active?: boolean | null
           license_expiry?: string | null
           license_number?: string | null
+          passport_number?: string | null
           phone?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -1622,6 +1625,7 @@ export type Database = {
           color: string | null
           company_id: string
           created_at: string | null
+          current_fuel_level: number | null
           current_odometer: number | null
           engine_type: string | null
           fuel_consumption_empty: number | null
@@ -1644,6 +1648,7 @@ export type Database = {
           color?: string | null
           company_id: string
           created_at?: string | null
+          current_fuel_level?: number | null
           current_odometer?: number | null
           engine_type?: string | null
           fuel_consumption_empty?: number | null
@@ -1666,6 +1671,7 @@ export type Database = {
           color?: string | null
           company_id?: string
           created_at?: string | null
+          current_fuel_level?: number | null
           current_odometer?: number | null
           engine_type?: string | null
           fuel_consumption_empty?: number | null
