@@ -207,6 +207,65 @@ export type Database = {
           },
         ]
       }
+      driver_vehicle_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          company_id: string
+          driver_id: string
+          id: string
+          unassigned_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          company_id: string
+          driver_id: string
+          id?: string
+          unassigned_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          company_id?: string
+          driver_id?: string
+          id?: string
+          unassigned_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_vehicle_assignments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_vehicle_assignments_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_vehicle_assignments_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers_basic"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_vehicle_assignments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers: {
         Row: {
           address: string | null
@@ -383,6 +442,135 @@ export type Database = {
           },
           {
             foreignKeyName: "expense_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_events: {
+        Row: {
+          amount: number
+          category: Database["public"]["Enums"]["financial_category"]
+          client_id: string | null
+          company_id: string
+          created_at: string
+          created_by_type: Database["public"]["Enums"]["financial_created_by"]
+          created_by_user: string | null
+          direction: Database["public"]["Enums"]["financial_direction"]
+          driver_id: string | null
+          event_date: string
+          event_id: string
+          event_type: Database["public"]["Enums"]["financial_event_type"]
+          invoice_id: string | null
+          metadata: Json | null
+          notes: string | null
+          reference_id: string | null
+          reversal_of_event_id: string | null
+          source_module: Database["public"]["Enums"]["financial_source_module"]
+          supplier_id: string | null
+          trip_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          amount: number
+          category: Database["public"]["Enums"]["financial_category"]
+          client_id?: string | null
+          company_id: string
+          created_at?: string
+          created_by_type?: Database["public"]["Enums"]["financial_created_by"]
+          created_by_user?: string | null
+          direction: Database["public"]["Enums"]["financial_direction"]
+          driver_id?: string | null
+          event_date?: string
+          event_id?: string
+          event_type: Database["public"]["Enums"]["financial_event_type"]
+          invoice_id?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          reference_id?: string | null
+          reversal_of_event_id?: string | null
+          source_module: Database["public"]["Enums"]["financial_source_module"]
+          supplier_id?: string | null
+          trip_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: Database["public"]["Enums"]["financial_category"]
+          client_id?: string | null
+          company_id?: string
+          created_at?: string
+          created_by_type?: Database["public"]["Enums"]["financial_created_by"]
+          created_by_user?: string | null
+          direction?: Database["public"]["Enums"]["financial_direction"]
+          driver_id?: string | null
+          event_date?: string
+          event_id?: string
+          event_type?: Database["public"]["Enums"]["financial_event_type"]
+          invoice_id?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          reference_id?: string | null
+          reversal_of_event_id?: string | null
+          source_module?: Database["public"]["Enums"]["financial_source_module"]
+          supplier_id?: string | null
+          trip_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_events_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "financial_events_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_events_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_payment_status"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "financial_events_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_events_reversal_of_event_id_fkey"
+            columns: ["reversal_of_event_id"]
+            isOneToOne: false
+            referencedRelation: "financial_events"
+            referencedColumns: ["event_id"]
+          },
+          {
+            foreignKeyName: "financial_events_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_events_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
@@ -611,6 +799,13 @@ export type Database = {
           viewed_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "invoices_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
           {
             foreignKeyName: "invoices_client_id_fkey"
             columns: ["client_id"]
@@ -888,6 +1083,13 @@ export type Database = {
             foreignKeyName: "payment_records_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "payment_records_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
@@ -897,6 +1099,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_records_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_payment_status"
+            referencedColumns: ["invoice_id"]
           },
           {
             foreignKeyName: "payment_records_invoice_id_fkey"
@@ -1179,6 +1388,13 @@ export type Database = {
             foreignKeyName: "transactions_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "transactions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
@@ -1455,6 +1671,13 @@ export type Database = {
             foreignKeyName: "trips_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "trips_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
@@ -1702,6 +1925,25 @@ export type Database = {
       }
     }
     Views: {
+      client_balances: {
+        Row: {
+          balance_due: number | null
+          client_id: string | null
+          client_name: string | null
+          company_id: string | null
+          total_invoiced: number | null
+          total_paid: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers_basic: {
         Row: {
           company_id: string | null
@@ -1734,6 +1976,48 @@ export type Database = {
           },
         ]
       }
+      financial_summary: {
+        Row: {
+          company_id: string | null
+          event_date: string | null
+          fuel_expenses: number | null
+          invoiced: number | null
+          maintenance_expenses: number | null
+          net_cashflow: number | null
+          payments_received: number | null
+          total_expenses: number | null
+          total_income: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_payment_status: {
+        Row: {
+          amount_paid: number | null
+          balance_due: number | null
+          company_id: string | null
+          invoice_id: string | null
+          invoice_number: string | null
+          payment_status: string | null
+          total_amount: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       generate_invoice_number: { Args: never; Returns: string }
@@ -1751,6 +2035,39 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "owner" | "manager" | "driver" | "accountant"
+      financial_category:
+        | "REVENUE"
+        | "COST_OF_SALES"
+        | "OPERATING_EXPENSE"
+        | "FUEL"
+        | "MAINTENANCE"
+        | "INVENTORY"
+        | "PAYROLL"
+        | "ADMIN"
+        | "OTHER"
+      financial_created_by: "USER" | "SYSTEM" | "AI"
+      financial_direction: "IN" | "OUT"
+      financial_event_type:
+        | "INVOICE_ISSUED"
+        | "CUSTOMER_PAYMENT"
+        | "OPERATING_EXPENSE"
+        | "WORKSHOP_EXPENSE"
+        | "INVENTORY_ISSUE"
+        | "SUPPLIER_PAYMENT"
+        | "OPENING_BALANCE"
+        | "ADJUSTMENT"
+        | "REVERSAL"
+        | "CUSTOM"
+        | "FUEL_PURCHASE"
+        | "TRIP_BOOKOUT"
+      financial_source_module:
+        | "TRIPS"
+        | "PAYMENTS"
+        | "WORKSHOP"
+        | "STOREROOM"
+        | "ADMIN"
+        | "MIGRATION"
+        | "FUEL"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1879,6 +2196,42 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "owner", "manager", "driver", "accountant"],
+      financial_category: [
+        "REVENUE",
+        "COST_OF_SALES",
+        "OPERATING_EXPENSE",
+        "FUEL",
+        "MAINTENANCE",
+        "INVENTORY",
+        "PAYROLL",
+        "ADMIN",
+        "OTHER",
+      ],
+      financial_created_by: ["USER", "SYSTEM", "AI"],
+      financial_direction: ["IN", "OUT"],
+      financial_event_type: [
+        "INVOICE_ISSUED",
+        "CUSTOMER_PAYMENT",
+        "OPERATING_EXPENSE",
+        "WORKSHOP_EXPENSE",
+        "INVENTORY_ISSUE",
+        "SUPPLIER_PAYMENT",
+        "OPENING_BALANCE",
+        "ADJUSTMENT",
+        "REVERSAL",
+        "CUSTOM",
+        "FUEL_PURCHASE",
+        "TRIP_BOOKOUT",
+      ],
+      financial_source_module: [
+        "TRIPS",
+        "PAYMENTS",
+        "WORKSHOP",
+        "STOREROOM",
+        "ADMIN",
+        "MIGRATION",
+        "FUEL",
+      ],
     },
   },
 } as const
