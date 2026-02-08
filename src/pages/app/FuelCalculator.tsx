@@ -5,18 +5,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Calculator, 
   Truck, 
   Droplets,
-  RefreshCw
+  RefreshCw,
+  Fuel
 } from "lucide-react";
-import { useVehicles } from "@/hooks/useVehicles";
+import { useVehicles, useUpdateVehicle } from "@/hooks/useVehicles";
 import { useTrips } from "@/hooks/useTrips";
+import { useToast } from "@/hooks/use-toast";
 
 export default function FuelCalculator() {
   const { data: vehicles = [] } = useVehicles();
   const { data: trips = [] } = useTrips();
+  const updateVehicle = useUpdateVehicle();
+  const { toast } = useToast();
 
   const [selectedVehicle, setSelectedVehicle] = useState("");
   const [distance, setDistance] = useState("");
@@ -24,19 +29,23 @@ export default function FuelCalculator() {
   const [uncertaintyLiters, setUncertaintyLiters] = useState("0");
   const [calculated, setCalculated] = useState(false);
 
+  // Fuel up dialog state
+  const [fuelUpOpen, setFuelUpOpen] = useState(false);
+  const [fuelUpVehicle, setFuelUpVehicle] = useState("");
+  const [fuelUpAmount, setFuelUpAmount] = useState("");
+
   const selectedVehicleData = vehicles.find(v => v.id === selectedVehicle);
 
   // Get consumption rates from vehicle (km per liter)
-  const loadedRatio = selectedVehicleData?.fuel_consumption_loaded || 2; // 1L per 2km when loaded
-  const emptyRatio = selectedVehicleData?.fuel_consumption_empty || 2.5; // 1L per 2.5km when empty
+  const loadedRatio = selectedVehicleData?.fuel_consumption_loaded || 2;
+  const emptyRatio = selectedVehicleData?.fuel_consumption_empty || 2.5;
 
   const distanceNum = parseFloat(distance) || 0;
   const uncertaintyNum = parseFloat(uncertaintyLiters) || 0;
-  const reserve = 17.5;
 
-  // Calculate fuel: distance / ratio + reserve + uncertainty
+  // Calculate fuel: distance / ratio + uncertainty (no reserve)
   const ratio = loadStatus === "loaded" ? loadedRatio : emptyRatio;
-  const baseFuel = distanceNum > 0 ? (distanceNum / ratio) + reserve : 0;
+  const baseFuel = distanceNum > 0 ? (distanceNum / ratio) : 0;
   const fuelNeeded = baseFuel + uncertaintyNum;
 
   const handleCalculate = () => {
@@ -53,6 +62,38 @@ export default function FuelCalculator() {
     setCalculated(false);
   };
 
+  const handleFuelUp = async () => {
+    if (!fuelUpVehicle || !fuelUpAmount) {
+      toast({ title: 'Please select vehicle and enter amount', variant: 'destructive' });
+      return;
+    }
+
+    const vehicle = vehicles.find(v => v.id === fuelUpVehicle);
+    if (!vehicle) return;
+
+    const currentLevel = vehicle.current_fuel_level || 0;
+    const tankCapacity = vehicle.tank_capacity_liters || 800;
+    const addAmount = parseFloat(fuelUpAmount);
+    const newLevel = Math.min(currentLevel + addAmount, tankCapacity);
+
+    try {
+      // Use any cast since current_fuel_level was just added to schema
+      await updateVehicle.mutateAsync({
+        id: fuelUpVehicle,
+        current_fuel_level: newLevel,
+      } as any);
+      toast({ 
+        title: 'Fuel added successfully',
+        description: `Added ${addAmount}L to ${vehicle.registration_number}. New level: ${newLevel}L`
+      });
+      setFuelUpOpen(false);
+      setFuelUpVehicle("");
+      setFuelUpAmount("");
+    } catch (error: any) {
+      toast({ title: 'Error adding fuel', description: error.message, variant: 'destructive' });
+    }
+  };
+
   // Get recent trips for quick selection
   const recentTrips = trips
     .filter(t => t.distance_km && t.distance_km > 0)
@@ -62,12 +103,89 @@ export default function FuelCalculator() {
     <AppLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Calculator className="w-7 h-7 text-secondary" />
-            Fuel Calculator
-          </h1>
-          <p className="text-muted-foreground">Calculate fuel requirements for your trips</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Calculator className="w-7 h-7 text-secondary" />
+              Fuel Calculator
+            </h1>
+            <p className="text-muted-foreground">Calculate fuel requirements for your trips</p>
+          </div>
+          <Dialog open={fuelUpOpen} onOpenChange={setFuelUpOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 bg-green-600 hover:bg-green-700">
+                <Fuel className="w-4 h-4" />
+                Fuel Up
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add Fuel to Vehicle</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Select Vehicle *</Label>
+                  <Select value={fuelUpVehicle} onValueChange={setFuelUpVehicle}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a vehicle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {vehicles.filter(v => v.is_active).map(vehicle => {
+                        const currentLevel = vehicle.current_fuel_level || 0;
+                        const tankCapacity = vehicle.tank_capacity_liters || 800;
+                        return (
+                          <SelectItem key={vehicle.id} value={vehicle.id}>
+                            {vehicle.registration_number} ({currentLevel}L / {tankCapacity}L)
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Fuel Amount (Liters) *</Label>
+                  <Input
+                    type="number"
+                    value={fuelUpAmount}
+                    onChange={(e) => setFuelUpAmount(e.target.value)}
+                    placeholder="e.g., 500"
+                  />
+                </div>
+
+                {fuelUpVehicle && (
+                  <div className="bg-muted p-3 rounded-lg text-sm">
+                    {(() => {
+                      const vehicle = vehicles.find(v => v.id === fuelUpVehicle);
+                      if (!vehicle) return null;
+                      const currentLevel = vehicle.current_fuel_level || 0;
+                      const tankCapacity = vehicle.tank_capacity_liters || 800;
+                      const addAmount = parseFloat(fuelUpAmount) || 0;
+                      const newLevel = Math.min(currentLevel + addAmount, tankCapacity);
+                      return (
+                        <>
+                          <p>Current: <span className="font-medium">{currentLevel}L</span></p>
+                          <p>After fill: <span className="font-medium">{newLevel}L</span></p>
+                          <p className="text-muted-foreground">Tank capacity: {tankCapacity}L</p>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={() => setFuelUpOpen(false)}>Cancel</Button>
+                  <Button 
+                    onClick={handleFuelUp} 
+                    disabled={!fuelUpVehicle || !fuelUpAmount || updateVehicle.isPending}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    {updateVehicle.isPending ? 'Adding...' : 'Add Fuel'}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -155,7 +273,7 @@ export default function FuelCalculator() {
                 </Select>
               </div>
 
-              {/* Uncertainty Allowance - Now in Liters */}
+              {/* Uncertainty Allowance - In Liters */}
               <div>
                 <Label htmlFor="uncertaintyLiters">Allowance for Uncertainties (Liters)</Label>
                 <Input
@@ -214,7 +332,7 @@ export default function FuelCalculator() {
                   <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1">
                     <p className="font-medium mb-1">Formula Used:</p>
                     <p className="font-mono text-muted-foreground">
-                      ({distance}km ÷ {ratio}km/L) + {reserve}L reserve = {baseFuel.toFixed(1)}L
+                      {distance}km ÷ {ratio}km/L = {baseFuel.toFixed(1)}L
                     </p>
                     {uncertaintyNum > 0 && (
                       <p className="font-mono text-muted-foreground">

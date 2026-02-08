@@ -12,83 +12,50 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { 
-  MapPin, Satellite, Truck, Activity, Signal, Settings,
-  Navigation, Battery, Gauge, Clock, AlertTriangle, Wifi
+  MapPin, Satellite, Truck, Signal,
+  Navigation, Clock, Wifi
 } from 'lucide-react';
 import { useVehicles } from '@/hooks/useVehicles';
 import { useActiveTrips } from '@/hooks/useTrips';
-
-const GPS_PROVIDERS = [
-  { id: 'cartrack', name: 'Cartrack', logo: '🛰️' },
-  { id: 'netstar', name: 'Netstar', logo: '📡' },
-  { id: 'tracker', name: 'Tracker Connect', logo: '🔗' },
-  { id: 'mix', name: 'MiX Telematics', logo: '📍' },
-  { id: 'custom', name: 'Custom API', logo: '⚙️' },
-];
-
-// Demo tracking data
-const demoTrackingData = [
-  { 
-    vehicleId: '1', 
-    registration: 'ABC 123 GP',
-    lat: -25.7461, 
-    lng: 28.1881, 
-    speed: 85, 
-    heading: 45,
-    lastUpdate: '2 min ago',
-    status: 'moving',
-    ignition: true,
-    fuel: 75,
-    driver: 'John Moyo'
-  },
-  { 
-    vehicleId: '2', 
-    registration: 'XYZ 456 GP',
-    lat: -26.2041, 
-    lng: 28.0473, 
-    speed: 0, 
-    heading: 0,
-    lastUpdate: '5 min ago',
-    status: 'stationary',
-    ignition: false,
-    fuel: 45,
-    driver: 'Peter Ncube'
-  },
-  { 
-    vehicleId: '3', 
-    registration: 'DEF 789 GP',
-    lat: -17.8292, 
-    lng: 31.0522, 
-    speed: 72, 
-    heading: 180,
-    lastUpdate: '1 min ago',
-    status: 'moving',
-    ignition: true,
-    fuel: 60,
-    driver: 'Sarah Dube'
-  },
-];
+import { useGPSIntegrations, useCreateGPSIntegration } from '@/hooks/useGPSIntegrations';
+import { useToast } from '@/hooks/use-toast';
 
 const Tracking = () => {
   const [isConnectOpen, setIsConnectOpen] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState('');
+  const [providerName, setProviderName] = useState('');
+  const [apiUrl, setApiUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
   const { data: vehicles } = useVehicles();
   const { data: activeTrips } = useActiveTrips();
+  const { data: integrations = [] } = useGPSIntegrations();
+  const createIntegration = useCreateGPSIntegration();
+  const { toast } = useToast();
 
-  const handleConnect = () => {
-    if (!selectedProvider || !apiKey) return;
-    setIsConnected(true);
-    setIsConnectOpen(false);
+  const isConnected = integrations.some(i => i.is_active);
+  const activeIntegration = integrations.find(i => i.is_active);
+
+  const handleConnect = async () => {
+    if (!providerName || !apiUrl || !apiKey) {
+      toast({ title: 'Please fill in all fields', variant: 'destructive' });
+      return;
+    }
+    
+    try {
+      await createIntegration.mutateAsync({
+        provider_name: providerName,
+        api_url: apiUrl,
+        api_key: apiKey,
+        is_active: true,
+      });
+      toast({ title: 'GPS provider connected successfully' });
+      setIsConnectOpen(false);
+      setProviderName('');
+      setApiUrl('');
+      setApiKey('');
+    } catch (error: any) {
+      toast({ title: 'Error connecting provider', description: error.message, variant: 'destructive' });
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -99,6 +66,10 @@ const Tracking = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Count vehicles by status (based on active trips)
+  const movingCount = activeTrips?.filter(t => t.status === 'in_transit').length || 0;
+  const stationaryCount = (vehicles?.length || 0) - movingCount;
 
   return (
     <AppLayout>
@@ -122,26 +93,25 @@ const Tracking = () => {
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label>Select GPS Provider</Label>
-                  <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose your GPS provider" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {GPS_PROVIDERS.map((provider) => (
-                        <SelectItem key={provider.id} value={provider.id}>
-                          <span className="flex items-center gap-2">
-                            <span>{provider.logo}</span>
-                            {provider.name}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label>Provider Name *</Label>
+                  <Input
+                    value={providerName}
+                    onChange={(e) => setProviderName(e.target.value)}
+                    placeholder="e.g., Cartrack, Netstar, MiX Telematics"
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>API Key / Access Token</Label>
+                  <Label>API Endpoint URL *</Label>
+                  <Input
+                    value={apiUrl}
+                    onChange={(e) => setApiUrl(e.target.value)}
+                    placeholder="https://api.yourprovider.com/v1"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>API Key / Access Token *</Label>
                   <Input
                     type="password"
                     value={apiKey}
@@ -152,13 +122,6 @@ const Tracking = () => {
                     Get this from your GPS provider's dashboard
                   </p>
                 </div>
-
-                {selectedProvider === 'custom' && (
-                  <div className="space-y-2">
-                    <Label>API Endpoint URL</Label>
-                    <Input placeholder="https://api.yourprovider.com/v1" />
-                  </div>
-                )}
 
                 <div className="bg-muted/50 p-4 rounded-lg text-sm">
                   <p className="font-medium mb-2">Integration Benefits:</p>
@@ -173,8 +136,8 @@ const Tracking = () => {
 
                 <div className="flex justify-end gap-2 pt-4">
                   <Button variant="outline" onClick={() => setIsConnectOpen(false)}>Cancel</Button>
-                  <Button onClick={handleConnect} disabled={!selectedProvider || !apiKey}>
-                    Connect Provider
+                  <Button onClick={handleConnect} disabled={!providerName || !apiUrl || !apiKey || createIntegration.isPending}>
+                    {createIntegration.isPending ? 'Connecting...' : 'Connect Provider'}
                   </Button>
                 </div>
               </div>
@@ -193,7 +156,7 @@ const Tracking = () => {
                 <div>
                   <p className="font-medium text-green-800">GPS Connected</p>
                   <p className="text-sm text-green-600">
-                    {GPS_PROVIDERS.find(p => p.id === selectedProvider)?.name} - Live tracking active
+                    {activeIntegration?.provider_name} - Live tracking active
                   </p>
                 </div>
               </div>
@@ -226,9 +189,7 @@ const Tracking = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Moving</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {demoTrackingData.filter(v => v.status === 'moving').length}
-                  </p>
+                  <p className="text-2xl font-bold text-green-600">{movingCount}</p>
                 </div>
               </div>
             </CardContent>
@@ -241,9 +202,7 @@ const Tracking = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Stationary</p>
-                  <p className="text-2xl font-bold text-amber-600">
-                    {demoTrackingData.filter(v => v.status === 'stationary').length}
-                  </p>
+                  <p className="text-2xl font-bold text-amber-600">{stationaryCount}</p>
                 </div>
               </div>
             </CardContent>
@@ -269,7 +228,7 @@ const Tracking = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total Tracked</p>
-                  <p className="text-2xl font-bold">{demoTrackingData.length}</p>
+                  <p className="text-2xl font-bold">{vehicles?.length || 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -303,27 +262,6 @@ const Tracking = () => {
                   </p>
                 </div>
               </div>
-              
-              {/* Vehicle markers (demo) */}
-              {isConnected && demoTrackingData.map((vehicle, index) => (
-                <div 
-                  key={vehicle.vehicleId}
-                  className="absolute animate-pulse"
-                  style={{
-                    left: `${20 + (index * 25)}%`,
-                    top: `${30 + (index * 15)}%`,
-                  }}
-                >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    vehicle.status === 'moving' ? 'bg-green-500' : 'bg-amber-500'
-                  }`}>
-                    <Truck className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-xs font-medium mt-1 bg-white px-1 rounded shadow">
-                    {vehicle.registration}
-                  </p>
-                </div>
-              ))}
             </div>
           </CardContent>
         </Card>
@@ -334,52 +272,51 @@ const Tracking = () => {
             <CardTitle>Vehicle Status</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {demoTrackingData.map((vehicle) => (
-                <div 
-                  key={vehicle.vehicleId} 
-                  className="flex items-center justify-between p-4 bg-muted/50 rounded-lg"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                      vehicle.status === 'moving' ? 'bg-green-100' : 'bg-amber-100'
-                    }`}>
-                      <Truck className={`w-6 h-6 ${
-                        vehicle.status === 'moving' ? 'text-green-600' : 'text-amber-600'
-                      }`} />
-                    </div>
-                    <div>
-                      <p className="font-semibold">{vehicle.registration}</p>
-                      <p className="text-sm text-muted-foreground">{vehicle.driver}</p>
-                    </div>
-                  </div>
+            {vehicles && vehicles.length > 0 ? (
+              <div className="space-y-4">
+                {vehicles.map((vehicle) => {
+                  const isMoving = activeTrips?.some(t => t.vehicle_id === vehicle.id && t.status === 'in_transit');
+                  return (
+                    <div 
+                      key={vehicle.id} 
+                      className="flex items-center justify-between p-4 bg-muted/50 rounded-lg"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                          isMoving ? 'bg-green-100' : 'bg-amber-100'
+                        }`}>
+                          <Truck className={`w-6 h-6 ${
+                            isMoving ? 'text-green-600' : 'text-amber-600'
+                          }`} />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{vehicle.registration_number}</p>
+                          <p className="text-sm text-muted-foreground">{vehicle.make} {vehicle.model}</p>
+                        </div>
+                      </div>
 
-                  <div className="flex items-center gap-6 text-sm">
-                    <div className="text-center">
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Gauge className="w-4 h-4" />
-                        <span>{vehicle.speed} km/h</span>
+                      <div className="flex items-center gap-6 text-sm">
+                        <div className="text-center">
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Clock className="w-4 h-4" />
+                            <span>—</span>
+                          </div>
+                        </div>
+                        <Badge className={getStatusColor(isMoving ? 'moving' : 'stationary')}>
+                          {isMoving ? '🟢 Moving' : '🟡 Parked'}
+                        </Badge>
                       </div>
                     </div>
-                    <div className="text-center">
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Battery className="w-4 h-4" />
-                        <span>{vehicle.fuel}%</span>
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        <span>{vehicle.lastUpdate}</span>
-                      </div>
-                    </div>
-                    <Badge className={getStatusColor(vehicle.status)}>
-                      {vehicle.status === 'moving' ? '🟢 Moving' : '🟡 Parked'}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Truck className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No vehicles in your fleet yet.</p>
+                <p className="text-sm">Add vehicles to start tracking them.</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -12,6 +12,7 @@ export interface Vehicle {
   tank_capacity_liters: number;
   year: number | null;
   current_odometer: number;
+  current_fuel_level: number;
   status: string;
   fuel_consumption_empty: number;
   fuel_consumption_loaded: number;
@@ -30,6 +31,7 @@ export interface VehicleInsert {
   tank_capacity_liters?: number;
   year?: number;
   current_odometer?: number;
+  current_fuel_level?: number;
   status?: string;
   fuel_consumption_empty?: number;
   fuel_consumption_loaded?: number;
