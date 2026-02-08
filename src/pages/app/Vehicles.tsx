@@ -655,7 +655,7 @@ function VehicleCard({ vehicle, trailers, onAttachTrailer, onDelete }: { vehicle
   };
 
   // Calculate fuel level percentage
-  const fuelLevel = (vehicle as any).current_fuel_level || 0;
+  const fuelLevel = vehicle.current_fuel_level || 0;
   const tankCapacity = vehicle.tank_capacity_liters || 800;
   const fuelPercentage = Math.min(Math.round((fuelLevel / tankCapacity) * 100), 100);
   const fuelColor = fuelPercentage > 50 ? 'bg-green-500' : fuelPercentage > 25 ? 'bg-yellow-500' : 'bg-red-500';

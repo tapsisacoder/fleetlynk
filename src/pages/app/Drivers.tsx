@@ -40,7 +40,6 @@ interface DriverFormData {
   license_number: string;
   license_expiry: string;
   emergency_contact: string;
-  emergency_phone: string;
 }
 
 const emptyForm: DriverFormData = {
@@ -51,7 +50,6 @@ const emptyForm: DriverFormData = {
   license_number: "",
   license_expiry: "",
   emergency_contact: "",
-  emergency_phone: "",
 };
 
 export default function Drivers() {
@@ -84,7 +82,6 @@ export default function Drivers() {
         license_number: driver.license_number || "",
         license_expiry: driver.license_expiry || "",
         emergency_contact: driver.emergency_contact || "",
-        emergency_phone: driver.emergency_phone || "",
       });
     } else {
       setEditingDriver(null);
@@ -318,22 +315,13 @@ export default function Drivers() {
                   onChange={(e) => setFormData(prev => ({ ...prev, license_expiry: e.target.value }))}
                 />
               </div>
-              <div>
-                <Label htmlFor="emergency_contact">Emergency Contact</Label>
+              <div className="md:col-span-2">
+                <Label htmlFor="emergency_contact">Emergency Contact Name</Label>
                 <Input
                   id="emergency_contact"
                   value={formData.emergency_contact}
                   onChange={(e) => setFormData(prev => ({ ...prev, emergency_contact: e.target.value }))}
                   placeholder="Contact name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="emergency_phone">Emergency Phone</Label>
-                <Input
-                  id="emergency_phone"
-                  value={formData.emergency_phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, emergency_phone: e.target.value }))}
-                  placeholder="+27 123 456 7890"
                 />
               </div>
             </div>

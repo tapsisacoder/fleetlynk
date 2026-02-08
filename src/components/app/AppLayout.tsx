@@ -41,7 +41,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     { path: "/app/deploy", icon: Truck, label: "Deploy Trip" },
     { path: "/app/tracking", icon: MapPin, label: "GPS Tracking" },
     { path: "/app/vehicles", icon: Truck, label: "Fleet" },
-    { path: "/app/drivers", icon: Users, label: "Drivers" },
     { path: "/app/calculator", icon: Calculator, label: "Fuel Calculator" },
     { path: "/app/documents", icon: AlertTriangle, label: "Doc Reminders" },
     { divider: true, label: "Workshop" },
