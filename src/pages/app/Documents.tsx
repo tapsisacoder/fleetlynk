@@ -6,67 +6,58 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { AlertTriangle, FileText, Calendar, CheckCircle, Clock, AlertCircle, Plus } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { AlertTriangle, FileText, Calendar, CheckCircle, Clock, AlertCircle, Plus, Trash2, RefreshCw } from "lucide-react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { format, differenceInDays } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
 const DOCUMENT_TYPES = [
-  'License',
-  'Insurance',
-  'Roadworthy',
-  'Permit',
-  'Registration',
-  'Other'
+  'License', 'Insurance', 'Roadworthy', 'Permit', 'Registration',
+  'COF (Certificate of Fitness)', 'Cross-Border Permit', 'Tax Clearance', 'Other'
 ];
+
+const DOCUMENT_CATEGORIES = [
+  { value: 'vehicle', label: 'Vehicle Document' },
+  { value: 'admin', label: 'Admin / Company Document' },
+];
+
+interface CustomDocument {
+  id: string;
+  vehicle: string;
+  vehicleId: string;
+  documentType: string;
+  documentName: string;
+  category: string;
+  expiryDate: Date;
+  daysUntilExpiry: number;
+  status: 'expired' | 'critical' | 'warning' | 'ok';
+}
 
 export default function Documents() {
   const { data: vehicles = [] } = useVehicles();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [customDocuments, setCustomDocuments] = useState<Array<{
-    id: string;
-    vehicle: string;
-    vehicleId: string;
-    documentType: string;
-    documentName: string;
-    expiryDate: Date;
-    daysUntilExpiry: number;
-    status: 'expired' | 'critical' | 'warning' | 'ok';
-  }>>([]);
+  const [renewDialogOpen, setRenewDialogOpen] = useState(false);
+  const [deleteDocId, setDeleteDocId] = useState<string | null>(null);
+  const [renewDoc, setRenewDoc] = useState<CustomDocument | null>(null);
+  const [renewDate, setRenewDate] = useState('');
+  const [customDocuments, setCustomDocuments] = useState<CustomDocument[]>([]);
 
   const [newDocument, setNewDocument] = useState({
-    vehicleId: '',
-    documentType: '',
-    documentName: '',
-    expiryDate: '',
+    vehicleId: '', documentType: '', documentName: '', expiryDate: '', category: 'vehicle',
   });
 
-  // Generate document reminders based on vehicle data
   const generateReminders = () => {
-    const reminders: Array<{
-      id: string;
-      vehicle: string;
-      vehicleId: string;
-      documentType: string;
-      documentName?: string;
-      expiryDate: Date;
-      daysUntilExpiry: number;
-      status: 'expired' | 'critical' | 'warning' | 'ok';
-    }> = [];
+    const reminders: CustomDocument[] = [];
 
     vehicles.forEach(vehicle => {
       const docs = [
@@ -79,7 +70,6 @@ export default function Documents() {
         if (doc.expiry) {
           const expiryDate = new Date(doc.expiry);
           const daysUntil = differenceInDays(expiryDate, new Date());
-          
           let status: 'expired' | 'critical' | 'warning' | 'ok' = 'ok';
           if (daysUntil < 0) status = 'expired';
           else if (daysUntil <= 7) status = 'critical';
@@ -90,6 +80,8 @@ export default function Documents() {
             vehicle: vehicle.registration_number,
             vehicleId: vehicle.id,
             documentType: doc.type,
+            documentName: doc.type,
+            category: 'vehicle',
             expiryDate,
             daysUntilExpiry: daysUntil,
             status,
@@ -98,46 +90,71 @@ export default function Documents() {
       });
     });
 
-    // Add custom documents
-    customDocuments.forEach(doc => {
-      reminders.push(doc);
-    });
-
+    customDocuments.forEach(doc => reminders.push(doc));
     return reminders.sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
   };
 
   const handleAddDocument = () => {
-    if (!newDocument.vehicleId || !newDocument.documentType || !newDocument.expiryDate) {
+    if (!newDocument.documentType || !newDocument.expiryDate) {
       toast({ title: 'Please fill all required fields', variant: 'destructive' });
       return;
     }
 
-    const vehicle = vehicles.find(v => v.id === newDocument.vehicleId);
-    if (!vehicle) return;
+    if (newDocument.category === 'vehicle' && !newDocument.vehicleId) {
+      toast({ title: 'Please select a vehicle for vehicle documents', variant: 'destructive' });
+      return;
+    }
+
+    const vehicle = newDocument.category === 'vehicle' 
+      ? vehicles.find(v => v.id === newDocument.vehicleId) 
+      : null;
 
     const expiryDate = new Date(newDocument.expiryDate);
     const daysUntil = differenceInDays(expiryDate, new Date());
-    
     let status: 'expired' | 'critical' | 'warning' | 'ok' = 'ok';
     if (daysUntil < 0) status = 'expired';
     else if (daysUntil <= 7) status = 'critical';
     else if (daysUntil <= 30) status = 'warning';
 
-    const newDoc = {
+    setCustomDocuments([...customDocuments, {
       id: `custom-${Date.now()}`,
-      vehicle: vehicle.registration_number,
-      vehicleId: newDocument.vehicleId,
+      vehicle: vehicle?.registration_number || 'Admin',
+      vehicleId: newDocument.vehicleId || '',
       documentType: newDocument.documentType,
       documentName: newDocument.documentName || newDocument.documentType,
+      category: newDocument.category,
       expiryDate,
       daysUntilExpiry: daysUntil,
       status,
-    };
-
-    setCustomDocuments([...customDocuments, newDoc]);
+    }]);
     setIsDialogOpen(false);
-    setNewDocument({ vehicleId: '', documentType: '', documentName: '', expiryDate: '' });
+    setNewDocument({ vehicleId: '', documentType: '', documentName: '', expiryDate: '', category: 'vehicle' });
     toast({ title: 'Document added successfully' });
+  };
+
+  const handleDelete = () => {
+    if (!deleteDocId) return;
+    setCustomDocuments(customDocuments.filter(d => d.id !== deleteDocId));
+    setDeleteDocId(null);
+    toast({ title: 'Document removed' });
+  };
+
+  const handleRenew = () => {
+    if (!renewDoc || !renewDate) return;
+    const expiryDate = new Date(renewDate);
+    const daysUntil = differenceInDays(expiryDate, new Date());
+    let status: 'expired' | 'critical' | 'warning' | 'ok' = 'ok';
+    if (daysUntil < 0) status = 'expired';
+    else if (daysUntil <= 7) status = 'critical';
+    else if (daysUntil <= 30) status = 'warning';
+
+    setCustomDocuments(customDocuments.map(d => 
+      d.id === renewDoc.id ? { ...d, expiryDate, daysUntilExpiry: daysUntil, status } : d
+    ));
+    setRenewDialogOpen(false);
+    setRenewDoc(null);
+    setRenewDate('');
+    toast({ title: 'Document renewed successfully' });
   };
 
   const reminders = generateReminders();
@@ -147,29 +164,23 @@ export default function Documents() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'expired':
-        return <Badge variant="destructive">Expired</Badge>;
-      case 'critical':
-        return <Badge className="bg-orange-500">Due Soon</Badge>;
-      case 'warning':
-        return <Badge className="bg-yellow-500 text-black">Upcoming</Badge>;
-      default:
-        return <Badge className="bg-green-500">Valid</Badge>;
+      case 'expired': return <Badge variant="destructive">Expired</Badge>;
+      case 'critical': return <Badge className="bg-orange-500">Due Soon</Badge>;
+      case 'warning': return <Badge className="bg-yellow-500 text-black">Upcoming</Badge>;
+      default: return <Badge className="bg-green-500">Valid</Badge>;
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'expired':
-        return <AlertCircle className="w-5 h-5 text-destructive" />;
-      case 'critical':
-        return <AlertTriangle className="w-5 h-5 text-orange-500" />;
-      case 'warning':
-        return <Clock className="w-5 h-5 text-yellow-500" />;
-      default:
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+      case 'expired': return <AlertCircle className="w-5 h-5 text-destructive" />;
+      case 'critical': return <AlertTriangle className="w-5 h-5 text-orange-500" />;
+      case 'warning': return <Clock className="w-5 h-5 text-yellow-500" />;
+      default: return <CheckCircle className="w-5 h-5 text-green-500" />;
     }
   };
+
+  const isCustomDoc = (id: string) => id.startsWith('custom-');
 
   return (
     <AppLayout>
@@ -181,44 +192,41 @@ export default function Documents() {
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="w-4 h-4" />
-                Add Document
-              </Button>
+              <Button className="gap-2"><Plus className="w-4 h-4" />Add Document</Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add Document Reminder</DialogTitle>
-              </DialogHeader>
+              <DialogHeader><DialogTitle>Add Document Reminder</DialogTitle></DialogHeader>
               <div className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label>Vehicle *</Label>
-                  <Select 
-                    value={newDocument.vehicleId} 
-                    onValueChange={(v) => setNewDocument({...newDocument, vehicleId: v})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select vehicle" />
-                    </SelectTrigger>
+                  <Label>Document Category *</Label>
+                  <Select value={newDocument.category} onValueChange={(v) => setNewDocument({...newDocument, category: v})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {vehicles.map(v => (
-                        <SelectItem key={v.id} value={v.id}>
-                          {v.registration_number} - {v.make} {v.model}
-                        </SelectItem>
+                      {DOCUMENT_CATEGORIES.map(cat => (
+                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
+                {newDocument.category === 'vehicle' && (
+                  <div className="space-y-2">
+                    <Label>Vehicle *</Label>
+                    <Select value={newDocument.vehicleId} onValueChange={(v) => setNewDocument({...newDocument, vehicleId: v})}>
+                      <SelectTrigger><SelectValue placeholder="Select vehicle" /></SelectTrigger>
+                      <SelectContent>
+                        {vehicles.map(v => (
+                          <SelectItem key={v.id} value={v.id}>{v.registration_number} - {v.make} {v.model}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label>Document Type *</Label>
-                  <Select 
-                    value={newDocument.documentType} 
-                    onValueChange={(v) => setNewDocument({...newDocument, documentType: v})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
+                  <Select value={newDocument.documentType} onValueChange={(v) => setNewDocument({...newDocument, documentType: v})}>
+                    <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                     <SelectContent>
                       {DOCUMENT_TYPES.map(type => (
                         <SelectItem key={type} value={type}>{type}</SelectItem>
@@ -229,20 +237,12 @@ export default function Documents() {
 
                 <div className="space-y-2">
                   <Label>Document Name (optional)</Label>
-                  <Input
-                    value={newDocument.documentName}
-                    onChange={(e) => setNewDocument({...newDocument, documentName: e.target.value})}
-                    placeholder="e.g., Cross-border Permit"
-                  />
+                  <Input value={newDocument.documentName} onChange={(e) => setNewDocument({...newDocument, documentName: e.target.value})} placeholder="e.g., Cross-border Permit ZW-SA" />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Expiry Date *</Label>
-                  <Input
-                    type="date"
-                    value={newDocument.expiryDate}
-                    onChange={(e) => setNewDocument({...newDocument, expiryDate: e.target.value})}
-                  />
+                  <Input type="date" value={newDocument.expiryDate} onChange={(e) => setNewDocument({...newDocument, expiryDate: e.target.value})} />
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4">
@@ -267,7 +267,6 @@ export default function Documents() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="border-l-4 border-l-orange-500">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -279,7 +278,6 @@ export default function Documents() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="border-l-4 border-l-yellow-500">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -293,44 +291,6 @@ export default function Documents() {
           </Card>
         </div>
 
-        {/* Urgent Reminders */}
-        {(expired.length > 0 || critical.length > 0) && (
-          <Card className="border-destructive">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-destructive">
-                <AlertTriangle className="w-5 h-5" />
-                Urgent Attention Required
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[...expired, ...critical].map(reminder => (
-                  <div key={reminder.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center gap-3">
-                      {getStatusIcon(reminder.status)}
-                      <div>
-                        <p className="font-medium text-foreground">{reminder.vehicle}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {reminder.documentName || reminder.documentType}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      {getStatusBadge(reminder.status)}
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {reminder.status === 'expired' 
-                          ? `Expired ${Math.abs(reminder.daysUntilExpiry)} days ago`
-                          : `${reminder.daysUntilExpiry} days left`
-                        }
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* All Documents Table */}
         <Card>
           <CardHeader>
@@ -343,24 +303,30 @@ export default function Documents() {
             {reminders.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No document expiry dates set for your vehicles.</p>
-                <p className="text-sm">Add license, insurance, and roadworthy dates to your fleet.</p>
+                <p>No document expiry dates set.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Vehicle</th>
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Category</th>
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Vehicle/Admin</th>
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Document</th>
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Expiry Date</th>
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Days Left</th>
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {reminders.map(reminder => (
                       <tr key={reminder.id} className="border-b border-border hover:bg-muted/50">
+                        <td className="py-3 px-4">
+                          <Badge variant="outline" className="text-xs">
+                            {reminder.category === 'admin' ? 'Admin' : 'Vehicle'}
+                          </Badge>
+                        </td>
                         <td className="py-3 px-4 font-medium">{reminder.vehicle}</td>
                         <td className="py-3 px-4">{reminder.documentName || reminder.documentType}</td>
                         <td className="py-3 px-4">{format(reminder.expiryDate, 'dd MMM yyyy')}</td>
@@ -371,6 +337,29 @@ export default function Documents() {
                           }
                         </td>
                         <td className="py-3 px-4">{getStatusBadge(reminder.status)}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-1">
+                            {isCustomDoc(reminder.id) && (
+                              <>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => { setRenewDoc(reminder); setRenewDialogOpen(true); }}
+                                >
+                                  <RefreshCw className="w-4 h-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => setDeleteDocId(reminder.id)}
+                                  className="text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -379,6 +368,42 @@ export default function Documents() {
             )}
           </CardContent>
         </Card>
+
+        {/* Renew Dialog */}
+        <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Renew Document</DialogTitle></DialogHeader>
+            <div className="space-y-4 pt-4">
+              {renewDoc && (
+                <p className="text-sm text-muted-foreground">
+                  Renewing: <span className="font-medium text-foreground">{renewDoc.documentName}</span> for {renewDoc.vehicle}
+                </p>
+              )}
+              <div className="space-y-2">
+                <Label>New Expiry Date *</Label>
+                <Input type="date" value={renewDate} onChange={(e) => setRenewDate(e.target.value)} />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setRenewDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleRenew} disabled={!renewDate}>Renew</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirm */}
+        <AlertDialog open={!!deleteDocId} onOpenChange={() => setDeleteDocId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Document?</AlertDialogTitle>
+              <AlertDialogDescription>This will remove the document reminder permanently.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AppLayout>
   );

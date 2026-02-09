@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import { Shield } from "lucide-react";
-import heroTruckBg from "@/assets/hero-truck-bg.jpg";
+import { Shield, Lock, Zap, Globe } from "lucide-react";
+import heroOperator from "@/assets/hero-operator.jpg";
 import dashboardScreenshot from "@/assets/dashboard-screenshot.png";
 
 export const HeroSection = () => {
@@ -13,7 +13,7 @@ export const HeroSection = () => {
     <section 
       className="relative min-h-[90vh] overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(to bottom right, hsla(221, 47%, 11%, 0.85), hsla(221, 47%, 8%, 0.9)), url(${heroTruckBg})`,
+        backgroundImage: `linear-gradient(to bottom right, hsla(221, 47%, 11%, 0.85), hsla(221, 47%, 8%, 0.92)), url(${heroOperator})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -22,112 +22,103 @@ export const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Copy */}
           <div className="text-left">
-            {/* Hero headline with spring animation */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 100, damping: 15, mass: 0.8 }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
             >
-              Stop Running Your Fleet.
+              Stop Losing $7,500 Every Month
               <br />
-              <span className="text-accent">Start Owning Your Profit.</span>
+              <span className="text-accent">To Hidden Fleet Costs You Can't Even See</span>
             </motion.h1>
 
-            {/* Subheadline */}
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 100, 
-                damping: 15, 
-                mass: 0.8,
-                delay: 0.2 
-              }}
+              transition={{ type: "spring", stiffness: 100, damping: 15, mass: 0.8, delay: 0.2 }}
               className="text-lg md:text-xl text-white/90 mb-8 max-w-xl"
             >
-              LynkFleet is the Command Center for fleet operators who are tired of manual chaos. Get total visibility of your fleet, fuel, finance, compliance and more —all from your phone.
+              LynkFleet gives you complete visibility and control of your fleet operations—from anywhere, at anytime, without expensive hardware, in under 24 hours.
             </motion.p>
 
-            {/* CTA Button */}
+            {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 100, 
-                damping: 15,
-                delay: 0.4 
-              }}
+              transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.4 }}
               className="flex flex-col sm:flex-row gap-4 mb-6"
             >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button 
                   variant="hero" 
                   size="xl"
                   onClick={openWhatsApp}
                   className="shadow-2xl w-full sm:w-auto"
                 >
-                  CONTACT US ON WHATSAPP AND SECURE YOUR MARGINS
+                  💬 Chat With Us On WhatsApp →
                 </Button>
               </motion.div>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="text-white border-white/30 hover:bg-white/10"
+              >
+                ▶ Watch 2-Minute Demo
+              </Button>
             </motion.div>
 
-            {/* Trust line */}
+            {/* Trust Badges */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="flex items-center gap-2 text-sm text-white/70"
+              className="flex flex-wrap items-center gap-4 text-sm text-white/70"
             >
-              <Shield className="w-4 h-4" />
-              <span>No hardware required • No long-term contracts</span>
+              <div className="flex items-center gap-1.5">
+                <Lock className="w-4 h-4" />
+                <span>Bank-Level Encryption</span>
+              </div>
+              <span className="hidden sm:inline">•</span>
+              <div className="flex items-center gap-1.5">
+                <Globe className="w-4 h-4" />
+                <span>Built for Africa</span>
+              </div>
+              <span className="hidden sm:inline">•</span>
+              <div className="flex items-center gap-1.5">
+                <Zap className="w-4 h-4" />
+                <span>Only 3 Spots Left</span>
+              </div>
             </motion.div>
           </div>
 
-          {/* Right Column - Laptop + Phone Mockup (Smaller) */}
+          {/* Right Column - Device Mockup */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 80, 
-              damping: 20,
-              delay: 0.3 
-            }}
+            transition={{ type: "spring", stiffness: 80, damping: 20, delay: 0.3 }}
             className="relative flex justify-center lg:justify-end"
           >
             <div className="relative scale-75 md:scale-85 lg:scale-90 origin-center">
               {/* Laptop Frame */}
               <div className="relative">
-                {/* Laptop Screen */}
                 <div className="relative w-[420px] md:w-[480px] bg-gray-800 rounded-t-xl p-2 shadow-2xl">
-                  {/* Screen bezel */}
                   <div className="w-full h-[260px] md:h-[300px] bg-background rounded-lg overflow-hidden relative">
-                    {/* Dashboard Screenshot */}
                     <img 
                       src={dashboardScreenshot} 
                       alt="LynkFleet Dashboard"
                       className="w-full h-full object-cover object-top"
                     />
                   </div>
-                  
-                  {/* Camera notch */}
                   <div className="absolute top-3 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-600 rounded-full"></div>
                 </div>
-                
-                {/* Laptop Base */}
                 <div className="w-[460px] md:w-[520px] h-4 bg-gray-700 rounded-b-xl mx-auto relative">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-gray-600 rounded-b"></div>
                 </div>
                 <div className="w-[500px] md:w-[560px] h-2 bg-gray-800 rounded-b-lg mx-auto"></div>
               </div>
 
-              {/* Phone Frame - Positioned to overlap */}
+              {/* Phone Frame */}
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -135,17 +126,13 @@ export const HeroSection = () => {
                 className="absolute -right-2 -bottom-6 md:-right-4 md:-bottom-8"
               >
                 <div className="relative w-[120px] md:w-[140px] h-[240px] md:h-[280px] bg-gray-900 rounded-[1.5rem] p-1.5 shadow-2xl border-2 border-gray-800">
-                  {/* Screen */}
                   <div className="w-full h-full bg-background rounded-[1.2rem] overflow-hidden relative">
-                    {/* Status Bar */}
                     <div className="h-5 bg-primary flex items-center justify-between px-3 text-white text-[8px]">
                       <span>9:41</span>
                       <div className="flex gap-0.5">
                         <div className="w-2 h-1 bg-white/80 rounded-sm"></div>
                       </div>
                     </div>
-                    
-                    {/* Reports Preview */}
                     <div className="p-2 space-y-2">
                       <div className="flex items-center gap-1.5 mb-2">
                         <div className="w-3 h-3 bg-primary rounded flex items-center justify-center">
@@ -153,8 +140,6 @@ export const HeroSection = () => {
                         </div>
                         <span className="text-[9px] font-semibold text-foreground">Reports</span>
                       </div>
-
-                      {/* Mini Stats */}
                       <div className="grid grid-cols-2 gap-1.5">
                         <div className="bg-green-500/10 p-1.5 rounded">
                           <p className="text-[6px] text-muted-foreground">Revenue</p>
@@ -165,8 +150,6 @@ export const HeroSection = () => {
                           <p className="text-[10px] font-bold text-red-500">$36K</p>
                         </div>
                       </div>
-
-                      {/* Profit */}
                       <div className="bg-accent/10 p-1.5 rounded">
                         <div className="flex items-center justify-between">
                           <div>
@@ -176,8 +159,6 @@ export const HeroSection = () => {
                           <span className="text-green-500">↑</span>
                         </div>
                       </div>
-
-                      {/* Mini Bar Chart */}
                       <div className="flex items-end gap-0.5 h-6 mt-2">
                         {[40, 60, 35, 80, 55, 70, 45].map((h, i) => (
                           <div key={i} className="flex-1 bg-primary/60 rounded-t" style={{ height: `${h}%` }}></div>
@@ -185,13 +166,10 @@ export const HeroSection = () => {
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Notch */}
                   <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-3 bg-gray-900 rounded-full"></div>
                 </div>
               </motion.div>
               
-              {/* Glow Effect */}
               <div className="absolute -inset-10 bg-accent/20 blur-3xl rounded-full -z-10"></div>
             </div>
           </motion.div>
