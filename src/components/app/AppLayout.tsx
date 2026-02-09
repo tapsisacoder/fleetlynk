@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { 
   LayoutDashboard, 
   Calculator, 
@@ -32,6 +33,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, company, profile, loading, signOut } = useAuth();
+  useSessionTimeout();
 
   const isActive = (path: string) => location.pathname === path;
 
