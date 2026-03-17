@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Logo } from "@/components/Logo";
 import { 
   Users, 
   Calendar, 
@@ -11,10 +13,12 @@ import {
   Search,
   Download,
   RefreshCw,
+  Copy,
   Mail,
-  MessageCircle
+  MessageCircle,
+  X
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { storage } from "@/lib/storage";
 import { FoundingApplication } from "@/types/founding";
 import { toast } from "sonner";
 import {
@@ -23,95 +27,65 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { User } from "@supabase/supabase-js";
+
+const ADMIN_PASSWORD = "fleetlynk2026";
 
 const Admin = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
   const [applications, setApplications] = useState<FoundingApplication[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedApp, setSelectedApp] = useState<FoundingApplication | null>(null);
 
   useEffect(() => {
-    checkAuth();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        checkAdminRole(session.user.id);
-      } else {
-        setUser(null);
-        setIsAdmin(false);
-        navigate("/admin-auth");
-      }
-    });
+    const auth = sessionStorage.getItem("fleetlynk_admin_auth");
+    if (auth === "true") {
+      setIsAuthenticated(true);
+      loadApplications();
+    }
+  }, []);
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      setUser(session.user);
-      await checkAdminRole(session.user.id);
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      sessionStorage.setItem("fleetlynk_admin_auth", "true");
+      setIsAuthenticated(true);
+      loadApplications();
     } else {
-      navigate("/admin-auth");
-    }
-    setIsLoading(false);
-  };
-
-  const checkAdminRole = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      if (data) {
-        setIsAdmin(true);
-        loadApplications();
-      } else {
-        toast.error("Access denied. Admin role required.");
-        navigate("/admin-auth");
-      }
-    } catch (error) {
-      toast.error("Failed to verify admin access");
-      navigate("/admin-auth");
+      setPasswordError(true);
+      setTimeout(() => setPasswordError(false), 500);
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/admin-auth");
+  const handleLogout = () => {
+    sessionStorage.removeItem("fleetlynk_admin_auth");
+    setIsAuthenticated(false);
+    navigate("/");
   };
 
   const loadApplications = async () => {
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('founding_applications')
-        .select('*')
-        .order('timestamp', { ascending: false });
+      const keys = await storage.list("founding:");
+      const apps: FoundingApplication[] = [];
 
-      if (error) throw error;
+      for (const key of keys) {
+        const data = await storage.get(key);
+        if (data) {
+          apps.push(JSON.parse(data));
+        }
+      }
 
-      const apps: FoundingApplication[] = (data || []).map(app => ({
-        id: app.id,
-        timestamp: app.timestamp,
-        region: app.region,
-        company: app.company,
-        email: app.email,
-        whatsapp: app.whatsapp,
-        vehicles: app.vehicles
-      }));
-
+      apps.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       setApplications(apps);
     } catch (error) {
-      toast.error("Failed to load applications. Please try again.");
+      console.error("Error loading applications:", error);
+      toast.error("Failed to load applications");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,19 +98,31 @@ const Admin = () => {
     const headers = [
       "Timestamp",
       "Region",
-      "Company",
+      "Name",
       "Email",
       "WhatsApp",
-      "Vehicles"
+      "Company",
+      "Trucks",
+      "Biggest Pain",
+      "Fuel Tracking",
+      "Current Tracking",
+      "Priority Factor",
+      "Must-Have Feature"
     ];
 
     const rows = applications.map(app => [
       app.timestamp,
       app.region,
-      app.company,
+      app.name,
       app.email,
       app.whatsapp,
-      app.vehicles
+      app.company,
+      app.trucks,
+      `"${app.biggestPain.replace(/"/g, '""')}"`,
+      app.fuelTracking,
+      `"${app.trackingMethod.join(', ')}"`,
+      app.priorityFactor,
+      `"${app.mustHaveFeature.replace(/"/g, '""')}"`
     ]);
 
     const csv = [headers, ...rows].map(row => row.join(",")).join("\n");
@@ -144,21 +130,35 @@ const Admin = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `lynkfleet_founding_fleet_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `fleetlynk_founding_fleet_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     toast.success("CSV exported!");
   };
 
   const getRegionFlag = (region: string) => {
-    if (region.includes("South Africa")) return "🇿🇦";
-    if (region.includes("Zimbabwe")) return "🇿🇼";
-    if (region.includes("Mozambique")) return "🇲🇿";
-    if (region.includes("Zambia")) return "🇿🇲";
-    if (region.includes("Botswana")) return "🇧🇼";
-    return "🌍";
+    const flags: Record<string, string> = {
+      "south-africa": "🇿🇦",
+      "zimbabwe": "🇿🇼",
+      "both": "🌍",
+      "other-southern": "🌍",
+      "outside": "🌐"
+    };
+    return flags[region] || "🌍";
+  };
+
+  const getPriorityBadgeColor = (priority: string) => {
+    const colors: Record<string, string> = {
+      "affordable": "bg-accent/10 text-accent",
+      "reliable": "bg-blue-100 text-blue-700",
+      "simple": "bg-green-100 text-green-700",
+      "support": "bg-purple-100 text-purple-700",
+      "integration": "bg-pink-100 text-pink-700"
+    };
+    return colors[priority] || "bg-gray-100 text-gray-700";
   };
 
   const filteredApplications = applications.filter(app =>
+    app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     app.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     app.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
     app.region.toLowerCase().includes(searchQuery.toLowerCase())
@@ -177,22 +177,42 @@ const Admin = () => {
       weekAgo.setDate(weekAgo.getDate() - 7);
       return appDate >= weekAgo;
     }).length,
-    zimbabwe: applications.filter(app => app.region.includes("Zimbabwe")).length
+    affordablePriority: Math.round(
+      (applications.filter(app => app.priorityFactor === "affordable").length / 
+       Math.max(applications.length, 1)) * 100
+    )
   };
 
-  if (isLoading) {
+  if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-br from-primary via-primary to-[hsl(221,47%,12%)] flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md animate-scale-in">
+          <Logo className="mb-8" />
+          <h1 className="text-2xl font-bold text-primary text-center mb-6">
+            FleetLynk Admin
+          </h1>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={passwordError ? "border-destructive animate-shake" : ""}
+                placeholder="Enter admin password"
+              />
+              {passwordError && (
+                <p className="text-sm text-destructive">Wrong password</p>
+              )}
+            </div>
+            <Button type="submit" variant="hero" size="lg" className="w-full">
+              Access Dashboard
+            </Button>
+          </form>
         </div>
       </div>
     );
-  }
-
-  if (!user || !isAdmin) {
-    return null;
   }
 
   return (
@@ -249,8 +269,8 @@ const Admin = () => {
             <div className="flex items-center gap-3 mb-2">
               <Target className="w-8 h-8 text-purple-500" />
             </div>
-            <div className="text-3xl font-bold text-primary">{stats.zimbabwe}</div>
-            <div className="text-sm text-muted-foreground">Zimbabwe</div>
+            <div className="text-3xl font-bold text-primary">{stats.affordablePriority}%</div>
+            <div className="text-sm text-muted-foreground">Price-Conscious</div>
           </div>
         </div>
 
@@ -310,17 +330,18 @@ const Admin = () => {
                 <tr>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Date/Time</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Region</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Company</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Name</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Email</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">WhatsApp</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Vehicles</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Trucks</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Priority</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredApplications.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                    <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
                       {applications.length === 0
                         ? "No applications yet. Time to share your page!"
                         : "No results found for your search."}
@@ -345,10 +366,15 @@ const Admin = () => {
                       <td className="px-4 py-3 text-sm">
                         <span className="text-lg">{getRegionFlag(app.region)}</span>
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium">{app.company}</td>
+                      <td className="px-4 py-3 text-sm font-medium">{app.name}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{app.email}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{app.whatsapp}</td>
-                      <td className="px-4 py-3 text-sm">{app.vehicles}</td>
+                      <td className="px-4 py-3 text-sm">{app.trucks}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getPriorityBadgeColor(app.priorityFactor)}`}>
+                          {app.priorityFactor}
+                        </span>
+                      </td>
                       <td className="px-4 py-3">
                         <Button
                           variant="outline"
@@ -374,7 +400,7 @@ const Admin = () => {
             <>
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
-                  {selectedApp.company}
+                  {selectedApp.name}
                   <span className="text-lg">{getRegionFlag(selectedApp.region)}</span>
                 </DialogTitle>
                 <p className="text-sm text-muted-foreground">
@@ -411,11 +437,58 @@ const Admin = () => {
                       <span className="text-muted-foreground">Company:</span>
                       <span className="font-medium">{selectedApp.company}</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* Fleet Details */}
+                <div>
+                  <h3 className="font-semibold text-primary mb-3">Fleet Details</h3>
+                  <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Vehicles:</span>
-                      <span className="font-medium">{selectedApp.vehicles}</span>
+                      <span className="text-muted-foreground">Truck Count:</span>
+                      <span className="font-medium">{selectedApp.trucks}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Fuel Method:</span>
+                      <span className="font-medium">{selectedApp.fuelTracking}</span>
+                    </div>
+                    <div className="flex items-start justify-between">
+                      <span className="text-muted-foreground">Tracking:</span>
+                      <div className="flex flex-wrap gap-1 justify-end">
+                        {selectedApp.trackingMethod.map((method) => (
+                          <span
+                            key={method}
+                            className="px-2 py-1 bg-primary/10 text-primary rounded text-xs"
+                          >
+                            {method}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Insights */}
+                <div>
+                  <h3 className="font-semibold text-primary mb-3">Insights</h3>
+                  <div className="space-y-4">
+                    <div className="border-l-4 border-accent pl-4">
+                      <p className="text-sm text-muted-foreground mb-1">Biggest Pain:</p>
+                      <p className="text-sm italic">{selectedApp.biggestPain}</p>
+                    </div>
+                    <div className="border-l-4 border-accent pl-4">
+                      <p className="text-sm text-muted-foreground mb-1">Must-Have:</p>
+                      <p className="text-sm italic">{selectedApp.mustHaveFeature}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Priority */}
+                <div>
+                  <h3 className="font-semibold text-primary mb-3">Priority Factor</h3>
+                  <span className={`inline-block px-4 py-2 rounded-lg text-sm font-medium ${getPriorityBadgeColor(selectedApp.priorityFactor)}`}>
+                    {selectedApp.priorityFactor}
+                  </span>
                 </div>
 
                 {/* Actions */}
@@ -427,7 +500,7 @@ const Admin = () => {
                     }}
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
-                    WhatsApp {selectedApp.company}
+                    WhatsApp {selectedApp.name.split(" ")[0]}
                   </Button>
                   <Button
                     variant="outline"
@@ -436,7 +509,7 @@ const Admin = () => {
                     }}
                   >
                     <Mail className="w-4 h-4 mr-2" />
-                    Email {selectedApp.company}
+                    Email {selectedApp.name.split(" ")[0]}
                   </Button>
                 </div>
               </div>

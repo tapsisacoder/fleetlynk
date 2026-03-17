@@ -1,23 +1,18 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { LogoHorizontal } from "./Logo";
 
 export const Navigation = () => {
-  const openWhatsApp = () => {
-    window.open("https://wa.me/263780009785?text=Hi%20LynkFleet%2C%20I%27m%20interested%20in%20the%20Founding%20Fleet%20program", "_blank");
+  const scrollToForm = () => {
+    const formSection = document.getElementById("application-form");
+    formSection?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <LogoHorizontal />
-            <span className="hidden md:block text-sm text-gray-600 italic border-l border-gray-300 pl-3">
-              Master your Margins
-            </span>
-          </div>
+          <LogoHorizontal />
           
           <div className="flex items-center gap-4">
             <motion.div
@@ -31,16 +26,6 @@ export const Navigation = () => {
               </span>
             </motion.div>
             
-            <Link to="/login">
-              <Button 
-                variant="outline" 
-                size="default"
-                className="font-semibold"
-              >
-                Login
-              </Button>
-            </Link>
-            
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -49,10 +34,10 @@ export const Navigation = () => {
               <Button 
                 variant="cta" 
                 size="default"
-                onClick={openWhatsApp}
+                onClick={scrollToForm}
                 className="font-semibold"
               >
-                Contact Us
+                Apply Now
               </Button>
             </motion.div>
           </div>

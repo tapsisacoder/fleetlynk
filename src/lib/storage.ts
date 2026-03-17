@@ -2,12 +2,13 @@
 // In production, this would connect to a real backend
 
 class StorageManager {
-  private prefix = "lynkfleet_";
+  private prefix = "fleetlynk_";
 
   async set(key: string, value: string): Promise<void> {
     try {
       localStorage.setItem(this.prefix + key, value);
     } catch (error) {
+      console.error("Storage set error:", error);
       throw error;
     }
   }
@@ -16,6 +17,7 @@ class StorageManager {
     try {
       return localStorage.getItem(this.prefix + key);
     } catch (error) {
+      console.error("Storage get error:", error);
       return null;
     }
   }
@@ -34,6 +36,7 @@ class StorageManager {
       
       return keys;
     } catch (error) {
+      console.error("Storage list error:", error);
       return [];
     }
   }
@@ -42,6 +45,7 @@ class StorageManager {
     try {
       localStorage.removeItem(this.prefix + key);
     } catch (error) {
+      console.error("Storage delete error:", error);
       throw error;
     }
   }
