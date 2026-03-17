@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { 
-  Users, 
-  Calendar, 
-  TrendingUp, 
+import {
+  Users,
+  Calendar,
+  TrendingUp,
   Target,
   LogOut,
   Search,
@@ -16,7 +16,7 @@ import {
   Copy,
   Mail,
   MessageCircle,
-  X
+  X,
 } from "lucide-react";
 import { storage } from "@/lib/storage";
 import { FoundingApplication } from "@/types/founding";
@@ -71,14 +71,10 @@ const Admin = () => {
     try {
       const keys = await storage.list("founding:");
       const apps: FoundingApplication[] = [];
-
       for (const key of keys) {
         const data = await storage.get(key);
-        if (data) {
-          apps.push(JSON.parse(data));
-        }
+        if (data) apps.push(JSON.parse(data));
       }
-
       apps.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       setApplications(apps);
     } catch (error) {
@@ -95,102 +91,54 @@ const Admin = () => {
   };
 
   const exportCSV = () => {
-    const headers = [
-      "Timestamp",
-      "Region",
-      "Name",
-      "Email",
-      "WhatsApp",
-      "Company",
-      "Trucks",
-      "Biggest Pain",
-      "Fuel Tracking",
-      "Current Tracking",
-      "Priority Factor",
-      "Must-Have Feature"
-    ];
-
-    const rows = applications.map(app => [
+    const headers = ["Timestamp", "Full Name", "Email", "Company", "Trucks", "Country"];
+    const rows = applications.map((app) => [
       app.timestamp,
-      app.region,
-      app.name,
+      app.fullName,
       app.email,
-      app.whatsapp,
       app.company,
       app.trucks,
-      `"${app.biggestPain.replace(/"/g, '""')}"`,
-      app.fuelTracking,
-      `"${app.trackingMethod.join(', ')}"`,
-      app.priorityFactor,
-      `"${app.mustHaveFeature.replace(/"/g, '""')}"`
+      app.country,
     ]);
-
-    const csv = [headers, ...rows].map(row => row.join(",")).join("\n");
+    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `fleetlynk_founding_fleet_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `lynkfleet_applications_${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     toast.success("CSV exported!");
   };
 
-  const getRegionFlag = (region: string) => {
-    const flags: Record<string, string> = {
-      "south-africa": "🇿🇦",
-      "zimbabwe": "🇿🇼",
-      "both": "🌍",
-      "other-southern": "🌍",
-      "outside": "🌐"
-    };
-    return flags[region] || "🌍";
-  };
-
-  const getPriorityBadgeColor = (priority: string) => {
-    const colors: Record<string, string> = {
-      "affordable": "bg-accent/10 text-accent",
-      "reliable": "bg-blue-100 text-blue-700",
-      "simple": "bg-green-100 text-green-700",
-      "support": "bg-purple-100 text-purple-700",
-      "integration": "bg-pink-100 text-pink-700"
-    };
-    return colors[priority] || "bg-gray-100 text-gray-700";
-  };
-
-  const filteredApplications = applications.filter(app =>
-    app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    app.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    app.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    app.region.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredApplications = applications.filter(
+    (app) =>
+      app.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      app.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      app.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      app.country.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const stats = {
     total: applications.length,
-    today: applications.filter(app => {
-      const appDate = new Date(app.timestamp);
-      const today = new Date();
-      return appDate.toDateString() === today.toDateString();
+    today: applications.filter((app) => {
+      const d = new Date(app.timestamp);
+      return d.toDateString() === new Date().toDateString();
     }).length,
-    thisWeek: applications.filter(app => {
-      const appDate = new Date(app.timestamp);
+    thisWeek: applications.filter((app) => {
+      const d = new Date(app.timestamp);
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
-      return appDate >= weekAgo;
+      return d >= weekAgo;
     }).length,
-    affordablePriority: Math.round(
-      (applications.filter(app => app.priorityFactor === "affordable").length / 
-       Math.max(applications.length, 1)) * 100
-    )
+    zimbabwe: applications.filter((app) => app.country === "Zimbabwe").length,
   };
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary via-primary to-[hsl(221,47%,12%)] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md animate-scale-in">
+      <div className="min-h-screen bg-primary flex items-center justify-center p-4">
+        <div className="bg-white p-8 w-full max-w-md">
           <Logo className="mb-8" />
-          <h1 className="text-2xl font-bold text-primary text-center mb-6">
-            FleetLynk Admin
-          </h1>
+          <h1 className="text-xl font-bold text-primary mb-6">LynkFleet Admin</h1>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -199,16 +147,14 @@ const Admin = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={passwordError ? "border-destructive animate-shake" : ""}
+                className={passwordError ? "border-destructive" : ""}
                 placeholder="Enter admin password"
               />
-              {passwordError && (
-                <p className="text-sm text-destructive">Wrong password</p>
-              )}
+              {passwordError && <p className="text-sm text-destructive">Wrong password</p>}
             </div>
-            <Button type="submit" variant="hero" size="lg" className="w-full">
-              Access Dashboard
-            </Button>
+            <button type="submit" className="w-full bg-accent text-accent-foreground py-3 text-sm font-bold tracking-widest uppercase">
+              ACCESS DASHBOARD
+            </button>
           </form>
         </div>
       </div>
@@ -216,105 +162,60 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl md:text-2xl font-bold text-primary">
-                Founding Fleet Admin
-              </h1>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-success rounded-full animate-pulse-subtle"></div>
-                <span className="text-sm text-muted-foreground">Live</span>
-              </div>
+      <header className="sticky top-0 z-50 bg-white border-b border-border">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-lg font-bold text-primary">LynkFleet Admin</h1>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-xs text-muted-foreground">Live</span>
             </div>
-            <Button variant="ghost" onClick={handleLogout} className="text-destructive">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
           </div>
+          <Button variant="ghost" onClick={handleLogout} className="text-destructive text-sm">
+            <LogOut className="w-4 h-4 mr-1" />
+            Logout
+          </Button>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Cards */}
+        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-lg p-6 shadow-md animate-fade-in-up">
-            <div className="flex items-center gap-3 mb-2">
-              <Users className="w-8 h-8 text-accent" />
+          {[
+            { icon: Users, label: "Total", value: stats.total, color: "text-accent" },
+            { icon: Calendar, label: "Today", value: stats.today, color: "text-blue-500" },
+            { icon: TrendingUp, label: "This Week", value: stats.thisWeek, color: "text-green-500" },
+            { icon: Target, label: "Zimbabwe", value: stats.zimbabwe, color: "text-purple-500" },
+          ].map((stat) => (
+            <div key={stat.label} className="bg-white p-5 border border-border">
+              <stat.icon className={`w-6 h-6 ${stat.color} mb-2`} />
+              <div className="text-2xl font-bold text-primary font-mono">{stat.value}</div>
+              <div className="text-xs text-muted-foreground">{stat.label}</div>
             </div>
-            <div className="text-3xl font-bold text-primary">{stats.total}</div>
-            <div className="text-sm text-muted-foreground">Applications</div>
-          </div>
-
-          <div className="bg-white rounded-lg p-6 shadow-md animate-fade-in-up delay-100">
-            <div className="flex items-center gap-3 mb-2">
-              <Calendar className="w-8 h-8 text-blue-500" />
-            </div>
-            <div className="text-3xl font-bold text-primary">{stats.today}</div>
-            <div className="text-sm text-muted-foreground">Today</div>
-          </div>
-
-          <div className="bg-white rounded-lg p-6 shadow-md animate-fade-in-up delay-200">
-            <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-8 h-8 text-green-500" />
-            </div>
-            <div className="text-3xl font-bold text-primary">{stats.thisWeek}</div>
-            <div className="text-sm text-muted-foreground">This Week</div>
-          </div>
-
-          <div className="bg-white rounded-lg p-6 shadow-md animate-fade-in-up delay-300">
-            <div className="flex items-center gap-3 mb-2">
-              <Target className="w-8 h-8 text-purple-500" />
-            </div>
-            <div className="text-3xl font-bold text-primary">{stats.affordablePriority}%</div>
-            <div className="text-sm text-muted-foreground">Price-Conscious</div>
-          </div>
+          ))}
         </div>
 
         {/* Actions */}
-        <div className="bg-white rounded-lg p-6 shadow-md mb-8 animate-fade-in-up delay-400">
-          <div className="flex flex-wrap gap-3">
-            <Button
-              variant="outline"
-              onClick={() => {
-                const whatsapps = applications.map(a => a.whatsapp).join("\n");
-                copyToClipboard(whatsapps, `${applications.length} WhatsApp numbers`);
-              }}
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Copy All WhatsApp
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                const emails = applications.map(a => a.email).join(", ");
-                copyToClipboard(emails, `${applications.length} emails`);
-              }}
-            >
-              <Mail className="w-4 h-4 mr-2" />
-              Copy All Emails
-            </Button>
-            <Button variant="outline" onClick={exportCSV}>
-              <Download className="w-4 h-4 mr-2" />
-              Export CSV
-            </Button>
-            <Button variant="outline" onClick={loadApplications} disabled={isLoading}>
-              <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-              Refresh
-            </Button>
-          </div>
+        <div className="bg-white p-4 border border-border mb-6 flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => copyToClipboard(applications.map((a) => a.email).join(", "), `${applications.length} emails`)}>
+            <Mail className="w-4 h-4 mr-1" /> Copy Emails
+          </Button>
+          <Button variant="outline" size="sm" onClick={exportCSV}>
+            <Download className="w-4 h-4 mr-1" /> Export CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={loadApplications} disabled={isLoading}>
+            <RefreshCw className={`w-4 h-4 mr-1 ${isLoading ? "animate-spin" : ""}`} /> Refresh
+          </Button>
         </div>
 
         {/* Search */}
-        <div className="bg-white rounded-lg p-6 shadow-md mb-8 animate-fade-in-up delay-500">
+        <div className="bg-white p-4 border border-border mb-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              type="text"
-              placeholder="Search name, email, company, region..."
+              placeholder="Search name, email, company..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -322,65 +223,41 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Applications Table */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden animate-fade-in-up delay-600">
+        {/* Table */}
+        <div className="bg-white border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-muted/50">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Date/Time</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Region</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Name</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Email</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">WhatsApp</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Trucks</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Priority</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-primary">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Company</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Trucks</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Country</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredApplications.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
-                      {applications.length === 0
-                        ? "No applications yet. Time to share your page!"
-                        : "No results found for your search."}
+                    <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                      {applications.length === 0 ? "No applications yet." : "No results."}
                     </td>
                   </tr>
                 ) : (
-                  filteredApplications.map((app, index) => (
-                    <tr
-                      key={app.id}
-                      className={`border-t hover:bg-muted/30 transition-colors ${
-                        index % 2 === 0 ? "bg-white" : "bg-muted/10"
-                      }`}
-                    >
-                      <td className="px-4 py-3 text-sm">
-                        {new Date(app.timestamp).toLocaleDateString("en-ZA", {
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit"
-                        })}
+                  filteredApplications.map((app, i) => (
+                    <tr key={app.id} className={`border-t ${i % 2 === 0 ? "bg-white" : "bg-muted/30"} hover:bg-muted/50 transition-colors`}>
+                      <td className="px-4 py-3 text-xs text-muted-foreground font-mono">
+                        {new Date(app.timestamp).toLocaleDateString("en-ZA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                       </td>
-                      <td className="px-4 py-3 text-sm">
-                        <span className="text-lg">{getRegionFlag(app.region)}</span>
-                      </td>
-                      <td className="px-4 py-3 text-sm font-medium">{app.name}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-primary">{app.fullName}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{app.company}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{app.email}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{app.whatsapp}</td>
-                      <td className="px-4 py-3 text-sm">{app.trucks}</td>
+                      <td className="px-4 py-3 text-sm font-mono">{app.trucks}</td>
+                      <td className="px-4 py-3 text-sm">{app.country}</td>
                       <td className="px-4 py-3">
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getPriorityBadgeColor(app.priorityFactor)}`}>
-                          {app.priorityFactor}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedApp(app)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => setSelectedApp(app)}>
                           View
                         </Button>
                       </td>
@@ -395,121 +272,45 @@ const Admin = () => {
 
       {/* Detail Modal */}
       <Dialog open={!!selectedApp} onOpenChange={() => setSelectedApp(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg">
           {selectedApp && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
-                  {selectedApp.name}
-                  <span className="text-lg">{getRegionFlag(selectedApp.region)}</span>
+                <DialogTitle className="text-xl font-bold text-primary">
+                  {selectedApp.fullName}
                 </DialogTitle>
-                <p className="text-sm text-muted-foreground">
-                  Applied on {new Date(selectedApp.timestamp).toLocaleString("en-ZA", {
-                    dateStyle: "long",
-                    timeStyle: "short"
-                  })}
+                <p className="text-xs text-muted-foreground font-mono">
+                  {new Date(selectedApp.timestamp).toLocaleString("en-ZA", { dateStyle: "long", timeStyle: "short" })}
                 </p>
               </DialogHeader>
 
-              <div className="space-y-6 mt-4">
-                {/* Contact */}
-                <div className="bg-muted/30 rounded-lg p-4">
-                  <h3 className="font-semibold text-primary mb-3">Contact</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Email:</span>
-                      <a href={`mailto:${selectedApp.email}`} className="text-accent hover:underline">
-                        {selectedApp.email}
-                      </a>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">WhatsApp:</span>
-                      <a
-                        href={`https://wa.me/${selectedApp.whatsapp.replace(/\D/g, "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-accent hover:underline"
-                      >
-                        {selectedApp.whatsapp}
-                      </a>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Company:</span>
-                      <span className="font-medium">{selectedApp.company}</span>
-                    </div>
+              <div className="space-y-4 mt-4">
+                <div className="bg-muted/30 p-4 space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Company</span>
+                    <span className="font-medium">{selectedApp.company}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Email</span>
+                    <a href={`mailto:${selectedApp.email}`} className="text-accent hover:underline">{selectedApp.email}</a>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Trucks</span>
+                    <span className="font-mono">{selectedApp.trucks}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Country</span>
+                    <span>{selectedApp.country}</span>
                   </div>
                 </div>
 
-                {/* Fleet Details */}
-                <div>
-                  <h3 className="font-semibold text-primary mb-3">Fleet Details</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Truck Count:</span>
-                      <span className="font-medium">{selectedApp.trucks}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Fuel Method:</span>
-                      <span className="font-medium">{selectedApp.fuelTracking}</span>
-                    </div>
-                    <div className="flex items-start justify-between">
-                      <span className="text-muted-foreground">Tracking:</span>
-                      <div className="flex flex-wrap gap-1 justify-end">
-                        {selectedApp.trackingMethod.map((method) => (
-                          <span
-                            key={method}
-                            className="px-2 py-1 bg-primary/10 text-primary rounded text-xs"
-                          >
-                            {method}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Insights */}
-                <div>
-                  <h3 className="font-semibold text-primary mb-3">Insights</h3>
-                  <div className="space-y-4">
-                    <div className="border-l-4 border-accent pl-4">
-                      <p className="text-sm text-muted-foreground mb-1">Biggest Pain:</p>
-                      <p className="text-sm italic">{selectedApp.biggestPain}</p>
-                    </div>
-                    <div className="border-l-4 border-accent pl-4">
-                      <p className="text-sm text-muted-foreground mb-1">Must-Have:</p>
-                      <p className="text-sm italic">{selectedApp.mustHaveFeature}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Priority */}
-                <div>
-                  <h3 className="font-semibold text-primary mb-3">Priority Factor</h3>
-                  <span className={`inline-block px-4 py-2 rounded-lg text-sm font-medium ${getPriorityBadgeColor(selectedApp.priorityFactor)}`}>
-                    {selectedApp.priorityFactor}
-                  </span>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-wrap gap-3 pt-4 border-t">
-                  <Button
-                    variant="cta"
-                    onClick={() => {
-                      window.open(`https://wa.me/${selectedApp.whatsapp.replace(/\D/g, "")}`, "_blank");
-                    }}
-                  >
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    WhatsApp {selectedApp.name.split(" ")[0]}
-                  </Button>
+                <div className="flex gap-2 pt-2">
                   <Button
                     variant="outline"
-                    onClick={() => {
-                      window.location.href = `mailto:${selectedApp.email}`;
-                    }}
+                    size="sm"
+                    onClick={() => window.location.href = `mailto:${selectedApp.email}`}
                   >
-                    <Mail className="w-4 h-4 mr-2" />
-                    Email {selectedApp.name.split(" ")[0]}
+                    <Mail className="w-4 h-4 mr-1" /> Email
                   </Button>
                 </div>
               </div>
