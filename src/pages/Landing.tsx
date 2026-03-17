@@ -1,32 +1,30 @@
 import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
-import { WhyWeExistSection } from "@/components/WhyWeExistSection";
-import { WhySignUpNowSection } from "@/components/WhySignUpNowSection";
-import { MVPFeatureSection } from "@/components/MVPFeatureSection";
-import { FoundingProgramSectionNew } from "@/components/FoundingProgramSectionNew";
-import { ApplicationFormNew } from "@/components/ApplicationFormNew";
+import { LossSection } from "@/components/LossSection";
+import { SolutionSection } from "@/components/SolutionSection";
+import { VisualSection } from "@/components/VisualSection";
+import { PlatformSection } from "@/components/PlatformSection";
+import { PricingSection } from "@/components/PricingSection";
+import { ApplicationSection } from "@/components/ApplicationSection";
 import { Footer } from "@/components/Footer";
 
 const Landing = () => {
   useEffect(() => {
-    // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = "smooth";
-    
-    return () => {
-      document.documentElement.style.scrollBehavior = "auto";
-    };
+    return () => { document.documentElement.style.scrollBehavior = "auto"; };
   }, []);
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <HeroSection />
-      <WhyWeExistSection />
-      <WhySignUpNowSection />
-      <MVPFeatureSection />
-      <FoundingProgramSectionNew />
-      <ApplicationFormNew />
+      <LossSection />
+      <SolutionSection />
+      <VisualSection />
+      <PlatformSection />
+      <PricingSection />
+      <ApplicationSection />
       <Footer />
     </div>
   );

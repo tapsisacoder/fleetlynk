@@ -1,46 +1,38 @@
-import { motion } from "framer-motion";
-import { Button } from "./ui/button";
-import { LogoHorizontal } from "./Logo";
+import { Logo } from "./Logo";
 
 export const Navigation = () => {
   const scrollToForm = () => {
-    const formSection = document.getElementById("application-form");
-    formSection?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById("application-form")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm shadow-sm">
-      <div className="container mx-auto px-4 py-4">
+    <nav className="sticky top-0 z-50 w-full bg-white border-b border-border">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <LogoHorizontal />
-          
-          <div className="flex items-center gap-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-accent/10 rounded-full border border-accent/20"
-            >
-              <span className="text-xs font-semibold text-accent">
-                Pilot: Free
-              </span>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            >
-              <Button 
-                variant="cta" 
-                size="default"
-                onClick={scrollToForm}
-                className="font-semibold"
-              >
-                Apply Now
-              </Button>
-            </motion.div>
+          <Logo />
+
+          <div className="hidden md:flex items-center gap-8">
+            <button onClick={() => scrollTo("how-it-works")} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+              How It Works
+            </button>
+            <button onClick={() => scrollTo("the-platform")} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+              The Platform
+            </button>
+            <button onClick={() => scrollTo("pricing")} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+              Pricing
+            </button>
           </div>
+
+          <button
+            onClick={scrollToForm}
+            className="bg-accent text-accent-foreground px-5 py-2.5 text-xs font-bold tracking-widest uppercase hover:opacity-90 transition-opacity"
+          >
+            REQUEST ACCESS
+          </button>
         </div>
       </div>
     </nav>

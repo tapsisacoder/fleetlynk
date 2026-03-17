@@ -1,74 +1,30 @@
 import { motion } from "framer-motion";
 
-export const Logo = ({ className = "" }: { className?: string }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 100, damping: 15 }}
-      className={`flex items-center gap-2 ${className}`}
-    >
-      {/* Geometric F icon made of connected nodes */}
-      <div className="relative w-8 h-8">
-        <svg viewBox="0 0 32 32" className="w-full h-full">
-          <motion.path
-            d="M6 6 L26 6 L26 12 L14 12 L14 18 L22 18"
-            stroke="hsl(var(--primary))"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1, ease: "easeInOut" }}
-          />
-          <motion.circle cx="6" cy="6" r="2" fill="hsl(var(--accent))" 
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-          />
-          <motion.circle cx="26" cy="6" r="2" fill="hsl(var(--accent))"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
-          />
-          <motion.circle cx="14" cy="12" r="2" fill="hsl(var(--accent))"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-          />
-        </svg>
-      </div>
-      <div className="font-semibold text-xl text-primary">FleetLynk</div>
-    </motion.div>
-  );
-};
+export const Logo = ({ className = "", variant = "dark" }: { className?: string; variant?: "dark" | "light" }) => {
+  const textColor = variant === "light" ? "text-white" : "text-primary";
+  const strokeColor = variant === "light" ? "#ffffff" : "hsl(210, 50%, 12%)";
+  const accentColor = "hsl(22, 91%, 47%)";
 
-export const LogoHorizontal = ({ className = "" }: { className?: string }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ type: "spring", stiffness: 100, damping: 15 }}
-      className={`flex items-center gap-2 ${className}`}
-    >
-      {/* Geometric F icon */}
-      <div className="relative w-8 h-8">
+    <div className={`flex items-center gap-2 ${className}`}>
+      <div className="relative w-7 h-7">
         <svg viewBox="0 0 32 32" className="w-full h-full">
           <path
             d="M6 6 L26 6 L26 12 L14 12 L14 18 L22 18"
-            stroke="hsl(var(--primary))"
+            stroke={strokeColor}
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="none"
           />
-          <circle cx="6" cy="6" r="2" fill="hsl(var(--accent))" />
-          <circle cx="26" cy="6" r="2" fill="hsl(var(--accent))" />
-          <circle cx="14" cy="12" r="2" fill="hsl(var(--accent))" />
+          <circle cx="6" cy="6" r="2" fill={accentColor} />
+          <circle cx="26" cy="6" r="2" fill={accentColor} />
+          <circle cx="14" cy="12" r="2" fill={accentColor} />
         </svg>
       </div>
-      <div className="font-semibold text-xl text-primary">FleetLynk</div>
-    </motion.div>
+      <span className={`font-semibold text-lg tracking-tight ${textColor}`}>LynkFleet</span>
+    </div>
   );
 };
+
+export const LogoHorizontal = Logo;
