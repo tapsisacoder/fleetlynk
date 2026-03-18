@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { storage } from "@/lib/storage";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FormData {
   fullName: string;
