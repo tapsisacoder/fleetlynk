@@ -4,44 +4,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import {
-  Users,
-  Calendar,
-  TrendingUp,
-  Target,
-  LogOut,
-  Search,
-  Download,
-  RefreshCw,
-  Copy,
-  Mail,
-  MessageCircle,
-  X,
-} from "lucide-react";
-import { storage } from "@/lib/storage";
-import { FoundingApplication } from "@/types/founding";
+import { Users, Calendar, TrendingUp, Target, LogOut, Search, Download, RefreshCw, Mail, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const ADMIN_PASSWORD = "fleetlynk2026";
+
+interface Application {
+  id: string;
+  full_name: string;
+  email: string;
+  company_name: string;
+  trucks: string;
+  country: string;
+  source: string;
+  created_at: string;
+}
 
 const Admin = () => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
-  const [applications, setApplications] = useState<FoundingApplication[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedApp, setSelectedApp] = useState<FoundingApplication | null>(null);
+  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
 
   useEffect(() => {
-    const auth = sessionStorage.getItem("fleetlynk_admin_auth");
+    const auth = sessionStorage.getItem("lynkfleet_admin_auth");
     if (auth === "true") {
       setIsAuthenticated(true);
       loadApplications();
@@ -51,7 +43,7 @@ const Admin = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem("fleetlynk_admin_auth", "true");
+      sessionStorage.setItem("lynkfleet_admin_auth", "true");
       setIsAuthenticated(true);
       loadApplications();
     } else {
@@ -61,7 +53,7 @@ const Admin = () => {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem("fleetlynk_admin_auth");
+    sessionStorage.removeItem("lynkfleet_admin_auth");
     setIsAuthenticated(false);
     navigate("/");
   };
@@ -69,16 +61,14 @@ const Admin = () => {
   const loadApplications = async () => {
     setIsLoading(true);
     try {
-      const keys = await storage.list("founding:");
-      const apps: FoundingApplication[] = [];
-      for (const key of keys) {
-        const data = await storage.get(key);
-        if (data) apps.push(JSON.parse(data));
-      }
-      apps.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-      setApplications(apps);
+      const { data, error } = await supabase
+        .from("founding_applications")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      setApplications((data as unknown as Application[]) || []);
     } catch (error) {
-      console.error("Error loading applications:", error);
+      console.error("Error loading:", error);
       toast.error("Failed to load applications");
     } finally {
       setIsLoading(false);
@@ -93,14 +83,9 @@ const Admin = () => {
   const exportCSV = () => {
     const headers = ["Timestamp", "Full Name", "Email", "Company", "Trucks", "Country"];
     const rows = applications.map((app) => [
-      app.timestamp,
-      app.fullName,
-      app.email,
-      app.company,
-      app.trucks,
-      app.country,
+      app.created_at, app.full_name, app.email, app.company_name, app.trucks, app.country,
     ]);
-    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
+    const csv = [headers, ...rows].map((row) => row.map(v => `"${v}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -110,25 +95,20 @@ const Admin = () => {
     toast.success("CSV exported!");
   };
 
-  const filteredApplications = applications.filter(
-    (app) =>
-      app.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.country.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredApplications = applications.filter((app) =>
+    app.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    app.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    app.company_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    app.country.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const stats = {
     total: applications.length,
-    today: applications.filter((app) => {
-      const d = new Date(app.timestamp);
-      return d.toDateString() === new Date().toDateString();
-    }).length,
+    today: applications.filter((app) => new Date(app.created_at).toDateString() === new Date().toDateString()).length,
     thisWeek: applications.filter((app) => {
-      const d = new Date(app.timestamp);
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
-      return d >= weekAgo;
+      return new Date(app.created_at) >= weekAgo;
     }).length,
     zimbabwe: applications.filter((app) => app.country === "Zimbabwe").length,
   };
@@ -136,20 +116,14 @@ const Admin = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-primary flex items-center justify-center p-4">
-        <div className="bg-white p-8 w-full max-w-md">
+        <div className="bg-background p-8 w-full max-w-md">
           <Logo className="mb-8" />
-          <h1 className="text-xl font-bold text-primary mb-6">LynkFleet Admin</h1>
+          <h1 className="text-xl font-bold text-foreground mb-6">LynkFleet Admin</h1>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={passwordError ? "border-destructive" : ""}
-                placeholder="Enter admin password"
-              />
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                className={passwordError ? "border-destructive" : ""} placeholder="Enter admin password" />
               {passwordError && <p className="text-sm text-destructive">Wrong password</p>}
             </div>
             <button type="submit" className="w-full bg-accent text-accent-foreground py-3 text-sm font-bold tracking-widest uppercase">
@@ -163,19 +137,17 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-muted">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-border">
+      <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-lg font-bold text-primary">LynkFleet Admin</h1>
+            <h1 className="text-lg font-bold text-foreground">LynkFleet Admin</h1>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <span className="text-xs text-muted-foreground">Live</span>
             </div>
           </div>
           <Button variant="ghost" onClick={handleLogout} className="text-destructive text-sm">
-            <LogOut className="w-4 h-4 mr-1" />
-            Logout
+            <LogOut className="w-4 h-4 mr-1" /> Logout
           </Button>
         </div>
       </header>
@@ -189,16 +161,16 @@ const Admin = () => {
             { icon: TrendingUp, label: "This Week", value: stats.thisWeek, color: "text-green-500" },
             { icon: Target, label: "Zimbabwe", value: stats.zimbabwe, color: "text-purple-500" },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white p-5 border border-border">
+            <div key={stat.label} className="bg-card p-5 border border-border">
               <stat.icon className={`w-6 h-6 ${stat.color} mb-2`} />
-              <div className="text-2xl font-bold text-primary font-mono">{stat.value}</div>
+              <div className="text-2xl font-bold text-foreground font-mono">{stat.value}</div>
               <div className="text-xs text-muted-foreground">{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Actions */}
-        <div className="bg-white p-4 border border-border mb-6 flex flex-wrap gap-2">
+        <div className="bg-card p-4 border border-border mb-6 flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => copyToClipboard(applications.map((a) => a.email).join(", "), `${applications.length} emails`)}>
             <Mail className="w-4 h-4 mr-1" /> Copy Emails
           </Button>
@@ -211,31 +183,26 @@ const Admin = () => {
         </div>
 
         {/* Search */}
-        <div className="bg-white p-4 border border-border mb-6">
+        <div className="bg-card p-4 border border-border mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search name, email, company..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+            <Input placeholder="Search name, email, company..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
           </div>
         </div>
 
         {/* Table */}
-        <div className="bg-white border border-border overflow-hidden">
+        <div className="bg-card border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Name</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Company</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Trucks</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Country</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-primary">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-foreground">Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-foreground">Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-foreground">Company</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-foreground">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-foreground">Trucks</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-foreground">Country</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -247,19 +214,17 @@ const Admin = () => {
                   </tr>
                 ) : (
                   filteredApplications.map((app, i) => (
-                    <tr key={app.id} className={`border-t ${i % 2 === 0 ? "bg-white" : "bg-muted/30"} hover:bg-muted/50 transition-colors`}>
+                    <tr key={app.id} className={`border-t ${i % 2 === 0 ? "bg-card" : "bg-muted/30"} hover:bg-muted/50 transition-colors`}>
                       <td className="px-4 py-3 text-xs text-muted-foreground font-mono">
-                        {new Date(app.timestamp).toLocaleDateString("en-ZA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        {new Date(app.created_at).toLocaleDateString("en-ZA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium text-primary">{app.fullName}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{app.company}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-foreground">{app.full_name}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{app.company_name}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{app.email}</td>
                       <td className="px-4 py-3 text-sm font-mono">{app.trucks}</td>
                       <td className="px-4 py-3 text-sm">{app.country}</td>
                       <td className="px-4 py-3">
-                        <Button variant="outline" size="sm" onClick={() => setSelectedApp(app)}>
-                          View
-                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setSelectedApp(app)}>View</Button>
                       </td>
                     </tr>
                   ))
@@ -270,46 +235,25 @@ const Admin = () => {
         </div>
       </div>
 
-      {/* Detail Modal */}
       <Dialog open={!!selectedApp} onOpenChange={() => setSelectedApp(null)}>
         <DialogContent className="max-w-lg">
           {selectedApp && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold text-primary">
-                  {selectedApp.fullName}
-                </DialogTitle>
+                <DialogTitle className="text-xl font-bold">{selectedApp.full_name}</DialogTitle>
                 <p className="text-xs text-muted-foreground font-mono">
-                  {new Date(selectedApp.timestamp).toLocaleString("en-ZA", { dateStyle: "long", timeStyle: "short" })}
+                  {new Date(selectedApp.created_at).toLocaleString("en-ZA", { dateStyle: "long", timeStyle: "short" })}
                 </p>
               </DialogHeader>
-
               <div className="space-y-4 mt-4">
                 <div className="bg-muted/30 p-4 space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Company</span>
-                    <span className="font-medium">{selectedApp.company}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Email</span>
-                    <a href={`mailto:${selectedApp.email}`} className="text-accent hover:underline">{selectedApp.email}</a>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Trucks</span>
-                    <span className="font-mono">{selectedApp.trucks}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Country</span>
-                    <span>{selectedApp.country}</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Company</span><span className="font-medium">{selectedApp.company_name}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Email</span><a href={`mailto:${selectedApp.email}`} className="text-accent hover:underline">{selectedApp.email}</a></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Trucks</span><span className="font-mono">{selectedApp.trucks}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Country</span><span>{selectedApp.country}</span></div>
                 </div>
-
                 <div className="flex gap-2 pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.location.href = `mailto:${selectedApp.email}`}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => window.location.href = `mailto:${selectedApp.email}`}>
                     <Mail className="w-4 h-4 mr-1" /> Email
                   </Button>
                 </div>
