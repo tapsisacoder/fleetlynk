@@ -43,13 +43,15 @@ export const ApplicationSection = () => {
 
     setIsSubmitting(true);
     try {
-      const data = {
-        id: `founding_${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        ...formData,
+      const { error: dbError } = await supabase.from("founding_applications").insert({
+        full_name: formData.fullName,
+        email: formData.email,
+        company_name: formData.company,
+        trucks: formData.trucks,
+        country: formData.country,
         source: "landing_page",
-      };
-      await storage.set(`founding:${Date.now()}`, JSON.stringify(data));
+      });
+      if (dbError) throw dbError;
       setIsSuccess(true);
       toast.success("Application submitted");
     } catch {
