@@ -50,6 +50,32 @@ const Accounts = () => {
   return (
     <>
       <AppHeader title="Accounts">
+        <Button variant="outline" size="sm" className="mr-2" onClick={async () => {
+          const companyName = await exportCtx.loadCompanyName();
+          downloadCsv({
+            companyName, reportName: "Invoice Register", generatedBy: exportCtx.generatedBy,
+            columns: [
+              { key: "invoice_number", label: "Invoice Number" },
+              { key: "invoice_date", label: "Invoice Date", format: "date" },
+              { key: "due_date", label: "Due Date", format: "date" },
+              { key: "client", label: "Client" },
+              { key: "trip_number", label: "Trip Number" },
+              { key: "total_usd", label: "Total (USD)", format: "decimal2" },
+              { key: "amount_paid_usd", label: "Amount Paid (USD)", format: "decimal2" },
+              { key: "amount_outstanding_usd", label: "Amount Outstanding (USD)", format: "decimal2" },
+              { key: "status", label: "Status" },
+            ],
+            data: invoices.map((inv) => ({
+              invoice_number: inv.invoice_number, invoice_date: inv.invoice_date, due_date: inv.due_date,
+              client: inv.clients?.company_name || "", trip_number: inv.trips?.trip_number || "",
+              total_usd: inv.total_usd, amount_paid_usd: inv.amount_paid_usd,
+              amount_outstanding_usd: inv.amount_outstanding_usd, status: inv.status,
+            })),
+          }, "invoice_register.csv");
+          toast.success("Invoice register exported");
+        }}>
+          <Download className="h-4 w-4 mr-1" /> Export CSV
+        </Button>
         <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
           <Plus className="h-4 w-4 mr-1" /> New Invoice
         </Button>

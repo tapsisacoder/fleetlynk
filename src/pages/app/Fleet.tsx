@@ -14,6 +14,7 @@ const Fleet = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"trucks" | "trailers">("trucks");
+  const exportCtx = useExportContext();
 
   useEffect(() => {
     loadVehicles();

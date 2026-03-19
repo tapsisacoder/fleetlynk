@@ -95,6 +95,9 @@ const Operations = () => {
   return (
     <>
       <AppHeader title="Operations">
+        <Button variant="outline" size="sm" className="mr-2" onClick={handleExportCsv}>
+          <Download className="h-4 w-4 mr-1" /> Export CSV
+        </Button>
         <Button variant="outline" size="sm" className="mr-2">
           <History className="h-4 w-4 mr-1" /> Trip History
         </Button>
