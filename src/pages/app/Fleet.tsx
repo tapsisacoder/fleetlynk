@@ -1,16 +1,20 @@
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import { downloadCsv } from "@/lib/exports";
+import { useExportContext } from "@/hooks/use-export-context";
+import { toast } from "sonner";
 
 const Fleet = () => {
   const [trucks, setTrucks] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"trucks" | "trailers">("trucks");
+  const exportCtx = useExportContext();
 
   useEffect(() => {
     loadVehicles();
@@ -63,6 +67,24 @@ const Fleet = () => {
   return (
     <>
       <AppHeader title="Fleet">
+        <Button variant="outline" size="sm" className="mr-2" onClick={async () => {
+          const companyName = await exportCtx.loadCompanyName();
+          downloadCsv({
+            companyName, reportName: "Vehicle Register", generatedBy: exportCtx.generatedBy,
+            columns: [
+              { key: "registration_number", label: "Registration Number" },
+              { key: "fleet_number", label: "Fleet Number" },
+              { key: "vehicle_type", label: "Vehicle Type" },
+              { key: "make", label: "Make" }, { key: "model", label: "Model" }, { key: "year", label: "Year" },
+              { key: "status", label: "Status" },
+              { key: "total_km", label: "Total km", format: "decimal2" },
+            ],
+            data: trucks.map((t) => ({ ...t })),
+          }, "vehicle_register.csv");
+          toast.success("Vehicle register exported");
+        }}>
+          <Download className="h-4 w-4 mr-1" /> Export CSV
+        </Button>
         <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
           <Plus className="h-4 w-4 mr-1" /> Add Vehicle
         </Button>
