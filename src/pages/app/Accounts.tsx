@@ -14,6 +14,7 @@ const Accounts = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"invoices" | "payments" | "expenses">("invoices");
+  const exportCtx = useExportContext();
 
   useEffect(() => {
     const load = async () => {
