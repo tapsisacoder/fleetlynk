@@ -17,6 +17,43 @@ const Operations = () => {
   const [search, setSearch] = useState("");
   const [showCreateTrip, setShowCreateTrip] = useState(false);
   const [loading, setLoading] = useState(true);
+  const exportCtx = useExportContext();
+
+  const handleExportCsv = async () => {
+    const companyName = await exportCtx.loadCompanyName();
+    downloadCsv({
+      companyName,
+      reportName: "Trip Archive",
+      generatedBy: exportCtx.generatedBy,
+      columns: [
+        { key: "trip_number", label: "Trip Number" },
+        { key: "trip_type", label: "Trip Type" },
+        { key: "status", label: "Status" },
+        { key: "client", label: "Client" },
+        { key: "truck", label: "Truck Registration" },
+        { key: "driver", label: "Driver Name" },
+        { key: "origin", label: "Origin" },
+        { key: "destination", label: "Destination" },
+        { key: "distance_km", label: "Distance (km)", format: "decimal2" },
+        { key: "rate_usd", label: "Rate (USD)", format: "decimal2" },
+        { key: "created_at", label: "Date Created", format: "date" },
+      ],
+      data: trips.map((t) => ({
+        trip_number: t.trip_number,
+        trip_type: t.trip_type,
+        status: t.status,
+        client: t.clients?.company_name || "",
+        truck: t.trucks?.registration_number || "",
+        driver: t.employees?.full_name || "",
+        origin: t.origin,
+        destination: t.destination,
+        distance_km: t.distance_km,
+        rate_usd: t.rate_usd,
+        created_at: t.created_at,
+      })),
+    }, "trip_archive.csv");
+    toast.success("Trip archive exported");
+  };
 
   useEffect(() => {
     loadTrips();
