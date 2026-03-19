@@ -1,7 +1,10 @@
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, History } from "lucide-react";
+import { Plus, Search, History, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { downloadCsv } from "@/lib/exports";
+import { useExportContext } from "@/hooks/use-export-context";
+import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
