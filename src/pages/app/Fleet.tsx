@@ -66,6 +66,24 @@ const Fleet = () => {
   return (
     <>
       <AppHeader title="Fleet">
+        <Button variant="outline" size="sm" className="mr-2" onClick={async () => {
+          const companyName = await exportCtx.loadCompanyName();
+          downloadCsv({
+            companyName, reportName: "Vehicle Register", generatedBy: exportCtx.generatedBy,
+            columns: [
+              { key: "registration_number", label: "Registration Number" },
+              { key: "fleet_number", label: "Fleet Number" },
+              { key: "vehicle_type", label: "Vehicle Type" },
+              { key: "make", label: "Make" }, { key: "model", label: "Model" }, { key: "year", label: "Year" },
+              { key: "status", label: "Status" },
+              { key: "total_km", label: "Total km", format: "decimal2" },
+            ],
+            data: trucks.map((t) => ({ ...t })),
+          }, "vehicle_register.csv");
+          toast.success("Vehicle register exported");
+        }}>
+          <Download className="h-4 w-4 mr-1" /> Export CSV
+        </Button>
         <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
           <Plus className="h-4 w-4 mr-1" /> Add Vehicle
         </Button>
