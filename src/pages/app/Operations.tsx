@@ -8,8 +8,21 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import { CreateTripDialog } from "@/components/operations/CreateTripDialog";
+
+const statusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    confirmed: "bg-muted text-muted-foreground",
+    loading: "bg-[hsl(var(--amber))]/10 text-[hsl(var(--amber))]",
+    in_transit: "bg-[hsl(var(--blue))]/10 text-[hsl(var(--blue))]",
+    at_border: "bg-purple-500/10 text-purple-600",
+    offloading: "bg-[hsl(var(--amber))]/10 text-[hsl(var(--amber))]",
+    delivered: "bg-[hsl(var(--green))]/10 text-[hsl(var(--green))]",
+    invoiced: "bg-accent/10 text-accent",
+    closed: "bg-muted text-muted-foreground",
+  };
+  return colors[status] || "bg-muted text-muted-foreground";
+};
 
 const Operations = () => {
   const [trips, setTrips] = useState<any[]>([]);
@@ -21,9 +34,7 @@ const Operations = () => {
   const handleExportCsv = async () => {
     const companyName = await exportCtx.loadCompanyName();
     downloadCsv({
-      companyName,
-      reportName: "Trip Archive",
-      generatedBy: exportCtx.generatedBy,
+      companyName, reportName: "Trip Archive", generatedBy: exportCtx.generatedBy,
       columns: [
         { key: "trip_number", label: "Trip Number" },
         { key: "trip_type", label: "Trip Type" },
@@ -38,25 +49,16 @@ const Operations = () => {
         { key: "created_at", label: "Date Created", format: "date" },
       ],
       data: trips.map((t) => ({
-        trip_number: t.trip_number,
-        trip_type: t.trip_type,
-        status: t.status,
-        client: t.clients?.company_name || "",
-        truck: t.trucks?.registration_number || "",
-        driver: t.employees?.full_name || "",
-        origin: t.origin,
-        destination: t.destination,
-        distance_km: t.distance_km,
-        rate_usd: t.rate_usd,
-        created_at: t.created_at,
+        trip_number: t.trip_number, trip_type: t.trip_type, status: t.status,
+        client: t.clients?.company_name || "", truck: t.trucks?.registration_number || "",
+        driver: t.employees?.full_name || "", origin: t.origin, destination: t.destination,
+        distance_km: t.distance_km, rate_usd: t.rate_usd, created_at: t.created_at,
       })),
     }, "trip_archive.csv");
     toast.success("Trip archive exported");
   };
 
-  useEffect(() => {
-    loadTrips();
-  }, []);
+  useEffect(() => { loadTrips(); }, []);
 
   const loadTrips = async () => {
     setLoading(true);
@@ -77,20 +79,6 @@ const Operations = () => {
     t.clients?.company_name?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const statusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      confirmed: "bg-muted text-muted-foreground",
-      loading: "bg-amber-500/10 text-amber-600",
-      in_transit: "bg-blue-500/10 text-blue-600",
-      at_border: "bg-purple-500/10 text-purple-600",
-      offloading: "bg-amber-500/10 text-amber-600",
-      delivered: "bg-green-500/10 text-green-600",
-      invoiced: "bg-orange/10 text-orange",
-      closed: "bg-muted text-muted-foreground",
-    };
-    return colors[status] || "bg-muted text-muted-foreground";
-  };
-
   return (
     <>
       <AppHeader title="Operations">
@@ -105,13 +93,11 @@ const Operations = () => {
         </Button>
       </AppHeader>
       <div className="flex-1 overflow-auto p-6">
-        {/* Search */}
         <div className="relative mb-4 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search trips..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
 
-        {/* Trips Table */}
         <div className="bg-card border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -160,63 +146,7 @@ const Operations = () => {
         </div>
       </div>
 
-      {/* Create Trip Dialog */}
-      <Dialog open={showCreateTrip} onOpenChange={setShowCreateTrip}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>New Trip</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Client</Label>
-                <Input placeholder="Select client" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Rate (USD)</Label>
-                <Input type="number" placeholder="0.00" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Truck</Label>
-                <Input placeholder="Select truck" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Driver</Label>
-                <Input placeholder="Auto-assigned" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Origin</Label>
-                <Input placeholder="From" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Destination</Label>
-                <Input placeholder="To" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Distance (km)</Label>
-                <Input type="number" placeholder="0" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Trip Type</Label>
-                <select className="w-full h-10 px-3 border border-input bg-background text-sm rounded-md">
-                  <option value="local">Local</option>
-                  <option value="export">Export</option>
-                  <option value="import">Import</option>
-                </select>
-              </div>
-            </div>
-            <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              Create Trip
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CreateTripDialog open={showCreateTrip} onOpenChange={setShowCreateTrip} onCreated={loadTrips} />
     </>
   );
 };
