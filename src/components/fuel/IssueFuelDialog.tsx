@@ -59,8 +59,6 @@ export const IssueFuelDialog = ({ open, onOpenChange, onCreated }: Props) => {
       if (error) throw error;
 
       // Update truck estimated fuel level
-      await supabase.rpc("", {}).catch(() => {});
-      // Simple update - subtract litres from estimated level
       const { data: truck } = await supabase.from("trucks").select("estimated_fuel_level_litres").eq("id", form.truck_id).single();
       if (truck) {
         const newLevel = Math.max(0, Number(truck.estimated_fuel_level_litres) - Number(form.litres));
