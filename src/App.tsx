@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import AppLayout from "./layouts/AppLayout";
+import DemoLayout from "./demo/DemoLayout";
 import Dashboard from "./pages/app/Dashboard";
 import Operations from "./pages/app/Operations";
 import Fleet from "./pages/app/Fleet";
@@ -34,7 +35,21 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<Admin />} />
+            {/* Production routes — require auth */}
             <Route path="/app" element={<AppLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="operations" element={<Operations />} />
+              <Route path="fleet" element={<Fleet />} />
+              <Route path="fuel" element={<FuelModule />} />
+              <Route path="workshop" element={<Workshop />} />
+              <Route path="inventory" element={<Inventory />} />
+              <Route path="accounts" element={<Accounts />} />
+              <Route path="hr" element={<HR />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="settings" element={<SettingsModule />} />
+            </Route>
+            {/* Demo routes — no auth, mock data */}
+            <Route path="/demo" element={<DemoLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="operations" element={<Operations />} />
               <Route path="fleet" element={<Fleet />} />

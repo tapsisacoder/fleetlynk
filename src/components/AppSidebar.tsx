@@ -11,19 +11,18 @@ import {
 } from "@/components/ui/sidebar";
 
 const modules = [
-  { title: "Dashboard", url: "/app", icon: LayoutDashboard, key: "dashboard" },
-  { title: "Operations", url: "/app/operations", icon: MapPin, key: "operations" },
-  { title: "Fleet", url: "/app/fleet", icon: Truck, key: "fleet" },
-  { title: "Fuel", url: "/app/fuel", icon: Fuel, key: "fuel" },
-  { title: "Workshop", url: "/app/workshop", icon: Wrench, key: "workshop" },
-  { title: "Inventory", url: "/app/inventory", icon: Package, key: "inventory" },
-  { title: "Accounts", url: "/app/accounts", icon: Calculator, key: "accounts" },
-  { title: "HR", url: "/app/hr", icon: Users, key: "hr" },
-  { title: "Reports", url: "/app/reports", icon: BarChart3, key: "reports" },
-  { title: "Settings", url: "/app/settings", icon: Settings, key: "settings" },
+  { title: "Dashboard", path: "", icon: LayoutDashboard, key: "dashboard" },
+  { title: "Operations", path: "/operations", icon: MapPin, key: "operations" },
+  { title: "Fleet", path: "/fleet", icon: Truck, key: "fleet" },
+  { title: "Fuel", path: "/fuel", icon: Fuel, key: "fuel" },
+  { title: "Workshop", path: "/workshop", icon: Wrench, key: "workshop" },
+  { title: "Inventory", path: "/inventory", icon: Package, key: "inventory" },
+  { title: "Accounts", path: "/accounts", icon: Calculator, key: "accounts" },
+  { title: "HR", path: "/hr", icon: Users, key: "hr" },
+  { title: "Reports", path: "/reports", icon: BarChart3, key: "reports" },
+  { title: "Settings", path: "/settings", icon: Settings, key: "settings" },
 ];
 
-// Role-based module access
 const roleAccess: Record<string, string[]> = {
   principal: ["dashboard", "operations", "fleet", "fuel", "workshop", "inventory", "accounts", "hr", "reports", "settings"],
   operations_manager: ["dashboard", "operations", "fleet", "fuel", "reports"],
@@ -41,9 +40,12 @@ export function AppSidebar() {
   const location = useLocation();
   const { profile } = useAuth();
 
+  // Detect demo mode from URL
+  const isDemo = location.pathname.startsWith("/demo");
+  const basePath = isDemo ? "/demo" : "/app";
+
   const userRole = profile?.role || "viewer";
   const allowedModules = roleAccess[userRole] || ["dashboard"];
-
   const visibleModules = modules.filter((m) => allowedModules.includes(m.key));
 
   return (
@@ -61,20 +63,26 @@ export function AppSidebar() {
           </div>
         )}
       </div>
+      {isDemo && !collapsed && (
+        <div className="mx-3 mt-2 px-2 py-1 bg-accent/10 border border-accent/20 rounded-sm">
+          <span className="text-[10px] font-bold text-accent tracking-wider">DEMO MODE</span>
+        </div>
+      )}
       <SidebarContent className="pt-2">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {visibleModules.map((item) => {
-                const isActive = item.url === "/app"
-                  ? location.pathname === "/app"
-                  : location.pathname.startsWith(item.url);
+                const fullPath = `${basePath}${item.path}`;
+                const isActive = item.path === ""
+                  ? location.pathname === basePath || location.pathname === `${basePath}/`
+                  : location.pathname.startsWith(fullPath);
                 return (
                   <SidebarMenuItem key={item.key}>
                     <SidebarMenuButton asChild isActive={isActive}>
                       <NavLink
-                        to={item.url}
-                        end={item.url === "/app"}
+                        to={fullPath}
+                        end={item.path === ""}
                         className="flex items-center gap-3 px-3 py-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
                         activeClassName="bg-sidebar-accent text-sidebar-foreground font-medium"
                       >
