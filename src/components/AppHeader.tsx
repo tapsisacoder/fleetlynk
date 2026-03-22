@@ -1,8 +1,8 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface Props {
   title: string;
@@ -12,10 +12,12 @@ interface Props {
 export const AppHeader = ({ title, children }: Props) => {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isDemo = location.pathname.startsWith("/demo");
 
   const handleLogout = async () => {
     await signOut();
-    navigate("/login");
+    navigate(isDemo ? "/" : "/login");
   };
 
   return (
@@ -23,6 +25,11 @@ export const AppHeader = ({ title, children }: Props) => {
       <div className="flex items-center gap-3">
         <SidebarTrigger className="text-muted-foreground" />
         <h1 className="text-sm font-semibold text-foreground">{title}</h1>
+        {isDemo && (
+          <span className="text-[10px] font-bold text-accent bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-sm tracking-wider">
+            DEMO
+          </span>
+        )}
       </div>
       <div className="flex items-center gap-2">
         {children}
