@@ -21,13 +21,16 @@ export const DemoIssueFuelDialog = ({ open, onOpenChange }: Props) => {
   const truckTrips = demo.openTrips.filter(t => t.truck_reg === truckReg);
   const selectedSupplier = demo.fuelSuppliers.find(s => s.supplier_name === supplier);
   const totalCost = selectedSupplier && litres ? Number(litres) * selectedSupplier.price_per_litre : 0;
-  const isAnomaly = tripNumber === "TRP-2026-0028" && supplier === "SOM Petroleum";
+  
+  // Anomaly only triggers on ADZ 9799 / TRP-2026-0028 (anomaly detection enabled truck)
+  const truck = demo.trucks.find(t => t.registration_number === truckReg);
+  const isAnomaly = truck?.anomaly_threshold_percent !== null && tripNumber === "TRP-2026-0028" && truckReg === "ADZ 9799";
 
   const handleConfirm = () => {
     if (!truckReg || !tripNumber || !supplier || !litres) return;
     demo.issueFuel(truckReg, Number(litres), supplier, tripNumber);
     if (isAnomaly) {
-      toast.error("⚠ FUEL ANOMALY DETECTED — TRP-2026-0028 — +61% variance", { duration: 5000 });
+      toast.error(`⚠ CRITICAL: FUEL ANOMALY DETECTED — ${tripNumber} — +${litres}L anomaly`, { duration: 5000 });
     } else {
       toast.success(`${litres}L issued to ${truckReg}`);
     }
@@ -90,7 +93,7 @@ export const DemoIssueFuelDialog = ({ open, onOpenChange }: Props) => {
                 <span className="text-muted-foreground">Total Cost</span>
                 <span className="font-mono font-bold">${totalCost.toFixed(2)}</span>
               </div>
-              {isAnomaly && <p className="text-[10px] text-destructive mt-1 font-medium">⚠ This will trigger a fuel anomaly alert (+61% variance)</p>}
+              {isAnomaly && <p className="text-[10px] text-destructive mt-1 font-medium">⚠ This will trigger a critical fuel anomaly alert</p>}
             </div>
           )}
         </div>

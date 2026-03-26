@@ -51,11 +51,11 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="bg-sidebar border-r border-sidebar-border">
       <div className="h-[52px] flex items-center px-4 border-b border-sidebar-border">
-        {!collapsed && <Logo variant="light" className="h-6" />}
+        {!collapsed && <Logo variant="dark" className="h-6" />}
         {collapsed && (
           <div className="w-7 h-7 mx-auto">
             <svg viewBox="0 0 32 32" className="w-full h-full">
-              <path d="M6 6 L26 6 L26 12 L14 12 L14 18 L22 18" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+              <path d="M6 6 L26 6 L26 12 L14 12 L14 18 L22 18" stroke="hsl(210, 50%, 12%)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               <circle cx="6" cy="6" r="2" fill="hsl(22, 91%, 47%)" />
               <circle cx="26" cy="6" r="2" fill="hsl(22, 91%, 47%)" />
               <circle cx="14" cy="12" r="2" fill="hsl(22, 91%, 47%)" />
@@ -63,11 +63,6 @@ export function AppSidebar() {
           </div>
         )}
       </div>
-      {isDemo && !collapsed && (
-        <div className="mx-3 mt-2 px-2 py-1 bg-accent/10 border border-accent/20 rounded-sm">
-          <span className="text-[10px] font-bold text-accent tracking-wider">DEMO MODE</span>
-        </div>
-      )}
       <SidebarContent className="pt-2">
         <SidebarGroup>
           <SidebarGroupContent>

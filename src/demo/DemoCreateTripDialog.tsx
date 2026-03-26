@@ -16,9 +16,10 @@ export const DemoCreateTripDialog = ({ open, onOpenChange }: Props) => {
   const [origin, setOrigin] = useState("Beira");
   const [destination, setDestination] = useState("Harare");
   const [distance, setDistance] = useState("600");
-  const [tripType, setTripType] = useState("Import");
-  const [rate, setRate] = useState("1500");
+  const [tripType, setTripType] = useState("Export");
+  const [rate, setRate] = useState("1450");
   const [loadType, setLoadType] = useState("Containers");
+  const [bookout, setBookout] = useState("280");
 
   if (!demo) return null;
 
@@ -27,14 +28,24 @@ export const DemoCreateTripDialog = ({ open, onOpenChange }: Props) => {
   const trailer = truck ? demo.trailers.find(tr => tr.id === truck.default_trailer_id) : null;
 
   const handleConfirm = () => {
-    demo.confirmTrip();
-    toast.success("Trip TRP-2026-0029 confirmed — AEU 1313 now ON ROAD");
+    demo.confirmTrip({
+      client_id: selectedClient,
+      client_name: demo.clients.find(c => c.id === selectedClient)?.company_name || "",
+      origin, destination,
+      distance_km: Number(distance),
+      trip_type: tripType,
+      rate_usd: Number(rate),
+      load_type: loadType,
+      bookout_usd: Number(bookout),
+      truck_id: selectedTruck,
+    });
+    toast.success("Trip TRP-2026-0029 confirmed — " + (truck?.registration_number || "") + " now ON ROAD");
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader><DialogTitle className="text-foreground">New Trip</DialogTitle></DialogHeader>
         <div className="space-y-4">
           <div>
@@ -94,7 +105,10 @@ export const DemoCreateTripDialog = ({ open, onOpenChange }: Props) => {
             <div><Label className="text-xs text-muted-foreground">Trailer (auto)</Label><Input value={trailer?.registration_number || ""} disabled className="bg-muted font-mono" /></div>
             <div><Label className="text-xs text-muted-foreground">Driver (auto)</Label><Input value={driver?.full_name || ""} disabled className="bg-muted" /></div>
           </div>
-          <div><Label className="text-xs text-muted-foreground">Rate (USD)</Label><Input value={rate} onChange={e => setRate(e.target.value)} type="number" className="font-mono" /></div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><Label className="text-xs text-muted-foreground">Rate (USD)</Label><Input value={rate} onChange={e => setRate(e.target.value)} type="number" className="font-mono" /></div>
+            <div><Label className="text-xs text-muted-foreground">Bookout (USD)</Label><Input value={bookout} onChange={e => setBookout(e.target.value)} type="number" className="font-mono" /></div>
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>

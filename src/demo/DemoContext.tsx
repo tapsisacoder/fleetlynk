@@ -6,6 +6,12 @@
 import { createContext, useContext, useState, useMemo, useCallback, ReactNode } from "react";
 import * as D from "./data";
 
+export interface TripInput {
+  client_id: string; client_name: string; origin: string; destination: string;
+  distance_km: number; trip_type: string; rate_usd: number; load_type: string;
+  bookout_usd: number; truck_id: string;
+}
+
 export interface DemoContextType {
   company: typeof D.DEMO_COMPANY;
   clients: D.DemoClient[];
@@ -23,7 +29,7 @@ export interface DemoContextType {
   alerts: D.DemoAlert[];
   allTrips: D.DemoTrip[];
   moneyToCollect: number;
-  confirmTrip: () => void;
+  confirmTrip: (input: TripInput) => void;
   issueFuel: (truckReg: string, litres: number, supplierName: string, tripNumber: string) => void;
   resolveAnomaly: (anomalyId: string) => void;
   raiseInvoice: (tripNumber: string) => void;
@@ -52,18 +58,26 @@ export const DemoProvider = ({ children }: { children: ReactNode }) => {
   const allTrips = useMemo(() => [...D.DEMO_CLOSED_TRIPS, ...openTrips], [openTrips]);
   const moneyToCollect = useMemo(() => invoices.reduce((s, i) => s + i.amount_outstanding_usd, 0), [invoices]);
 
-  const confirmTrip = useCallback(() => {
+  const confirmTrip = useCallback((input: TripInput) => {
+    const truck = D.DEMO_TRUCKS.find(t => t.id === input.truck_id);
+    const driver = truck ? D.DEMO_EMPLOYEES.find(e => e.id === truck.default_driver_id) : null;
+    const trailer = truck ? D.DEMO_TRAILERS.find(tr => tr.id === truck.default_trailer_id) : null;
+    
     const newTrip: D.DemoTrip = {
-      id: "trip29", trip_number: "TRP-2026-0029", origin: "Beira", destination: "Harare",
-      distance_km: 600, trip_type: "Import", client_id: "c3",
-      client_name: "Inland Logistics (Pvt) Ltd", truck_id: "t5",
-      truck_reg: "AEU 1313", trailer_reg: "AGL 2339", driver_id: "e5",
-      driver_name: "Shame Mutasa", rate_usd: 1500, total_costs_usd: 0,
-      margin_usd: 1500, status: "confirmed", created_at: "2026-03-23",
+      id: "trip29", trip_number: "TRP-2026-0029", origin: input.origin, destination: input.destination,
+      distance_km: input.distance_km, trip_type: input.trip_type, client_id: input.client_id,
+      client_name: input.client_name, truck_id: input.truck_id,
+      truck_reg: truck?.registration_number || "", trailer_reg: trailer?.registration_number || "",
+      driver_id: driver?.id || "", driver_name: driver?.full_name || "",
+      rate_usd: input.rate_usd, total_costs_usd: 0,
+      margin_usd: input.rate_usd, status: "confirmed", created_at: "2026-03-23",
+      bookout_usd: input.bookout_usd,
     };
     setOpenTrips(prev => [newTrip, ...prev]);
-    setTrucks(prev => prev.map(t => t.id === "t5" ? { ...t, status: "on_road" } : t));
-    setTrailers(prev => prev.map(t => t.id === "tr5" ? { ...t, status: "on_road" } : t));
+    setTrucks(prev => prev.map(t => t.id === input.truck_id ? { ...t, status: "on_road" } : t));
+    if (trailer) {
+      setTrailers(prev => prev.map(t => t.id === trailer.id ? { ...t, status: "on_road" } : t));
+    }
     setTripCreated(true);
   }, []);
 
@@ -71,9 +85,11 @@ export const DemoProvider = ({ children }: { children: ReactNode }) => {
     const supplier = D.DEMO_FUEL_SUPPLIERS.find(s => s.supplier_name === supplierName);
     const ppl = supplier?.price_per_litre || 2.05;
     const cost = Math.round(litres * ppl * 100) / 100;
-    const isAnomaly = tripNumber === "TRP-2026-0028" && supplierName === "SOM Petroleum";
-    const truck = D.DEMO_TRUCKS.find(t => t.registration_number === truckReg);
+    const truck = trucks.find(t => t.registration_number === truckReg);
     const driver = truck ? D.DEMO_EMPLOYEES.find(e => e.id === truck.default_driver_id) : null;
+
+    // Anomaly check: only for trucks with anomaly detection enabled, and specific conditions
+    const isAnomaly = truck?.anomaly_threshold_percent !== null && tripNumber === "TRP-2026-0028" && truckReg === "ADZ 9799";
 
     const tx: D.DemoFuelTransaction = {
       id: `ft-${Date.now()}`, date: "2026-03-23", truck_reg: truckReg,
@@ -95,17 +111,17 @@ export const DemoProvider = ({ children }: { children: ReactNode }) => {
     if (isAnomaly) {
       setFuelAnomalies(prev => [{
         id: "ano4", anomaly_number: "ANO-2026-0004", date: "2026-03-23",
-        trip_number: "TRP-2026-0028", truck_reg: "ADZ 9799",
-        driver_name: "John Moyo", route: "Selous to Beira",
-        variance_percent: 61, status: "open",
+        trip_number: tripNumber, truck_reg: truckReg,
+        driver_name: driver?.full_name || "John Moyo", route: "Selous to Beira",
+        variance_percent: 100, status: "open",
       }, ...prev]);
       setAlerts(prev => [{
         id: "al-anomaly", severity: "critical",
-        title: "Fuel anomaly — TRP-2026-0028 — ADZ 9799 — John Moyo — +61% variance",
+        title: `Fuel anomaly — ${tripNumber} — ${truckReg} — ${driver?.full_name || "John Moyo"} — +${litres}L anomaly`,
         module: "fuel",
       }, ...prev]);
     }
-  }, []);
+  }, [trucks]);
 
   const resolveAnomaly = useCallback((anomalyId: string) => {
     setFuelAnomalies(prev => prev.map(a => a.id === anomalyId ? { ...a, status: "resolved" } : a));
