@@ -1,13 +1,13 @@
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, History, Download, FileText } from "lucide-react";
+import { Plus, Search, History, Download, FileText, ArrowUp, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { downloadCsv } from "@/lib/exports";
 import { useExportContext } from "@/hooks/use-export-context";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { CreateTripDialog } from "@/components/operations/CreateTripDialog";
 import { useDemoContext } from "@/demo/DemoContext";
 import { DemoCreateTripDialog } from "@/demo/DemoCreateTripDialog";
@@ -30,6 +30,7 @@ const Operations = () => {
   const [showCreateTrip, setShowCreateTrip] = useState(false);
   const [loading, setLoading] = useState(!demo);
   const [invoiceTrip, setInvoiceTrip] = useState<string | null>(null);
+  const [selectedTrip, setSelectedTrip] = useState<string | null>(null);
   const exportCtx = useExportContext();
 
   useEffect(() => {
@@ -88,8 +89,21 @@ const Operations = () => {
   const canRaiseInvoice = (trip: any) => {
     if (!demo) return false;
     const hasInvoice = demo.invoices.some(inv => inv.trip_number === trip.trip_number);
-    return (trip.status === "confirmed" || trip.status === "in_transit" || trip.status === "delivered" || trip.status === "closed") && !hasInvoice;
+    return !hasInvoice;
   };
+
+  // Trip detail popup data
+  const getSelectedTripDetail = () => {
+    if (!selectedTrip || !demo) return null;
+    const t = [...demo.openTrips, ...demo.closedTrips].find(tr => tr.trip_number === selectedTrip);
+    if (!t) return null;
+    const totalCosts = t.total_costs_usd + (t.bookout_usd || 0);
+    const profit = t.rate_usd - totalCosts;
+    const costPerKm = t.distance_km > 0 ? totalCosts / t.distance_km : 0;
+    return { ...t, profit, costPerKm, totalCosts };
+  };
+
+  const tripDetail = getSelectedTripDetail();
 
   return (
     <>
@@ -107,6 +121,65 @@ const Operations = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search trips..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
         </div>
+
+        {/* Trip Detail Popup */}
+        <AnimatePresence>
+          {tripDetail && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+              className="bg-card border border-border p-4 mb-4 relative"
+            >
+              <button onClick={() => setSelectedTrip(null)} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+              <div className="flex items-start gap-6">
+                <div>
+                  <div className="text-xs text-muted-foreground">Trip</div>
+                  <div className="font-mono text-sm font-bold text-foreground">{tripDetail.trip_number}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Truck</div>
+                  <div className="font-mono text-sm text-foreground">{tripDetail.truck_reg}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Trailer</div>
+                  <div className="font-mono text-sm text-foreground">{tripDetail.trailer_reg}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Driver</div>
+                  <div className="text-sm text-foreground">{tripDetail.driver_name}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Route</div>
+                  <div className="text-sm text-foreground">{tripDetail.origin} → {tripDetail.destination}</div>
+                </div>
+                <div className="border-l border-border pl-6 flex items-center gap-6">
+                  <div className="flex items-center gap-1.5">
+                    <ArrowUp className="h-4 w-4 text-[hsl(var(--green))]" />
+                    <div>
+                      <div className="text-xs text-muted-foreground">Profit</div>
+                      <div className={`font-mono text-sm font-bold ${tripDetail.profit >= 0 ? "text-[hsl(var(--green))]" : "text-[hsl(var(--red))]"}`}>
+                        ${tripDetail.profit.toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Cost / km</div>
+                    <div className="font-mono text-sm font-bold text-foreground">${tripDetail.costPerKm.toFixed(2)} $/km</div>
+                  </div>
+                </div>
+                {canRaiseInvoice({ trip_number: tripDetail.trip_number }) && (
+                  <div className="ml-auto">
+                    <Button size="sm" variant="outline" onClick={() => { setSelectedTrip(null); setInvoiceTrip(tripDetail.trip_number); }}>
+                      <FileText className="h-3.5 w-3.5 mr-1" /> Raise Invoice
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="bg-card border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -127,7 +200,8 @@ const Operations = () => {
                   <tr><td colSpan={8} className="text-center py-8 text-muted-foreground">No trips found.</td></tr>
                 ) : filtered.map((trip, i) => (
                   <motion.tr key={trip.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
-                    className={`border-t border-border ${i % 2 === 0 ? "bg-card" : "bg-muted/20"} hover:bg-muted/40 cursor-pointer transition-colors`}>
+                    className={`border-t border-border ${i % 2 === 0 ? "bg-card" : "bg-muted/20"} hover:bg-muted/40 cursor-pointer transition-colors ${selectedTrip === trip.trip_number ? "ring-1 ring-accent" : ""}`}
+                    onClick={() => demo && setSelectedTrip(trip.trip_number === selectedTrip ? null : trip.trip_number)}>
                     <td className="px-4 py-3 font-mono text-xs font-medium">{trip.trip_number}</td>
                     <td className="px-4 py-3 text-xs">{trip.clients?.company_name || "—"}</td>
                     <td className="px-4 py-3 text-xs">{trip.origin} → {trip.destination}</td>
@@ -136,7 +210,7 @@ const Operations = () => {
                     <td className="px-4 py-3 font-mono text-xs">${Number(trip.rate_usd).toLocaleString()}</td>
                     <td className="px-4 py-3"><span className={`text-xs font-medium px-2 py-0.5 rounded-sm ${statusColor(trip.status)}`}>{trip.status.replace(/_/g, " ")}</span></td>
                     {demo && (
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                         {canRaiseInvoice(trip) && (
                           <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" onClick={() => setInvoiceTrip(trip.trip_number)}>
                             <FileText className="h-3 w-3 mr-1" /> Raise Invoice
