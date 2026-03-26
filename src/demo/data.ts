@@ -173,6 +173,7 @@ export const DEMO_FUEL_ANOMALIES: DemoFuelAnomaly[] = [
 
 // ─── ALERTS ───────────────────────────────────
 export const DEMO_ALERTS: DemoAlert[] = [
+  { id: "al0", severity: "critical", title: "Fuel anomaly — TRP-2026-0026B — AEG 7336 — Tendai Chirwa — +61L variance", module: "fuel" },
   { id: "al1", severity: "warning", title: "INV-2026-0020 unpaid — Inland Logistics — $1,300", module: "accounts" },
   { id: "al2", severity: "warning", title: "INV-2026-0024 unpaid — Inland Logistics — $1,500", module: "accounts" },
   { id: "al3", severity: "warning", title: "INV-2026-0026 unpaid — Inland Logistics — $1,300", module: "accounts" },

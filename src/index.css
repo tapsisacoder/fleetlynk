@@ -54,13 +54,13 @@
     --success: 152 64% 29%;
     --warning: 28 91% 37%;
 
-    --sidebar-background: 210 50% 12%;
-    --sidebar-foreground: 0 0% 95%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 210 50% 12%;
     --sidebar-primary: 22 91% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 50% 18%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 210 50% 18%;
+    --sidebar-accent: 216 20% 95%;
+    --sidebar-accent-foreground: 210 50% 12%;
+    --sidebar-border: 218 18% 88%;
     --sidebar-ring: 22 91% 47%;
   }
 

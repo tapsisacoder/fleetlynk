@@ -12,8 +12,8 @@ const DemoLayout = () => {
     session: {} as any,
     profile: {
       id: "demo-user", company_id: "demo-company",
-      first_name: "Demo", last_name: "Operator",
-      email: "demo@lynkfleet.com", role: "principal",
+      first_name: "Tapiwa", last_name: "Chamuka",
+      email: "tapiwa@mwanahaulage.co.zw", role: "principal",
       is_authoriser: true, theme_preference: "system", status: "active",
     },
     loading: false,

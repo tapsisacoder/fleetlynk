@@ -25,11 +25,6 @@ export const AppHeader = ({ title, children }: Props) => {
       <div className="flex items-center gap-3">
         <SidebarTrigger className="text-muted-foreground" />
         <h1 className="text-sm font-semibold text-foreground">{title}</h1>
-        {isDemo && (
-          <span className="text-[10px] font-bold text-accent bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-sm tracking-wider">
-            DEMO
-          </span>
-        )}
       </div>
       <div className="flex items-center gap-2">
         {children}
