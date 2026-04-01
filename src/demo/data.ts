@@ -91,6 +91,7 @@ export const DEMO_FUEL_SUPPLIERS: DemoFuelSupplier[] = [
   { id: "fs2", supplier_name: "Energy Park", price_per_litre: 2.05 },
   { id: "fs3", supplier_name: "Redan Fuels", price_per_litre: 2.05 },
   { id: "fs4", supplier_name: "SOM Petroleum", price_per_litre: 1.22 },
+  { id: "fs5", supplier_name: "Rhino", price_per_litre: 1.25 },
 ];
 
 // ─── EMPLOYEES / DRIVERS ──────────────────────
@@ -107,11 +108,11 @@ export const DEMO_EMPLOYEES: DemoEmployee[] = [
 
 // ─── TRUCKS ───────────────────────────────────
 export const DEMO_TRUCKS: DemoTruck[] = [
-  { id: "t1", registration_number: "ADZ 9799", fleet_number: "T-01", make: "Volvo", model: "FH16", year: 2019, status: "on_road", vehicle_type: "truck", default_driver_id: "e1", default_trailer_id: "tr1", fuel_tank_capacity_litres: 700, estimated_fuel_level_litres: 140, km_per_litre_loaded: 3.8, anomaly_threshold_percent: 15, total_km: 245000 },
+  { id: "t1", registration_number: "ADZ 9799", fleet_number: "T-01", make: "Volvo", model: "FH16", year: 2019, status: "on_road", vehicle_type: "truck", default_driver_id: "e1", default_trailer_id: "tr1", fuel_tank_capacity_litres: 700, estimated_fuel_level_litres: 550, km_per_litre_loaded: 3.8, anomaly_threshold_percent: 15, total_km: 245000 },
   { id: "t2", registration_number: "AEG 7336", fleet_number: "T-02", make: "Mercedes", model: "Actros 2645", year: 2018, status: "on_road", vehicle_type: "truck", default_driver_id: "e2", default_trailer_id: "tr2", fuel_tank_capacity_litres: 680, estimated_fuel_level_litres: 380, km_per_litre_loaded: 3.6, anomaly_threshold_percent: 15, total_km: 310000 },
   { id: "t3", registration_number: "AGB 1092", fleet_number: "T-03", make: "DAF", model: "XF105", year: 2016, status: "in_workshop", vehicle_type: "truck", default_driver_id: "e3", default_trailer_id: "tr3", fuel_tank_capacity_litres: 650, estimated_fuel_level_litres: 210, km_per_litre_loaded: 3.4, anomaly_threshold_percent: 15, total_km: 420000 },
   { id: "t4", registration_number: "AGL 4688", fleet_number: "T-04", make: "Volvo", model: "FH440", year: 2020, status: "on_road", vehicle_type: "truck", default_driver_id: "e4", default_trailer_id: "tr4", fuel_tank_capacity_litres: 720, estimated_fuel_level_litres: 520, km_per_litre_loaded: 4.0, anomaly_threshold_percent: 15, total_km: 180000 },
-  { id: "t5", registration_number: "AEU 1313", fleet_number: "T-05", make: "Freightliner", model: "Columbia 120", year: 2015, status: "standby", vehicle_type: "truck", default_driver_id: "e5", default_trailer_id: "tr5", fuel_tank_capacity_litres: 600, estimated_fuel_level_litres: 0, km_per_litre_loaded: 2.0, anomaly_threshold_percent: null, total_km: 520000 },
+  { id: "t5", registration_number: "AEU 1313", fleet_number: "T-05", make: "Freightliner", model: "Columbia 120", year: 2015, status: "standby", vehicle_type: "truck", default_driver_id: "e5", default_trailer_id: "tr5", fuel_tank_capacity_litres: 600, estimated_fuel_level_litres: 40, km_per_litre_loaded: 2.0, anomaly_threshold_percent: null, total_km: 520000 },
 ];
 
 // ─── TRAILERS ─────────────────────────────────
@@ -137,7 +138,7 @@ export const DEMO_CLOSED_TRIPS: DemoTrip[] = [
 
 // ─── OPEN TRIPS ───────────────────────────────
 export const DEMO_OPEN_TRIPS: DemoTrip[] = [
-  { id: "trip28", trip_number: "TRP-2026-0028", origin: "Selous", destination: "Beira", distance_km: 640, trip_type: "Export", client_id: "c1", client_name: "Mega Freight Ltd", truck_id: "t1", truck_reg: "ADZ 9799", trailer_reg: "AEZ 1730", driver_id: "e1", driver_name: "John Moyo", rate_usd: 1300, total_costs_usd: 369, margin_usd: 931, status: "in_transit", created_at: "2026-03-21", bookout_usd: 280, fuel_cost_usd: 369 },
+  { id: "trip28", trip_number: "TRP-2026-0028", origin: "Selous", destination: "Beira", distance_km: 640, trip_type: "Export", client_id: "c1", client_name: "Mega Freight Ltd", truck_id: "t1", truck_reg: "ADZ 9799", trailer_reg: "AEZ 1730", driver_id: "e1", driver_name: "John Moyo", rate_usd: 1300, total_costs_usd: 603.2, margin_usd: 416.8, status: "in_transit", created_at: "2026-03-21", bookout_usd: 280, fuel_cost_usd: 369 },
   { id: "trip26b", trip_number: "TRP-2026-0026B", origin: "Kildonan", destination: "Beira", distance_km: 680, trip_type: "Export", client_id: "c2", client_name: "Coastal Cargo Zimbabwe", truck_id: "t2", truck_reg: "AEG 7336", trailer_reg: "ABS 0741", driver_id: "e2", driver_name: "Tendai Chirwa", rate_usd: 1400, total_costs_usd: 0, margin_usd: 1400, status: "at_border", created_at: "2026-03-20" },
   { id: "trip25b", trip_number: "TRP-2026-0025B", origin: "Beira", destination: "Harare", distance_km: 600, trip_type: "Import", client_id: "c3", client_name: "Inland Logistics (Pvt) Ltd", truck_id: "t4", truck_reg: "AGL 4688", trailer_reg: "ACQ 9301", driver_id: "e4", driver_name: "Brighton Ncube", rate_usd: 1500, total_costs_usd: 0, margin_usd: 1500, status: "loading", created_at: "2026-03-22" },
 ];

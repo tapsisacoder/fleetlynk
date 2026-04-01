@@ -63,7 +63,7 @@ const FuelModule = () => {
 
         {tab === "overview" && (
           <div className="bg-card border border-border">
-            <div className="p-4 border-b border-border"><h2 className="text-sm font-semibold">Fleet Fuel Levels</h2></div>
+            <div className="p-4 border-b border-border"><h2 className="text-sm font-semibold">Estimated Fleet Fuel Levels at beginning/end of trip</h2></div>
             <div className="divide-y divide-border">
               {loading ? <div className="p-8 text-center text-muted-foreground text-sm">Loading...</div>
               : trucks.map((truck: any, i: number) => (

@@ -83,12 +83,12 @@ export const DemoProvider = ({ children }: { children: ReactNode }) => {
 
   const issueFuel = useCallback((truckReg: string, litres: number, supplierName: string, tripNumber: string) => {
     const supplier = D.DEMO_FUEL_SUPPLIERS.find(s => s.supplier_name === supplierName);
-    const ppl = supplier?.price_per_litre || 2.05;
+    const ppl = supplier?.price_per_litre || 1.25;
     const cost = Math.round(litres * ppl * 100) / 100;
     const truck = trucks.find(t => t.registration_number === truckReg);
     const driver = truck ? D.DEMO_EMPLOYEES.find(e => e.id === truck.default_driver_id) : null;
 
-    // Anomaly check: only for trucks with anomaly detection enabled, and specific conditions
+    // Anomaly check: triggers for ADZ 9799 on TRP-2026-0028 (has anomaly detection enabled)
     const isAnomaly = truck?.anomaly_threshold_percent !== null && tripNumber === "TRP-2026-0028" && truckReg === "ADZ 9799";
 
     const tx: D.DemoFuelTransaction = {
@@ -113,7 +113,7 @@ export const DemoProvider = ({ children }: { children: ReactNode }) => {
         id: "ano4", anomaly_number: "ANO-2026-0004", date: "2026-03-23",
         trip_number: tripNumber, truck_reg: truckReg,
         driver_name: driver?.full_name || "John Moyo", route: "Selous to Beira",
-        variance_percent: 100, status: "open",
+        variance_percent: Math.round((litres / (640 / 3.8)) * 100), status: "open",
       }, ...prev]);
       setAlerts(prev => [{
         id: "al-anomaly", severity: "critical",
