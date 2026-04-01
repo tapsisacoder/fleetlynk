@@ -10,8 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 interface Stats {
   trucksOnRoad: number; trucksInWorkshop: number; trucksStandby: number;
   trucksOffRoad: number; totalTrucks: number; moneyToCollect: number;
-  moneyOverdue: number; activeTrips: number; awaitingInvoice: number;
+  moneyPayable: number; moneyOverdue: number; activeTrips: number; awaitingInvoice: number;
   alertsTotal: number; alertsCritical: number; alertsWarning: number;
+  avgCostPerKm: number;
 }
 
 const Dashboard = () => {
@@ -22,8 +23,8 @@ const Dashboard = () => {
 
   const [prodStats, setProdStats] = useState<Stats>({
     trucksOnRoad: 0, trucksInWorkshop: 0, trucksStandby: 0, trucksOffRoad: 0,
-    totalTrucks: 0, moneyToCollect: 0, moneyOverdue: 0, activeTrips: 0,
-    awaitingInvoice: 0, alertsTotal: 0, alertsCritical: 0, alertsWarning: 0,
+    totalTrucks: 0, moneyToCollect: 0, moneyPayable: 0, moneyOverdue: 0, activeTrips: 0,
+    awaitingInvoice: 0, alertsTotal: 0, alertsCritical: 0, alertsWarning: 0, avgCostPerKm: 0,
   });
   const [prodLiveTrips, setProdLiveTrips] = useState<any[]>([]);
   const [prodAlerts, setProdAlerts] = useState<any[]>([]);
@@ -51,11 +52,12 @@ const Dashboard = () => {
         trucksOffRoad: trucks.filter((t: any) => t.status === "off_road" || t.status === "disposed").length,
         totalTrucks: trucks.length,
         moneyToCollect: invoices.reduce((s: number, i: any) => s + Number(i.amount_outstanding_usd || 0), 0),
-        moneyOverdue: overdue.reduce((s: number, i: any) => s + Number(i.amount_outstanding_usd || 0), 0),
+        moneyPayable: 0, moneyOverdue: overdue.reduce((s: number, i: any) => s + Number(i.amount_outstanding_usd || 0), 0),
         activeTrips: trips.length, awaitingInvoice: delivered.length,
         alertsTotal: alertsList.length,
         alertsCritical: alertsList.filter((a: any) => a.severity === "critical").length,
         alertsWarning: alertsList.filter((a: any) => a.severity === "warning").length,
+        avgCostPerKm: 0,
       });
       setProdLiveTrips(trips); setProdAlerts(alertsList);
     };
@@ -65,19 +67,25 @@ const Dashboard = () => {
   const stats = useMemo<Stats>(() => {
     if (!demo) return prodStats;
     const t = demo.trucks;
+    // Calculate fleet average cost/km from closed trips
+    const closedTrips = demo.closedTrips;
+    const totalCosts = closedTrips.reduce((s, tr) => s + tr.total_costs_usd, 0);
+    const totalKm = closedTrips.reduce((s, tr) => s + tr.distance_km, 0);
+    const avgCpk = totalKm > 0 ? totalCosts / totalKm : 0;
     return {
       trucksOnRoad: t.filter(x => x.status === "on_road").length,
       trucksInWorkshop: t.filter(x => x.status === "in_workshop").length,
       trucksStandby: t.filter(x => x.status === "standby").length,
       trucksOffRoad: t.filter(x => x.status === "off_road").length,
-      totalTrucks: t.length, moneyToCollect: demo.moneyToCollect, moneyOverdue: 0,
+      totalTrucks: t.length, moneyToCollect: demo.moneyToCollect, moneyPayable: 1278, moneyOverdue: 0,
       activeTrips: demo.openTrips.length,
       awaitingInvoice: demo.openTrips.filter(x => x.status === "delivered").length,
       alertsTotal: demo.alerts.length,
       alertsCritical: demo.alerts.filter(a => a.severity === "critical").length,
       alertsWarning: demo.alerts.filter(a => a.severity === "warning").length,
+      avgCostPerKm: Math.round(avgCpk * 10) / 10,
     };
-  }, [demo, demo?.trucks, demo?.openTrips, demo?.alerts, demo?.moneyToCollect, prodStats]);
+  }, [demo, demo?.trucks, demo?.openTrips, demo?.alerts, demo?.moneyToCollect, demo?.closedTrips, prodStats]);
 
   const liveTrips = useMemo(() => {
     if (!demo) return prodLiveTrips;
@@ -91,11 +99,22 @@ const Dashboard = () => {
 
   const alerts = useMemo(() => demo ? demo.alerts : prodAlerts, [demo, demo?.alerts, prodAlerts]);
 
-  const utilisation = stats.totalTrucks > 0 ? Math.round((stats.trucksOnRoad / stats.totalTrucks) * 100) : 0;
-
   const kpis = [
-    { label: "Trucks on Road", value: `${stats.trucksOnRoad} of ${stats.totalTrucks}`, subText: `${stats.trucksInWorkshop} workshop · ${stats.trucksStandby} standby`, borderClass: stats.trucksOnRoad > 0 ? "border-l-[hsl(var(--green))]" : "border-l-[hsl(var(--amber))]", icon: Truck },
-    { label: "Money to Collect", value: `$${stats.moneyToCollect.toLocaleString()}`, subText: stats.moneyOverdue > 0 ? `$${stats.moneyOverdue.toLocaleString()} overdue` : "All current", subTextClass: stats.moneyOverdue > 0 ? "text-[hsl(var(--red))]" : undefined, borderClass: "border-l-accent", icon: DollarSign },
+    {
+      label: "Fleet Status",
+      value: `Fleet Average cost per KM`,
+      subText: `${stats.avgCostPerKm.toFixed(1)} cost/km`,
+      borderClass: "border-l-[hsl(var(--green))]",
+      icon: Truck,
+    },
+    {
+      label: "Money to Collect",
+      value: `$${stats.moneyToCollect.toLocaleString()}`,
+      subText: `$${stats.moneyToCollect.toLocaleString()} receivable`,
+      subText2: `$${stats.moneyPayable.toLocaleString()} payable`,
+      borderClass: "border-l-accent",
+      icon: DollarSign,
+    },
     { label: "Active Trips", value: `${stats.activeTrips} active`, subText: `${stats.awaitingInvoice} awaiting invoice`, borderClass: "border-l-[hsl(var(--blue))]", icon: MapPin },
     { label: "Alerts", value: `${stats.alertsTotal} total`, subText: `${stats.alertsCritical} critical · ${stats.alertsWarning} warnings`, borderClass: stats.alertsTotal === 0 ? "border-l-[hsl(var(--green))]" : stats.alertsCritical > 0 ? "border-l-[hsl(var(--red))]" : "border-l-[hsl(var(--amber))]", icon: AlertTriangle },
   ];
@@ -128,8 +147,18 @@ const Dashboard = () => {
             <motion.div key={kpi.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
               className={`bg-card border border-border border-l-4 ${kpi.borderClass} p-4`}>
               <kpi.icon className="h-5 w-5 text-muted-foreground mb-2" />
-              <div className="text-xl font-bold font-mono text-foreground">{kpi.value}</div>
-              <div className={`text-xs mt-1 ${(kpi as any).subTextClass || "text-muted-foreground"}`}>{kpi.subText}</div>
+              {kpi.label === "Fleet Status" ? (
+                <>
+                  <div className="text-sm font-semibold text-foreground">{kpi.value}</div>
+                  <div className="text-xl font-bold font-mono text-foreground mt-1">{kpi.subText}</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-xl font-bold font-mono text-foreground">{kpi.value}</div>
+                  <div className="text-xs mt-1 text-muted-foreground">{kpi.subText}</div>
+                  {(kpi as any).subText2 && <div className="text-xs text-muted-foreground">{(kpi as any).subText2}</div>}
+                </>
+              )}
             </motion.div>
           ))}
         </div>
@@ -158,15 +187,6 @@ const Dashboard = () => {
                     <div className="text-xs text-muted-foreground">{s.label}</div>
                   </div>
                 ))}
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-muted-foreground">Fleet Utilisation</span>
-                  <span className="text-xs font-mono font-medium text-foreground">{utilisation}%</span>
-                </div>
-                <div className="w-full h-2 bg-muted rounded-sm overflow-hidden">
-                  <div className="h-full bg-[hsl(var(--green))] transition-all" style={{ width: `${utilisation}%` }} />
-                </div>
               </div>
             </div>
 

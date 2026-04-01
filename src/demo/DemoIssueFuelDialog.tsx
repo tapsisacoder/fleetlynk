@@ -22,7 +22,7 @@ export const DemoIssueFuelDialog = ({ open, onOpenChange }: Props) => {
   const selectedSupplier = demo.fuelSuppliers.find(s => s.supplier_name === supplier);
   const totalCost = selectedSupplier && litres ? Number(litres) * selectedSupplier.price_per_litre : 0;
   
-  // Anomaly only triggers on ADZ 9799 / TRP-2026-0028 (anomaly detection enabled truck)
+  // Anomaly triggers for ADZ 9799 on TRP-2026-0028
   const truck = demo.trucks.find(t => t.registration_number === truckReg);
   const isAnomaly = truck?.anomaly_threshold_percent !== null && tripNumber === "TRP-2026-0028" && truckReg === "ADZ 9799";
 
