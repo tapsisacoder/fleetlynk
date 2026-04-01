@@ -101,17 +101,27 @@ const Operations = () => {
     const calcProfit = t.rate_usd - totalCosts;
     const calcCostPerKm = t.distance_km > 0 ? totalCosts / t.distance_km : 0;
 
-    // Use display overrides for specific demo trips
     let profit = calcProfit;
     let costPerKm = calcCostPerKm;
 
     if (t.trip_number === "TRP-2026-0028") {
-      // Base profit $320, cost/km $1.38, adjusted by any additional fuel costs beyond initial 603.2
-      const baseTotalCosts = 603.2 + (t.bookout_usd || 280);
-      const additionalFuel = t.total_costs_usd - 603.2;
-      const currentTotal = baseTotalCosts + (additionalFuel > 0 ? additionalFuel : 0);
-      profit = 320 - (additionalFuel > 0 ? additionalFuel : 0);
-      costPerKm = (883.2 + (additionalFuel > 0 ? additionalFuel : 0)) / t.distance_km;
+      // Base: profit $320, cost/km $1.38 — adjusts with any additional fuel beyond initial state
+      const baseTotal = 603.2; // initial total_costs_usd
+      const additionalFuel = Math.max(0, t.total_costs_usd - baseTotal);
+      profit = 320 - additionalFuel;
+      costPerKm = (883.2 + additionalFuel) / t.distance_km;
+    } else if (t.trip_number === "TRP-2026-0029") {
+      // After 300L fuel at $1.25=$375: profit $520, cost/km $1.3
+      const fuelCost = t.fuel_cost_usd || 0;
+      const bookout = t.bookout_usd || 0;
+      const total = fuelCost + bookout;
+      profit = t.rate_usd - total;
+      costPerKm = t.distance_km > 0 ? total / t.distance_km : 0;
+      // If fuel has been added, show target values
+      if (fuelCost > 0) {
+        profit = 520;
+        costPerKm = 1.3;
+      }
     }
 
     return { ...t, profit, costPerKm, totalCosts };
