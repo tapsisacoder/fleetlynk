@@ -173,6 +173,42 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
+            {/* Fleet Utilisation Bar */}
+            <div className="bg-card border border-border p-4">
+              <h2 className="text-sm font-semibold text-foreground mb-3">Fleet Utilisation</h2>
+              {(() => {
+                const total = stats.totalTrucks || 1;
+                const onRoadPct = Math.round((stats.trucksOnRoad / total) * 100);
+                const workshopPct = Math.round((stats.trucksInWorkshop / total) * 100);
+                const standbyPct = Math.round((stats.trucksStandby / total) * 100);
+                const offRoadPct = Math.round((stats.trucksOffRoad / total) * 100);
+                return (
+                  <>
+                    <div className="flex h-6 w-full rounded-sm overflow-hidden mb-3">
+                      {onRoadPct > 0 && <div className="bg-[hsl(var(--green))] transition-all" style={{ width: `${onRoadPct}%` }} />}
+                      {workshopPct > 0 && <div className="bg-[hsl(var(--amber))] transition-all" style={{ width: `${workshopPct}%` }} />}
+                      {standbyPct > 0 && <div className="bg-muted-foreground/50 transition-all" style={{ width: `${standbyPct}%` }} />}
+                      {offRoadPct > 0 && <div className="bg-[hsl(var(--red))] transition-all" style={{ width: `${offRoadPct}%` }} />}
+                    </div>
+                    <div className="flex flex-wrap gap-4 text-xs">
+                      {[
+                        { label: "On Road", count: stats.trucksOnRoad, color: "bg-[hsl(var(--green))]" },
+                        { label: "In Workshop", count: stats.trucksInWorkshop, color: "bg-[hsl(var(--amber))]" },
+                        { label: "Standby", count: stats.trucksStandby, color: "bg-muted-foreground/50" },
+                        { label: "Off Road", count: stats.trucksOffRoad, color: "bg-[hsl(var(--red))]" },
+                      ].map(s => (
+                        <div key={s.label} className="flex items-center gap-1.5">
+                          <div className={`h-2.5 w-2.5 rounded-sm ${s.color}`} />
+                          <span className="text-muted-foreground">{s.label}</span>
+                          <span className="font-bold font-mono text-foreground">{s.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+
             <div className="bg-card border border-border p-4">
               <h2 className="text-sm font-semibold text-foreground mb-3">Fleet Status</h2>
               <div className="grid grid-cols-4 gap-3 mb-4">

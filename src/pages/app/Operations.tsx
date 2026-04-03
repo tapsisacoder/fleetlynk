@@ -166,10 +166,6 @@ const Operations = () => {
                   <div className="font-mono text-sm text-foreground">{tripDetail.truck_reg}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-muted-foreground">Trailer</div>
-                  <div className="font-mono text-sm text-foreground">{tripDetail.trailer_reg}</div>
-                </div>
-                <div>
                   <div className="text-xs text-muted-foreground">Driver</div>
                   <div className="text-sm text-foreground">{tripDetail.driver_name}</div>
                 </div>
@@ -177,6 +173,16 @@ const Operations = () => {
                   <div className="text-xs text-muted-foreground">Route</div>
                   <div className="text-sm text-foreground">{tripDetail.origin} → {tripDetail.destination}</div>
                 </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Started</div>
+                  <div className="text-sm text-foreground">{tripDetail.started_at ? new Date(tripDetail.started_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"}</div>
+                </div>
+                {tripDetail.closed_at && (
+                  <div>
+                    <div className="text-xs text-muted-foreground">Closed</div>
+                    <div className="text-sm text-foreground">{new Date(tripDetail.closed_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</div>
+                  </div>
+                )}
                 <div className="border-l border-border pl-6 flex items-center gap-6">
                   <div className="flex items-center gap-1.5">
                     {tripDetail.profit >= 0 ? (
