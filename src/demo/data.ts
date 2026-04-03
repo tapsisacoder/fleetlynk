@@ -35,6 +35,7 @@ export interface DemoTrip {
   driver_id: string; driver_name: string; rate_usd: number;
   total_costs_usd: number; margin_usd: number; status: string;
   created_at: string; bookout_usd?: number; fuel_cost_usd?: number;
+  started_at?: string; closed_at?: string;
 }
 export interface DemoInvoice {
   id: string; invoice_number: string; trip_number: string;
