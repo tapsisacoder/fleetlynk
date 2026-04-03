@@ -70,8 +70,8 @@ export const DemoProvider = ({ children }: { children: ReactNode }) => {
       truck_reg: truck?.registration_number || "", trailer_reg: trailer?.registration_number || "",
       driver_id: driver?.id || "", driver_name: driver?.full_name || "",
       rate_usd: input.rate_usd, total_costs_usd: 0,
-      margin_usd: input.rate_usd, status: "confirmed", created_at: "2026-03-23",
-      bookout_usd: input.bookout_usd,
+      margin_usd: input.rate_usd, status: "confirmed", created_at: "2026-04-02",
+      bookout_usd: input.bookout_usd, started_at: "2026-04-02",
     };
     setOpenTrips(prev => [newTrip, ...prev]);
     setTrucks(prev => prev.map(t => t.id === input.truck_id ? { ...t, status: "on_road" } : t));
