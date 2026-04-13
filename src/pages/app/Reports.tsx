@@ -1,23 +1,45 @@
 import { AppHeader } from "@/components/AppHeader";
 import { motion } from "framer-motion";
-import { BarChart3, DollarSign, Truck, Users, Fuel, Wrench, FileText, TrendingUp } from "lucide-react";
+import { DollarSign, Truck, Fuel, FileText, TrendingUp } from "lucide-react";
 import { useDemoContext } from "@/demo/DemoContext";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
 import { useState } from "react";
 
 const reportSections = [
-  { title: "Financial", icon: DollarSign, reports: ["P&L Statement", "AR Aging", "AP Aging", "VAT Summary", "Invoice Register"] },
-  { title: "Fleet & Trips", icon: Truck, reports: ["Trip Profitability", "Vehicle Cost Summary", "Route Profitability", "Fleet Utilisation", "Compliance Expiry"] },
-  { title: "Driver", icon: Users, reports: ["Driver Scorecard", "Driver Cost vs Revenue", "Driver Fuel Efficiency"] },
-  { title: "Fuel", icon: Fuel, reports: ["Fuel Cost Per Trip", "Fuel Cost Per Vehicle", "Anomaly Report", "Tank Reconciliation"] },
-  { title: "Workshop", icon: Wrench, reports: ["Workshop Cost Per Vehicle", "Planned vs Unplanned Maintenance", "Job Card Register", "Parts Consumption"] },
-  { title: "Debtors & Creditors", icon: FileText, reports: ["Client Statement", "Supplier Statement", "Outstanding Invoices"] },
-  { title: "Business Intelligence", icon: TrendingUp, reports: ["True Cost of a Driver", "Route Profitability Heatmap", "Vehicle True Cost of Ownership", "Client Dependency Risk"] },
+  { title: "Financial Reports", icon: DollarSign, reports: ["P&L Statement", "Invoice Register"] },
+  { title: "Fleet Reports", icon: Truck, reports: ["Compliance Expiry", "Vehicle Costs"] },
+  { title: "Fuel Reports", icon: Fuel, reports: ["Cost Per Trip", "Anomaly Report", "Spend by Route"] },
+  { title: "Debtors & Creditors", icon: FileText, reports: ["AR Aging", "AP Aging", "Client Statements"] },
+  { title: "Trip Profitability", icon: TrendingUp, reports: ["Trip Profitability"] },
 ];
+
+const plTrucks = ["ADZ-9799", "AEG 7336", "AGB 1092", "AGL 4688", "AEU 1313"] as const;
+
+const plData: Record<string, { revenue: number; fuel: number; maintenance: number; bookouts: number; tolls: number; insurance: number }> = {
+  "ADZ-9799":  { revenue: 18500, fuel: 5200, maintenance: 1800, bookouts: 2400, tolls: 680, insurance: 450 },
+  "AEG 7336":  { revenue: 22300, fuel: 4800, maintenance: 1200, bookouts: 3100, tolls: 720, insurance: 450 },
+  "AGB 1092":  { revenue: 15800, fuel: 4600, maintenance: 2100, bookouts: 2000, tolls: 580, insurance: 450 },
+  "AGL 4688":  { revenue: 19200, fuel: 4400, maintenance: 1500, bookouts: 2600, tolls: 640, insurance: 450 },
+  "AEU 1313":  { revenue: 16900, fuel: 4900, maintenance: 1600, bookouts: 2200, tolls: 610, insurance: 450 },
+};
+
+// Ensure margins match requested percentages: 21.3%, 30.3%, 18.8%, 24.0%, 22.2%
+// margin = revenue - totalCosts, margin% = margin/revenue
+// Adjust revenues to hit targets
+(() => {
+  const targets: Record<string, number> = { "ADZ-9799": 21.3, "AEG 7336": 30.3, "AGB 1092": 18.8, "AGL 4688": 24.0, "AEU 1313": 22.2 };
+  for (const truck of plTrucks) {
+    const d = plData[truck];
+    const totalCost = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+    // revenue = totalCost / (1 - margin%)
+    d.revenue = Math.round(totalCost / (1 - targets[truck] / 100));
+  }
+})();
 
 const Reports = () => {
   const demo = useDemoContext();
   const [activeReport, setActiveReport] = useState<string | null>(demo ? "Trip Profitability" : null);
+  const [truckFilter, setTruckFilter] = useState("ALL");
 
   const profitabilityData = demo ? demo.closedTrips.map(t => ({
     trip: t.trip_number.replace("TRP-2026-", ""),
@@ -25,6 +47,25 @@ const Reports = () => {
     marginUsd: t.margin_usd,
     profitable: t.margin_usd >= 0,
   })) : [];
+
+  const filteredTrucks = truckFilter === "ALL" ? [...plTrucks] : [truckFilter as typeof plTrucks[number]];
+
+  const totals = filteredTrucks.reduce((acc, t) => {
+    const d = plData[t];
+    acc.revenue += d.revenue;
+    acc.fuel += d.fuel;
+    acc.maintenance += d.maintenance;
+    acc.bookouts += d.bookouts;
+    acc.tolls += d.tolls;
+    acc.insurance += d.insurance;
+    return acc;
+  }, { revenue: 0, fuel: 0, maintenance: 0, bookouts: 0, tolls: 0, insurance: 0 });
+
+  const totalCosts = totals.fuel + totals.maintenance + totals.bookouts + totals.tolls + totals.insurance;
+  const netProfit = totals.revenue - totalCosts;
+  const marginPct = totals.revenue > 0 ? ((netProfit / totals.revenue) * 100).toFixed(1) : "0.0";
+
+  const fmt = (n: number) => `$${n.toLocaleString()}`;
 
   return (
     <>
@@ -51,7 +92,7 @@ const Reports = () => {
           ))}
         </div>
 
-        {/* Active Report Display */}
+        {/* Trip Profitability Chart */}
         {demo && activeReport === "Trip Profitability" && (
           <div className="bg-card border border-border p-6">
             <h2 className="text-sm font-semibold text-foreground mb-4">Trip Profitability — Closed Trips</h2>
@@ -82,6 +123,7 @@ const Reports = () => {
           </div>
         )}
 
+        {/* Anomaly Report */}
         {demo && activeReport === "Anomaly Report" && (
           <div className="bg-card border border-border overflow-hidden">
             <div className="p-4 border-b border-border"><h2 className="text-sm font-semibold">Fuel Anomaly Report</h2></div>
@@ -114,6 +156,103 @@ const Reports = () => {
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* P&L Statement */}
+        {demo && activeReport === "P&L Statement" && (
+          <div className="bg-card border border-border overflow-hidden">
+            <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center gap-3">
+              <h2 className="text-sm font-semibold text-foreground">Profit & Loss Statement</h2>
+              <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+                <select value={truckFilter} onChange={e => setTruckFilter(e.target.value)}
+                  className="text-xs bg-background border border-border rounded px-2 py-1.5 text-foreground">
+                  <option value="ALL">All Trucks</option>
+                  {plTrucks.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <input type="date" defaultValue="2026-03-01" className="bg-background border border-border rounded px-2 py-1.5 text-xs text-foreground" />
+                  <span>—</span>
+                  <input type="date" defaultValue="2026-04-13" className="bg-background border border-border rounded px-2 py-1.5 text-xs text-foreground" />
+                </div>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="text-left px-4 py-3 text-xs font-semibold">Category</th>
+                    {filteredTrucks.map(t => (
+                      <th key={t} className="text-right px-4 py-3 text-xs font-semibold font-mono">{t}</th>
+                    ))}
+                    {filteredTrucks.length > 1 && <th className="text-right px-4 py-3 text-xs font-semibold font-mono">Total</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Revenue */}
+                  <tr className="border-t border-border bg-[hsl(var(--green))]/5">
+                    <td className="px-4 py-3 text-xs font-semibold text-foreground">Revenue</td>
+                    {filteredTrucks.map(t => (
+                      <td key={t} className="px-4 py-3 text-xs font-mono text-right text-foreground">{fmt(plData[t].revenue)}</td>
+                    ))}
+                    {filteredTrucks.length > 1 && <td className="px-4 py-3 text-xs font-mono text-right font-semibold text-foreground">{fmt(totals.revenue)}</td>}
+                  </tr>
+                  {/* Costs */}
+                  {[
+                    { label: "Fuel", key: "fuel" as const },
+                    { label: "Maintenance", key: "maintenance" as const },
+                    { label: "Driver Bookouts", key: "bookouts" as const },
+                    { label: "Tolls & Borders", key: "tolls" as const },
+                    { label: "Insurance", key: "insurance" as const },
+                  ].map((row, ri) => (
+                    <tr key={row.key} className={`border-t border-border ${ri % 2 === 0 ? "bg-card" : "bg-muted/20"}`}>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">{row.label}</td>
+                      {filteredTrucks.map(t => (
+                        <td key={t} className="px-4 py-3 text-xs font-mono text-right text-muted-foreground">({fmt(plData[t][row.key])})</td>
+                      ))}
+                      {filteredTrucks.length > 1 && (
+                        <td className="px-4 py-3 text-xs font-mono text-right text-muted-foreground">
+                          ({fmt(filteredTrucks.reduce((s, t) => s + plData[t][row.key], 0))})
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                  {/* Total Costs */}
+                  <tr className="border-t-2 border-border bg-muted/40">
+                    <td className="px-4 py-3 text-xs font-semibold text-foreground">Total Costs</td>
+                    {filteredTrucks.map(t => {
+                      const d = plData[t];
+                      const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+                      return <td key={t} className="px-4 py-3 text-xs font-mono text-right font-semibold text-foreground">({fmt(tc)})</td>;
+                    })}
+                    {filteredTrucks.length > 1 && <td className="px-4 py-3 text-xs font-mono text-right font-semibold text-foreground">({fmt(totalCosts)})</td>}
+                  </tr>
+                  {/* Net Profit */}
+                  <tr className="border-t-2 border-border bg-[hsl(var(--green))]/5">
+                    <td className="px-4 py-3 text-xs font-bold text-foreground">Net Profit</td>
+                    {filteredTrucks.map(t => {
+                      const d = plData[t];
+                      const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+                      const np = d.revenue - tc;
+                      return <td key={t} className={`px-4 py-3 text-xs font-mono text-right font-bold ${np >= 0 ? "text-[hsl(var(--green))]" : "text-[hsl(var(--red))]"}`}>{fmt(np)}</td>;
+                    })}
+                    {filteredTrucks.length > 1 && <td className={`px-4 py-3 text-xs font-mono text-right font-bold ${netProfit >= 0 ? "text-[hsl(var(--green))]" : "text-[hsl(var(--red))]"}`}>{fmt(netProfit)}</td>}
+                  </tr>
+                  {/* Profit Margin */}
+                  <tr className="border-t border-border">
+                    <td className="px-4 py-3 text-xs font-semibold text-foreground">Profit Margin</td>
+                    {filteredTrucks.map(t => {
+                      const d = plData[t];
+                      const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+                      const m = ((d.revenue - tc) / d.revenue * 100).toFixed(1);
+                      return <td key={t} className="px-4 py-3 text-xs font-mono text-right font-semibold text-accent">{m}%</td>;
+                    })}
+                    {filteredTrucks.length > 1 && <td className="px-4 py-3 text-xs font-mono text-right font-semibold text-accent">{marginPct}%</td>}
+                  </tr>
                 </tbody>
               </table>
             </div>
