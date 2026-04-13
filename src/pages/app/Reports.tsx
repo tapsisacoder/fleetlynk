@@ -1,9 +1,12 @@
 import { AppHeader } from "@/components/AppHeader";
 import { motion } from "framer-motion";
-import { DollarSign, Truck, Fuel, FileText, TrendingUp } from "lucide-react";
+import { DollarSign, Truck, Fuel, FileText, TrendingUp, ArrowLeft, Download } from "lucide-react";
 import { useDemoContext } from "@/demo/DemoContext";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { downloadReportPdf } from "@/lib/exports/pdf-report";
+import { downloadCsv } from "@/lib/exports/csv-export";
 
 const reportSections = [
   { title: "Financial Reports", icon: DollarSign, reports: ["P&L Statement", "Invoice Register"] },
@@ -23,22 +26,21 @@ const plData: Record<string, { revenue: number; fuel: number; maintenance: numbe
   "AEU 1313":  { revenue: 16900, fuel: 4900, maintenance: 1600, bookouts: 2200, tolls: 610, insurance: 450 },
 };
 
-// Ensure margins match requested percentages: 21.3%, 30.3%, 18.8%, 24.0%, 22.2%
-// margin = revenue - totalCosts, margin% = margin/revenue
-// Adjust revenues to hit targets
 (() => {
   const targets: Record<string, number> = { "ADZ-9799": 21.3, "AEG 7336": 30.3, "AGB 1092": 18.8, "AGL 4688": 24.0, "AEU 1313": 22.2 };
   for (const truck of plTrucks) {
     const d = plData[truck];
     const totalCost = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
-    // revenue = totalCost / (1 - margin%)
     d.revenue = Math.round(totalCost / (1 - targets[truck] / 100));
   }
 })();
 
+type ViewMode = "index" | "report" | "pl-page";
+
 const Reports = () => {
   const demo = useDemoContext();
   const [activeReport, setActiveReport] = useState<string | null>(demo ? "Trip Profitability" : null);
+  const [viewMode, setViewMode] = useState<ViewMode>("index");
   const [truckFilter, setTruckFilter] = useState("ALL");
 
   const profitabilityData = demo ? demo.closedTrips.map(t => ({
@@ -67,11 +69,233 @@ const Reports = () => {
 
   const fmt = (n: number) => `$${n.toLocaleString()}`;
 
+  const handleReportClick = (report: string) => {
+    if (report === "P&L Statement") {
+      setViewMode("pl-page");
+      setActiveReport("P&L Statement");
+    } else {
+      setActiveReport(report);
+      setViewMode("report");
+    }
+  };
+
+  const handleExportPdf = () => {
+    const costRows = [
+      { label: "Fuel", key: "fuel" as const },
+      { label: "Maintenance", key: "maintenance" as const },
+      { label: "Driver Bookouts", key: "bookouts" as const },
+      { label: "Tolls & Borders", key: "tolls" as const },
+      { label: "Insurance", key: "insurance" as const },
+    ];
+    const columns = [
+      { header: "Category", dataKey: "category", width: 120 },
+      ...filteredTrucks.map(t => ({ header: t, dataKey: t, width: 80, align: "right" as const })),
+      ...(filteredTrucks.length > 1 ? [{ header: "Total", dataKey: "total", width: 80, align: "right" as const }] : []),
+    ];
+    const rows: Record<string, string>[] = [];
+    // Revenue row
+    const revRow: Record<string, string> = { category: "Revenue" };
+    filteredTrucks.forEach(t => { revRow[t] = fmt(plData[t].revenue); });
+    if (filteredTrucks.length > 1) revRow.total = fmt(totals.revenue);
+    rows.push(revRow);
+    // Cost rows
+    costRows.forEach(cr => {
+      const row: Record<string, string> = { category: cr.label };
+      filteredTrucks.forEach(t => { row[t] = `(${fmt(plData[t][cr.key])})`; });
+      if (filteredTrucks.length > 1) row.total = `(${fmt(filteredTrucks.reduce((s, t) => s + plData[t][cr.key], 0))})`;
+      rows.push(row);
+    });
+    // Total Costs
+    const tcRow: Record<string, string> = { category: "Total Costs" };
+    filteredTrucks.forEach(t => {
+      const d = plData[t]; tcRow[t] = `(${fmt(d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance)})`;
+    });
+    if (filteredTrucks.length > 1) tcRow.total = `(${fmt(totalCosts)})`;
+    rows.push(tcRow);
+    // Net Profit
+    const npRow: Record<string, string> = { category: "Net Profit" };
+    filteredTrucks.forEach(t => {
+      const d = plData[t]; const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+      npRow[t] = fmt(d.revenue - tc);
+    });
+    if (filteredTrucks.length > 1) npRow.total = fmt(netProfit);
+    rows.push(npRow);
+    // Margin
+    const mRow: Record<string, string> = { category: "Profit Margin" };
+    filteredTrucks.forEach(t => {
+      const d = plData[t]; const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+      mRow[t] = `${((d.revenue - tc) / d.revenue * 100).toFixed(1)}%`;
+    });
+    if (filteredTrucks.length > 1) mRow.total = `${marginPct}%`;
+    rows.push(mRow);
+
+    downloadReportPdf({
+      title: "Profit & Loss Statement",
+      subtitle: "1 Mar 2026 — 13 Apr 2026",
+      columns,
+      rows,
+      companyName: "Mwana Haulage (Pvt) Ltd",
+      generatedAt: new Date().toISOString(),
+    });
+  };
+
+  const handleExportCsv = () => {
+    const costKeys = ["fuel", "maintenance", "bookouts", "tolls", "insurance"] as const;
+    const costLabels = ["Fuel", "Maintenance", "Driver Bookouts", "Tolls & Borders", "Insurance"];
+    const columns = [
+      { header: "Category", accessor: (r: any) => r.category },
+      ...filteredTrucks.map(t => ({ header: t, accessor: (r: any) => r[t] })),
+      ...(filteredTrucks.length > 1 ? [{ header: "Total", accessor: (r: any) => r.total }] : []),
+    ];
+    const rows: Record<string, string | number>[] = [];
+    // Revenue
+    const revRow: Record<string, string | number> = { category: "Revenue" };
+    filteredTrucks.forEach(t => { revRow[t] = plData[t].revenue; });
+    if (filteredTrucks.length > 1) revRow.total = totals.revenue;
+    rows.push(revRow);
+    costKeys.forEach((k, i) => {
+      const row: Record<string, string | number> = { category: costLabels[i] };
+      filteredTrucks.forEach(t => { row[t] = plData[t][k]; });
+      if (filteredTrucks.length > 1) row.total = filteredTrucks.reduce((s, t) => s + plData[t][k], 0);
+      rows.push(row);
+    });
+    const tcRow: Record<string, string | number> = { category: "Total Costs" };
+    filteredTrucks.forEach(t => {
+      const d = plData[t]; tcRow[t] = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+    });
+    if (filteredTrucks.length > 1) tcRow.total = totalCosts;
+    rows.push(tcRow);
+    const npRow: Record<string, string | number> = { category: "Net Profit" };
+    filteredTrucks.forEach(t => {
+      const d = plData[t]; const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+      npRow[t] = d.revenue - tc;
+    });
+    if (filteredTrucks.length > 1) npRow.total = netProfit;
+    rows.push(npRow);
+
+    downloadCsv({ columns, rows, filename: "PL_Statement_Mar2026" });
+  };
+
+  // ── P&L dedicated page ──
+  if (viewMode === "pl-page") {
+    return (
+      <>
+        <AppHeader title="Reports" />
+        <div className="flex-1 overflow-auto p-6">
+          {/* Back + title + export buttons */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+            <button onClick={() => { setViewMode("index"); setActiveReport(demo ? "Trip Profitability" : null); }}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+              <ArrowLeft className="h-3.5 w-3.5" /> Back to Reports
+            </button>
+            <h2 className="text-base font-semibold text-foreground sm:ml-4">Profit & Loss Statement</h2>
+            <div className="flex items-center gap-2 sm:ml-auto">
+              <Button variant="outline" size="sm" className="text-xs gap-1.5" onClick={handleExportPdf}>
+                <Download className="h-3.5 w-3.5" /> Export PDF
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs gap-1.5" onClick={handleExportCsv}>
+                <Download className="h-3.5 w-3.5" /> Export CSV
+              </Button>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="bg-card border border-border p-4 mb-4 flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium text-muted-foreground">Truck</label>
+              <select value={truckFilter} onChange={e => setTruckFilter(e.target.value)}
+                className="text-xs bg-background border border-border rounded px-2 py-1.5 text-foreground">
+                <option value="ALL">All Trucks</option>
+                {plTrucks.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium text-muted-foreground">Date Range</label>
+              <input type="date" defaultValue="2026-03-01" className="bg-background border border-border rounded px-2 py-1.5 text-xs text-foreground" />
+              <span className="text-xs text-muted-foreground">—</span>
+              <input type="date" defaultValue="2026-04-13" className="bg-background border border-border rounded px-2 py-1.5 text-xs text-foreground" />
+            </div>
+          </div>
+
+          {/* P&L Table */}
+          <div className="bg-card border border-border overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="text-left px-4 py-3 text-xs font-semibold">Category</th>
+                    {filteredTrucks.map(t => (
+                      <th key={t} className="text-right px-4 py-3 text-xs font-semibold font-mono">{t}</th>
+                    ))}
+                    {filteredTrucks.length > 1 && <th className="text-right px-4 py-3 text-xs font-semibold font-mono">Total</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-t border-border bg-[hsl(var(--green))]/5">
+                    <td className="px-4 py-3 text-xs font-semibold text-foreground">Revenue</td>
+                    {filteredTrucks.map(t => (
+                      <td key={t} className="px-4 py-3 text-xs font-mono text-right text-foreground">{fmt(plData[t].revenue)}</td>
+                    ))}
+                    {filteredTrucks.length > 1 && <td className="px-4 py-3 text-xs font-mono text-right font-semibold text-foreground">{fmt(totals.revenue)}</td>}
+                  </tr>
+                  {[
+                    { label: "Fuel", key: "fuel" as const },
+                    { label: "Maintenance", key: "maintenance" as const },
+                    { label: "Driver Bookouts", key: "bookouts" as const },
+                    { label: "Tolls & Borders", key: "tolls" as const },
+                    { label: "Insurance", key: "insurance" as const },
+                  ].map((row, ri) => (
+                    <tr key={row.key} className={`border-t border-border ${ri % 2 === 0 ? "bg-card" : "bg-muted/20"}`}>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">{row.label}</td>
+                      {filteredTrucks.map(t => (
+                        <td key={t} className="px-4 py-3 text-xs font-mono text-right text-muted-foreground">({fmt(plData[t][row.key])})</td>
+                      ))}
+                      {filteredTrucks.length > 1 && (
+                        <td className="px-4 py-3 text-xs font-mono text-right text-muted-foreground">
+                          ({fmt(filteredTrucks.reduce((s, t) => s + plData[t][row.key], 0))})
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                  <tr className="border-t-2 border-border bg-muted/40">
+                    <td className="px-4 py-3 text-xs font-semibold text-foreground">Total Costs</td>
+                    {filteredTrucks.map(t => {
+                      const d = plData[t]; const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+                      return <td key={t} className="px-4 py-3 text-xs font-mono text-right font-semibold text-foreground">({fmt(tc)})</td>;
+                    })}
+                    {filteredTrucks.length > 1 && <td className="px-4 py-3 text-xs font-mono text-right font-semibold text-foreground">({fmt(totalCosts)})</td>}
+                  </tr>
+                  <tr className="border-t-2 border-border bg-[hsl(var(--green))]/5">
+                    <td className="px-4 py-3 text-xs font-bold text-foreground">Net Profit</td>
+                    {filteredTrucks.map(t => {
+                      const d = plData[t]; const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance; const np = d.revenue - tc;
+                      return <td key={t} className={`px-4 py-3 text-xs font-mono text-right font-bold ${np >= 0 ? "text-[hsl(var(--green))]" : "text-[hsl(var(--red))]"}`}>{fmt(np)}</td>;
+                    })}
+                    {filteredTrucks.length > 1 && <td className={`px-4 py-3 text-xs font-mono text-right font-bold ${netProfit >= 0 ? "text-[hsl(var(--green))]" : "text-[hsl(var(--red))]"}`}>{fmt(netProfit)}</td>}
+                  </tr>
+                  <tr className="border-t border-border">
+                    <td className="px-4 py-3 text-xs font-semibold text-foreground">Profit Margin</td>
+                    {filteredTrucks.map(t => {
+                      const d = plData[t]; const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
+                      const m = ((d.revenue - tc) / d.revenue * 100).toFixed(1);
+                      return <td key={t} className="px-4 py-3 text-xs font-mono text-right font-semibold text-accent">{m}%</td>;
+                    })}
+                    {filteredTrucks.length > 1 && <td className="px-4 py-3 text-xs font-mono text-right font-semibold text-accent">{marginPct}%</td>}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // ── Main reports index ──
   return (
     <>
       <AppHeader title="Reports" />
       <div className="flex-1 overflow-auto p-6">
-        {/* Report selector cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {reportSections.map((section, i) => (
             <motion.div key={section.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
@@ -82,7 +306,7 @@ const Reports = () => {
               </div>
               <ul className="space-y-1.5">
                 {section.reports.map(r => (
-                  <li key={r} onClick={() => setActiveReport(r)}
+                  <li key={r} onClick={() => handleReportClick(r)}
                     className={`text-xs cursor-pointer transition-colors ${activeReport === r ? "text-accent font-medium" : "text-muted-foreground hover:text-foreground"}`}>
                     {r}
                   </li>
@@ -156,103 +380,6 @@ const Reports = () => {
                       </td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* P&L Statement */}
-        {demo && activeReport === "P&L Statement" && (
-          <div className="bg-card border border-border overflow-hidden">
-            <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center gap-3">
-              <h2 className="text-sm font-semibold text-foreground">Profit & Loss Statement</h2>
-              <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
-                <select value={truckFilter} onChange={e => setTruckFilter(e.target.value)}
-                  className="text-xs bg-background border border-border rounded px-2 py-1.5 text-foreground">
-                  <option value="ALL">All Trucks</option>
-                  {plTrucks.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <input type="date" defaultValue="2026-03-01" className="bg-background border border-border rounded px-2 py-1.5 text-xs text-foreground" />
-                  <span>—</span>
-                  <input type="date" defaultValue="2026-04-13" className="bg-background border border-border rounded px-2 py-1.5 text-xs text-foreground" />
-                </div>
-              </div>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="text-left px-4 py-3 text-xs font-semibold">Category</th>
-                    {filteredTrucks.map(t => (
-                      <th key={t} className="text-right px-4 py-3 text-xs font-semibold font-mono">{t}</th>
-                    ))}
-                    {filteredTrucks.length > 1 && <th className="text-right px-4 py-3 text-xs font-semibold font-mono">Total</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Revenue */}
-                  <tr className="border-t border-border bg-[hsl(var(--green))]/5">
-                    <td className="px-4 py-3 text-xs font-semibold text-foreground">Revenue</td>
-                    {filteredTrucks.map(t => (
-                      <td key={t} className="px-4 py-3 text-xs font-mono text-right text-foreground">{fmt(plData[t].revenue)}</td>
-                    ))}
-                    {filteredTrucks.length > 1 && <td className="px-4 py-3 text-xs font-mono text-right font-semibold text-foreground">{fmt(totals.revenue)}</td>}
-                  </tr>
-                  {/* Costs */}
-                  {[
-                    { label: "Fuel", key: "fuel" as const },
-                    { label: "Maintenance", key: "maintenance" as const },
-                    { label: "Driver Bookouts", key: "bookouts" as const },
-                    { label: "Tolls & Borders", key: "tolls" as const },
-                    { label: "Insurance", key: "insurance" as const },
-                  ].map((row, ri) => (
-                    <tr key={row.key} className={`border-t border-border ${ri % 2 === 0 ? "bg-card" : "bg-muted/20"}`}>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">{row.label}</td>
-                      {filteredTrucks.map(t => (
-                        <td key={t} className="px-4 py-3 text-xs font-mono text-right text-muted-foreground">({fmt(plData[t][row.key])})</td>
-                      ))}
-                      {filteredTrucks.length > 1 && (
-                        <td className="px-4 py-3 text-xs font-mono text-right text-muted-foreground">
-                          ({fmt(filteredTrucks.reduce((s, t) => s + plData[t][row.key], 0))})
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                  {/* Total Costs */}
-                  <tr className="border-t-2 border-border bg-muted/40">
-                    <td className="px-4 py-3 text-xs font-semibold text-foreground">Total Costs</td>
-                    {filteredTrucks.map(t => {
-                      const d = plData[t];
-                      const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
-                      return <td key={t} className="px-4 py-3 text-xs font-mono text-right font-semibold text-foreground">({fmt(tc)})</td>;
-                    })}
-                    {filteredTrucks.length > 1 && <td className="px-4 py-3 text-xs font-mono text-right font-semibold text-foreground">({fmt(totalCosts)})</td>}
-                  </tr>
-                  {/* Net Profit */}
-                  <tr className="border-t-2 border-border bg-[hsl(var(--green))]/5">
-                    <td className="px-4 py-3 text-xs font-bold text-foreground">Net Profit</td>
-                    {filteredTrucks.map(t => {
-                      const d = plData[t];
-                      const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
-                      const np = d.revenue - tc;
-                      return <td key={t} className={`px-4 py-3 text-xs font-mono text-right font-bold ${np >= 0 ? "text-[hsl(var(--green))]" : "text-[hsl(var(--red))]"}`}>{fmt(np)}</td>;
-                    })}
-                    {filteredTrucks.length > 1 && <td className={`px-4 py-3 text-xs font-mono text-right font-bold ${netProfit >= 0 ? "text-[hsl(var(--green))]" : "text-[hsl(var(--red))]"}`}>{fmt(netProfit)}</td>}
-                  </tr>
-                  {/* Profit Margin */}
-                  <tr className="border-t border-border">
-                    <td className="px-4 py-3 text-xs font-semibold text-foreground">Profit Margin</td>
-                    {filteredTrucks.map(t => {
-                      const d = plData[t];
-                      const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
-                      const m = ((d.revenue - tc) / d.revenue * 100).toFixed(1);
-                      return <td key={t} className="px-4 py-3 text-xs font-mono text-right font-semibold text-accent">{m}%</td>;
-                    })}
-                    {filteredTrucks.length > 1 && <td className="px-4 py-3 text-xs font-mono text-right font-semibold text-accent">{marginPct}%</td>}
-                  </tr>
                 </tbody>
               </table>
             </div>
