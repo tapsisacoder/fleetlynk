@@ -88,92 +88,96 @@ const Reports = () => {
       { label: "Insurance", key: "insurance" as const },
     ];
     const columns = [
-      { header: "Category", dataKey: "category", width: 120 },
-      ...filteredTrucks.map(t => ({ header: t, dataKey: t, width: 80, align: "right" as const })),
-      ...(filteredTrucks.length > 1 ? [{ header: "Total", dataKey: "total", width: 80, align: "right" as const }] : []),
+      { key: "category", label: "Category", width: 120 },
+      ...filteredTrucks.map(t => ({ key: t, label: t, width: 80, align: "right" as const })),
+      ...(filteredTrucks.length > 1 ? [{ key: "total", label: "Total", width: 80, align: "right" as const }] : []),
     ];
-    const rows: Record<string, string>[] = [];
-    // Revenue row
+    const data: Record<string, string>[] = [];
     const revRow: Record<string, string> = { category: "Revenue" };
     filteredTrucks.forEach(t => { revRow[t] = fmt(plData[t].revenue); });
     if (filteredTrucks.length > 1) revRow.total = fmt(totals.revenue);
-    rows.push(revRow);
-    // Cost rows
+    data.push(revRow);
     costRows.forEach(cr => {
       const row: Record<string, string> = { category: cr.label };
       filteredTrucks.forEach(t => { row[t] = `(${fmt(plData[t][cr.key])})`; });
       if (filteredTrucks.length > 1) row.total = `(${fmt(filteredTrucks.reduce((s, t) => s + plData[t][cr.key], 0))})`;
-      rows.push(row);
+      data.push(row);
     });
-    // Total Costs
     const tcRow: Record<string, string> = { category: "Total Costs" };
     filteredTrucks.forEach(t => {
       const d = plData[t]; tcRow[t] = `(${fmt(d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance)})`;
     });
     if (filteredTrucks.length > 1) tcRow.total = `(${fmt(totalCosts)})`;
-    rows.push(tcRow);
-    // Net Profit
+    data.push(tcRow);
     const npRow: Record<string, string> = { category: "Net Profit" };
     filteredTrucks.forEach(t => {
       const d = plData[t]; const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
       npRow[t] = fmt(d.revenue - tc);
     });
     if (filteredTrucks.length > 1) npRow.total = fmt(netProfit);
-    rows.push(npRow);
-    // Margin
+    data.push(npRow);
     const mRow: Record<string, string> = { category: "Profit Margin" };
     filteredTrucks.forEach(t => {
       const d = plData[t]; const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
       mRow[t] = `${((d.revenue - tc) / d.revenue * 100).toFixed(1)}%`;
     });
     if (filteredTrucks.length > 1) mRow.total = `${marginPct}%`;
-    rows.push(mRow);
+    data.push(mRow);
 
     downloadReportPdf({
-      title: "Profit & Loss Statement",
-      subtitle: "1 Mar 2026 — 13 Apr 2026",
-      columns,
-      rows,
+      reportName: "Profit & Loss Statement",
+      module: "Financial",
       companyName: "Mwana Haulage (Pvt) Ltd",
-      generatedAt: new Date().toISOString(),
-    });
+      periodFrom: "2026-03-01",
+      periodTo: "2026-04-13",
+      generatedBy: { name: "Tapiwa Chamuka", role: "Admin" },
+      columns,
+      data,
+    }, "PL_Statement_Mar2026");
   };
 
   const handleExportCsv = () => {
     const costKeys = ["fuel", "maintenance", "bookouts", "tolls", "insurance"] as const;
     const costLabels = ["Fuel", "Maintenance", "Driver Bookouts", "Tolls & Borders", "Insurance"];
     const columns = [
-      { header: "Category", accessor: (r: any) => r.category },
-      ...filteredTrucks.map(t => ({ header: t, accessor: (r: any) => r[t] })),
-      ...(filteredTrucks.length > 1 ? [{ header: "Total", accessor: (r: any) => r.total }] : []),
+      { key: "category", label: "Category" },
+      ...filteredTrucks.map(t => ({ key: t, label: t })),
+      ...(filteredTrucks.length > 1 ? [{ key: "total", label: "Total" }] : []),
     ];
-    const rows: Record<string, string | number>[] = [];
-    // Revenue
+    const data: Record<string, string | number>[] = [];
     const revRow: Record<string, string | number> = { category: "Revenue" };
     filteredTrucks.forEach(t => { revRow[t] = plData[t].revenue; });
     if (filteredTrucks.length > 1) revRow.total = totals.revenue;
-    rows.push(revRow);
+    data.push(revRow);
     costKeys.forEach((k, i) => {
       const row: Record<string, string | number> = { category: costLabels[i] };
       filteredTrucks.forEach(t => { row[t] = plData[t][k]; });
       if (filteredTrucks.length > 1) row.total = filteredTrucks.reduce((s, t) => s + plData[t][k], 0);
-      rows.push(row);
+      data.push(row);
     });
     const tcRow: Record<string, string | number> = { category: "Total Costs" };
     filteredTrucks.forEach(t => {
       const d = plData[t]; tcRow[t] = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
     });
     if (filteredTrucks.length > 1) tcRow.total = totalCosts;
-    rows.push(tcRow);
+    data.push(tcRow);
     const npRow: Record<string, string | number> = { category: "Net Profit" };
     filteredTrucks.forEach(t => {
       const d = plData[t]; const tc = d.fuel + d.maintenance + d.bookouts + d.tolls + d.insurance;
       npRow[t] = d.revenue - tc;
     });
     if (filteredTrucks.length > 1) npRow.total = netProfit;
-    rows.push(npRow);
+    data.push(npRow);
 
-    downloadCsv({ columns, rows, filename: "PL_Statement_Mar2026" });
+    downloadCsv({
+      companyName: "Mwana Haulage (Pvt) Ltd",
+      reportName: "Profit & Loss Statement",
+      periodFrom: "2026-03-01",
+      periodTo: "2026-04-13",
+      generatedBy: { name: "Tapiwa Chamuka", role: "Admin" },
+      columns,
+      data,
+    }, "PL_Statement_Mar2026");
   };
 
   // ── P&L dedicated page ──
