@@ -88,9 +88,9 @@ export const DEMO_CLIENTS: DemoClient[] = [
 
 // ─── FUEL SUPPLIERS ────────────────────────────
 export const DEMO_FUEL_SUPPLIERS: DemoFuelSupplier[] = [
-  { id: "fs1", supplier_name: "Thuli Petroleum", price_per_litre: 2.05 },
-  { id: "fs2", supplier_name: "Energy Park", price_per_litre: 2.05 },
-  { id: "fs3", supplier_name: "Redan Fuels", price_per_litre: 2.05 },
+  { id: "fs1", supplier_name: "Thuli Petroleum", price_per_litre: 2.11 },
+  { id: "fs2", supplier_name: "Energy Park", price_per_litre: 2.11 },
+  { id: "fs3", supplier_name: "Redan Fuels", price_per_litre: 2.11 },
   { id: "fs4", supplier_name: "SOM Petroleum", price_per_litre: 1.22 },
   { id: "fs5", supplier_name: "Rhino", price_per_litre: 1.25 },
 ];
@@ -158,12 +158,12 @@ export const DEMO_INVOICES: DemoInvoice[] = [
 
 // ─── FUEL TRANSACTIONS ────────────────────────
 export const DEMO_FUEL_TRANSACTIONS: DemoFuelTransaction[] = [
-  { id: "ft6", date: "2026-03-21", truck_reg: "ADZ 9799", driver_name: "John Moyo", trip_number: "TRP-2026-0028", supplier_name: "Thuli Petroleum", litres: 180, price_per_litre: 2.05, total_cost: 369.00 },
-  { id: "ft5", date: "2026-03-18", truck_reg: "AGB 1092", driver_name: "Kevin Sibanda", trip_number: "TRP-2026-0026", supplier_name: "Thuli Petroleum", litres: 220, price_per_litre: 2.05, total_cost: 451.00 },
+  { id: "ft6", date: "2026-03-21", truck_reg: "ADZ 9799", driver_name: "John Moyo", trip_number: "TRP-2026-0028", supplier_name: "Thuli Petroleum", litres: 180, price_per_litre: 2.11, total_cost: 379.80 },
+  { id: "ft5", date: "2026-03-18", truck_reg: "AGB 1092", driver_name: "Kevin Sibanda", trip_number: "TRP-2026-0026", supplier_name: "Thuli Petroleum", litres: 220, price_per_litre: 2.11, total_cost: 464.20 },
   { id: "ft4", date: "2026-03-16", truck_reg: "ADZ 9799", driver_name: "John Moyo", trip_number: "TRP-2026-0021", supplier_name: "SOM Petroleum", litres: 160, price_per_litre: 1.22, total_cost: 195.20 },
-  { id: "ft3", date: "2026-03-14", truck_reg: "AGL 4688", driver_name: "Brighton Ncube", trip_number: "TRP-2026-0023", supplier_name: "Redan Fuels", litres: 180, price_per_litre: 2.05, total_cost: 369.00 },
-  { id: "ft2", date: "2026-03-10", truck_reg: "AEG 7336", driver_name: "Tendai Chirwa", trip_number: "TRP-2026-0022", supplier_name: "Energy Park", litres: 210, price_per_litre: 2.05, total_cost: 430.50 },
-  { id: "ft1", date: "2026-03-08", truck_reg: "ADZ 9799", driver_name: "John Moyo", trip_number: "TRP-2026-0021", supplier_name: "Thuli Petroleum", litres: 195, price_per_litre: 2.05, total_cost: 399.75 },
+  { id: "ft3", date: "2026-03-14", truck_reg: "AGL 4688", driver_name: "Brighton Ncube", trip_number: "TRP-2026-0023", supplier_name: "Redan Fuels", litres: 180, price_per_litre: 2.11, total_cost: 379.80 },
+  { id: "ft2", date: "2026-03-10", truck_reg: "AEG 7336", driver_name: "Tendai Chirwa", trip_number: "TRP-2026-0022", supplier_name: "Energy Park", litres: 210, price_per_litre: 2.11, total_cost: 443.10 },
+  { id: "ft1", date: "2026-03-08", truck_reg: "ADZ 9799", driver_name: "John Moyo", trip_number: "TRP-2026-0021", supplier_name: "Thuli Petroleum", litres: 195, price_per_litre: 2.11, total_cost: 411.45 },
 ];
 
 // ─── FUEL ANOMALIES ───────────────────────────

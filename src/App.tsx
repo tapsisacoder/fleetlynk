@@ -10,6 +10,7 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import AppLayout from "./layouts/AppLayout";
 import DemoLayout from "./demo/DemoLayout";
+import DemoLogin from "./demo/DemoLogin";
 import Dashboard from "./pages/app/Dashboard";
 import Operations from "./pages/app/Operations";
 import Fleet from "./pages/app/Fleet";
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="settings" element={<SettingsModule />} />
             </Route>
             {/* Demo routes — no auth, mock data */}
+            <Route path="/demo/login" element={<DemoLogin />} />
             <Route path="/demo" element={<DemoLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="operations" element={<Operations />} />
